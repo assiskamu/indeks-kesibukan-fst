@@ -1,0 +1,549 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; -webkit-text-stroke: #000000}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; -webkit-text-stroke: #000000; min-height: 14.0px}
+    span.s1 {font-kerning: none}
+  </style>
+</head>
+<body>
+<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
+<p class="p1"><span class="s1">&lt;html lang="ms"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;head&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;title&gt;Kalkulator Indeks Kesibukan Staf Fakulti&lt;/title&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1" /&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;!-- Chart.js untuk graf --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;script src="https://cdn.jsdelivr.net/npm/chart.js"&gt;&lt;/script&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;style&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>:root {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>--primary: #0d6efd;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>--bg: #f5f7fb;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>--card-bg: #ffffff;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>--text: #222;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>--border: #dde3f0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>--low: #0d6efd;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>--normal: #28a745;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>--high: #ffc107;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>--overload: #dc3545;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>* {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>box-sizing: border-box;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>body {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin: 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>padding: 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>background: var(--bg);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>color: var(--text);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.container {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>max-width: 1000px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin: 20px auto;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>padding: 20px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.card {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>background: var(--card-bg);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>border-radius: 12px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>padding: 20px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin-bottom: 20px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>h1 {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-size: 1.6rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin-bottom: 0.25rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>h2 {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-size: 1.1rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin-top: 1.5rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin-bottom: 0.75rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>p.subtitle {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin-top: 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>color: #555;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-size: 0.9rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.grid {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>display: grid;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>gap: 16px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.form-group {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin-bottom: 10px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.form-group label {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>display: block;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-size: 0.9rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin-bottom: 4px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.form-group small {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>display: block;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-size: 0.75rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>color: #666;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>input[type="number"] {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>width: 100%;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>padding: 8px 10px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>border-radius: 8px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-size: 0.9rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>input[type="number"]:focus {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>outline: none;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>border-color: var(--primary);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>box-shadow: 0 0 0 1px rgba(13, 110, 253, 0.4);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.actions {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin-top: 15px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>display: flex;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>gap: 10px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>flex-wrap: wrap;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>button {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>border: none;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>border-radius: 999px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>padding: 8px 16px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-size: 0.9rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>cursor: pointer;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.btn-primary {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>background: var(--primary);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>color: white;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.btn-secondary {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>background: #e2e6f0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>color: #333;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.result-header {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>display: flex;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>flex-wrap: wrap;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>justify-content: space-between;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>gap: 12px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>align-items: center;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin-bottom: 10px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.index-value {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-size: 1.4rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-weight: 600;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.badge {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>display: inline-flex;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>align-items: center;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>padding: 6px 12px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>border-radius: 999px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-size: 0.8rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-weight: 600;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>color: white;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.badge.low {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>background: var(--low);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.badge.normal {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>background: var(--normal);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.badge.high {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>background: var(--high);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>color: #333;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.badge.overload {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>background: var(--overload);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.result-text {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-size: 0.9rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>color: #444;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.hidden {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>display: none;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.small-table {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>width: 100%;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>border-collapse: collapse;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin-top: 10px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-size: 0.85rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.small-table th,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.small-table td {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>border: 1px solid #e0e4f0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>padding: 6px 8px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>text-align: left;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.small-table th {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>background: #f1f4fb;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.highlight {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-weight: 600;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>@media (max-width: 600px) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>.result-header {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>align-items: flex-start;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
+<p class="p1"><span class="s1">&lt;body&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="container"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="card"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;h1&gt;Kalkulator Indeks Kesibukan Staf Fakulti&lt;/h1&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;p class="subtitle"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>Staff isikan bilangan kursus, penyeliaan, geran dan jawatan. Sistem akan kira &lt;strong&gt;Indeks Kesibukan&lt;/strong&gt; (0–100)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>serta zon (kurang beban, normal, tinggi, overload).</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/p&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;form id="sbi-form"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="grid"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;!-- Pengajaran &amp; Penyeliaan --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h2&gt;Pengajaran &amp;amp; Penyeliaan (T)&lt;/h2&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="form-group"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;label for="coursesUG"&gt;Bilangan kursus UG (3 kredit)&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;small&gt;Termasuk kursus prasiswazah di fakulti.&lt;/small&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;input type="number" id="coursesUG" min="0" value="0" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="form-group"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;label for="coursesPG"&gt;Bilangan kursus PG&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;small&gt;Kursus pascasiswazah.&lt;/small&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;input type="number" id="coursesPG" min="0" value="0" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="form-group"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;label for="mastersSup"&gt;Bilangan pelajar Master diselia&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;input type="number" id="mastersSup" min="0" value="0" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="form-group"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;label for="phdSup"&gt;Bilangan pelajar PhD diselia&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;input type="number" id="phdSup" min="0" value="0" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;!-- Penyelidikan &amp; Geran --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h2&gt;Penyelidikan &amp;amp; Geran (R)&lt;/h2&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="form-group"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;label for="grantsPI"&gt;Bilangan geran sebagai PI / Ketua Projek&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;input type="number" id="grantsPI" min="0" value="0" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="form-group"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;label for="grantsCo"&gt;Bilangan geran sebagai Co-Researcher&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;input type="number" id="grantsCo" min="0" value="0" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="form-group"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;label for="papers"&gt;Bilangan artikel jurnal (setahun)&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;small&gt;Scopus/WoS/diindeks lain.&lt;/small&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;input type="number" id="papers" min="0" value="0" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;!-- Pentadbiran &amp; Jawatan --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h2&gt;Pentadbiran &amp;amp; Jawatan (A)&lt;/h2&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="form-group"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;label for="majorAdmin"&gt;Jawatan utama&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;small&gt;Contoh: Dekan, TDA, Ketua Program, Pengarah, dsb.&lt;/small&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;input type="number" id="majorAdmin" min="0" value="0" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="form-group"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;label for="minorAdmin"&gt;Jawatan / tugas jawatankuasa&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;small&gt;Contoh: Pengerusi/Penyelaras pusat, ahli JK tetap, dsb.&lt;/small&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;input type="number" id="minorAdmin" min="0" value="0" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="form-group"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;label for="otherDuties"&gt;Tugas khas lain (projek khas, dsb.)&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;small&gt;Anggar bilangan tugas utama yang aktif.&lt;/small&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;input type="number" id="otherDuties" min="0" value="0" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="actions"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;button type="submit" class="btn-primary"&gt;Kira Indeks&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;button type="reset" class="btn-secondary"&gt;Set Semula&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/form&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;!-- Seksyen Keputusan --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div id="result-card" class="card hidden"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="result-header"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="index-value"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>Indeks Kesibukan: &lt;span id="index-value-number"&gt;0.0&lt;/span&gt; / 100</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="result-text" id="index-interpretation"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;span id="zone-badge" class="badge normal"&gt;Zon Normal&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;table class="small-table"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;thead&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;tr&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;th&gt;Dimensi&lt;/th&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;th&gt;Skor (0–100)&lt;/th&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;th&gt;Catatan ringkas&lt;/th&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/tr&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/thead&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;tbody&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;tr&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;td&gt;Pengajaran &amp;amp; Penyeliaan (T)&lt;/td&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;td id="score-T" class="highlight"&gt;0&lt;/td&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;td&gt;Berdasarkan kursus &amp;amp; penyeliaan.&lt;/td&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/tr&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;tr&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;td&gt;Penyelidikan &amp;amp; Geran (R)&lt;/td&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;td id="score-R" class="highlight"&gt;0&lt;/td&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;td&gt;Berdasarkan geran &amp;amp; artikel.&lt;/td&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/tr&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;tr&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;td&gt;Pentadbiran &amp;amp; Jawatan (A)&lt;/td&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;td id="score-A" class="highlight"&gt;0&lt;/td&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;td&gt;Berdasarkan jawatan &amp;amp; tugas khas.&lt;/td&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/tr&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/tbody&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/table&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;p class="result-text" style="margin-top: 10px;"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;strong&gt;Nota:&lt;/strong&gt; Formula &amp; pemberat boleh disesuaikan mengikut keputusan Mesyuarat Fakulti.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>Versi ini hanyalah &lt;em&gt;prototaip&lt;/em&gt; untuk menguji konsep dan dashboard.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/p&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;canvas id="sbiChart" height="120"&gt;&lt;/canvas&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;!-- JavaScript terus di bawah sini --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;script&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>let sbiChart = null;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>document.addEventListener("DOMContentLoaded", () =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const form = document.getElementById("sbi-form");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const resultCard = document.getElementById("result-card");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const indexValueSpan = document.getElementById("index-value-number");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const indexInterpretation = document.getElementById("index-interpretation");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const zoneBadge = document.getElementById("zone-badge");</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const scoreTSpan = document.getElementById("score-T");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const scoreRSpan = document.getElementById("score-R");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const scoreASpan = document.getElementById("score-A");</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>form.addEventListener("submit", (event) =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>event.preventDefault();</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const coursesUG = toNumber("coursesUG");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const coursesPG = toNumber("coursesPG");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const mastersSup = toNumber("mastersSup");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const phdSup = toNumber("phdSup");</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const grantsPI = toNumber("grantsPI");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const grantsCo = toNumber("grantsCo");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const papers = toNumber("papers");</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const majorAdmin = toNumber("majorAdmin");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const minorAdmin = toNumber("minorAdmin");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const otherDuties = toNumber("otherDuties");</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// Pengajaran &amp; Penyeliaan (T)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let scoreT =</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>coursesUG * 10 +</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>coursesPG * 15 +</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>mastersSup * 5 +</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>phdSup * 8;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>scoreT = clamp(scoreT, 0, 100);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// Penyelidikan &amp; Geran (R)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let scoreR =</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>grantsPI * 20 +</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>grantsCo * 10 +</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>papers * 5;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>scoreR = clamp(scoreR, 0, 100);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// Pentadbiran &amp; Jawatan (A)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let scoreA =</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>majorAdmin * 40 +</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>minorAdmin * 10 +</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>otherDuties * 8;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>scoreA = clamp(scoreA, 0, 100);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const weightT = 0.4;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const weightR = 0.3;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const weightA = 0.3;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let indexValue = weightT * scoreT + weightR * scoreR + weightA * scoreA;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>indexValue = Math.round(indexValue * 10) / 10;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const { label, explanation, badgeClass } = classifyIndex(indexValue);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>indexValueSpan.textContent = indexValue.toFixed(1);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>indexInterpretation.textContent = explanation;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>zoneBadge.textContent = "Zon " + label;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>zoneBadge.className = "badge " + badgeClass;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>scoreTSpan.textContent = scoreT.toFixed(0);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>scoreRSpan.textContent = scoreR.toFixed(0);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>scoreASpan.textContent = scoreA.toFixed(0);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>resultCard.classList.remove("hidden");</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>drawChart(scoreT, scoreR, scoreA, indexValue);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>form.addEventListener("reset", () =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>setTimeout(() =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>resultCard.classList.add("hidden");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>if (sbiChart) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>sbiChart.destroy();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>sbiChart = null;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}, 0);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>});</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>function toNumber(id) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const el = document.getElementById(id);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>if (!el) return 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const value = parseFloat(el.value);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>return isNaN(value) ? 0 : value;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>function clamp(x, min, max) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>return Math.max(min, Math.min(max, x));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>function classifyIndex(indexValue) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>if (indexValue &lt; 40) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>return {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>label: "Kurang Beban",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>explanation:</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>"Indeks menunjukkan staf berada dalam zon beban kerja yang rendah. Boleh dipertimbangkan untuk menerima lebih banyak tugas rasmi jika sesuai.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>badgeClass: "low",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>};</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>} else if (indexValue &lt; 70) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>return {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>label: "Normal / Seimbang",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>explanation:</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>"Indeks dalam julat normal. Beban kerja dan kesibukan staf dianggap seimbang.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>badgeClass: "normal",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>};</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>} else if (indexValue &lt; 90) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>return {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>label: "Tinggi",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>explanation:</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>"Indeks menunjukkan kesibukan yang tinggi. Perlu berhati-hati apabila menambah tugas baharu.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>badgeClass: "high",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>};</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>} else {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>return {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>label: "Overload",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>explanation:</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>"Indeks sangat tinggi. Staf berisiko overload. Pertimbangkan pengagihan semula tugas atau sokongan tambahan.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>badgeClass: "overload",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>};</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>function drawChart(scoreT, scoreR, scoreA, indexValue) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const canvas = document.getElementById("sbiChart");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>if (!canvas) return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const ctx = canvas.getContext("2d");</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>if (sbiChart) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>sbiChart.destroy();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>sbiChart = new Chart(ctx, {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>type: "bar",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>data: {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>labels: [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>"Pengajaran &amp; Penyeliaan (T)",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>"Penyelidikan &amp; Geran (R)",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>"Pentadbiran &amp; Jawatan (A)",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>"Indeks Kesibukan (SBI)",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>datasets: [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>label: "Skor",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>data: [scoreT, scoreR, scoreA, indexValue],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>options: {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>responsive: true,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>plugins: {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>legend: { display: false },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>tooltip: {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>callbacks: {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>label: function (context) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>return "Skor: " + context.parsed.y.toFixed(1);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>scales: {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>y: {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>beginAtZero: true,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>max: 100,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>ticks: { stepSize: 20 },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>title: {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>display: true,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>text: "Skor (0–100)",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>});</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+</body>
+</html>
