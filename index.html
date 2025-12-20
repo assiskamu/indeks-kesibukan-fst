@@ -3,21 +3,31 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>FST UMS – Staff Busyness Index</title>
+  <title>FST UMS – Staff Busyness Index (Calculator)</title>
+
+  <!-- =========================================================
+       ADMIN PASSWORD (EDIT HERE)
+       Change this anytime to update admin access for Settings.
+       NOTE: This is front-end only (GitHub Pages static).
+       ========================================================= -->
+  <script>
+    const ADMIN_PASSWORD = "FST-ADMIN-2025";  // <-- EDIT PASSWORD HERE
+  </script>
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- jsPDF (manual PDF) -->
+  <!-- jsPDF for manual PDF -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
   <style>
     :root{
       --bg:#0b1220;
-      --card:#0f1a2f;
-      --card2:#0d1730;
       --text:#eaf0ff;
       --muted:#b8c3e6;
-      --line:rgba(255,255,255,.10);
+      --line:rgba(255,255,255,.12);
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --radius: 18px;
+
       --danger:#ff5b6e;
       --warn:#ffb020;
       --ok:#2bd4bf;
@@ -30,9 +40,6 @@
       --s:#fb7185;
       --l:#22c55e;
       --set:#60a5fa;
-
-      --shadow: 0 18px 60px rgba(0,0,0,.45);
-      --radius: 18px;
     }
 
     *{box-sizing:border-box}
@@ -41,17 +48,18 @@
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
       background:
-        radial-gradient(1200px 700px at 20% 5%, rgba(96,165,250,.20), transparent 55%),
-        radial-gradient(1000px 650px at 80% 10%, rgba(244,114,182,.18), transparent 60%),
-        radial-gradient(900px 650px at 70% 80%, rgba(45,212,191,.16), transparent 55%),
+        radial-gradient(1200px 700px at 20% 5%, rgba(96,165,250,.18), transparent 55%),
+        radial-gradient(1000px 650px at 80% 10%, rgba(244,114,182,.14), transparent 60%),
+        radial-gradient(900px 650px at 70% 80%, rgba(45,212,191,.12), transparent 55%),
         linear-gradient(180deg, #070b15, #0b1220 45%, #070b15);
       color:var(--text);
     }
 
-    .wrap{max-width:1180px;margin:0 auto;padding:28px 18px 80px}
+    .wrap{max-width:1180px;margin:0 auto;padding:22px 18px 80px}
+
     .topbar{
       display:flex;align-items:center;justify-content:space-between;gap:16px;
-      padding:16px 18px;border:1px solid var(--line);
+      padding:14px 16px;border:1px solid var(--line);
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       border-radius: var(--radius);
       box-shadow: var(--shadow);
@@ -59,17 +67,22 @@
       backdrop-filter: blur(10px);
     }
     .brand{display:flex;align-items:center;gap:14px}
-    .logo{
-      width:44px;height:44px;border-radius:12px;
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.12);
-      display:flex;align-items:center;justify-content:center;
+    .logoBox{
+      width:120px;height:72px;               /* bigger logo */
+      border-radius:14px;
+      background:#ffffff;                    /* white background */
       overflow:hidden;
+      display:flex;align-items:center;justify-content:center;
+      border:none;                           /* no border */
+      box-shadow:none;                       /* no border feel */
+      padding:8px;
     }
-    .logo img{width:100%;height:100%;object-fit:contain}
+    .logoBox img{width:100%;height:100%;object-fit:contain}
+
     .title{display:flex;flex-direction:column;gap:2px}
     .title h1{font-size:16px;margin:0;letter-spacing:.2px}
     .title .sub{font-size:12px;color:var(--muted)}
+
     .top-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
 
     .btn{
@@ -97,6 +110,16 @@
     }
     .pill strong{color:var(--text)}
 
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      font-size:12px;color:var(--muted)
+    }
+    .dot{width:9px;height:9px;border-radius:99px;background:var(--ok);box-shadow:0 0 0 4px rgba(45,212,191,.15)}
+    .dot.lock{background:var(--warn);box-shadow:0 0 0 4px rgba(255,176,32,.15)}
+
     .section{
       margin-top:16px;
       border:1px solid rgba(255,255,255,.10);
@@ -113,7 +136,7 @@
     .section .sub{margin-top:4px;color:var(--muted);font-size:12px;max-width:920px}
     .content{padding:16px 18px}
 
-    /* Strong glowing section backgrounds */
+    /* Strong section backgrounds */
     .profile{
       background:
         radial-gradient(900px 520px at 18% 10%, rgba(96,165,250,.46) 0%, rgba(96,165,250,0) 58%),
@@ -173,7 +196,11 @@
     .grid{display:grid;gap:12px}
     .grid.two{grid-template-columns:repeat(2, minmax(0,1fr))}
     .grid.three{grid-template-columns:repeat(3, minmax(0,1fr))}
-    @media(max-width:880px){ .grid.two,.grid.three{grid-template-columns:1fr} .topbar{position:relative;top:auto} }
+    @media(max-width:980px){
+      .grid.two,.grid.three{grid-template-columns:1fr}
+      .topbar{position:relative;top:auto}
+      .logoBox{width:110px;height:66px}
+    }
 
     label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
     input,select,textarea{
@@ -194,10 +221,10 @@
     th,td{border-bottom:1px solid rgba(255,255,255,.10);padding:10px 8px;vertical-align:top}
     th{font-size:12px;color:var(--muted);text-align:left}
     td input, td select{padding:8px 8px;border-radius:10px}
-    .mini{font-size:12px}
 
     .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .row.right{justify-content:flex-end}
+
     .notice{
       padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);
       background:rgba(255,255,255,.06);color:var(--muted);font-size:12px
@@ -227,18 +254,9 @@
       font-size:12px;text-align:center
     }
 
-    .badge{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:6px 10px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.06);
-      font-size:12px;color:var(--muted)
-    }
-    .dot{width:9px;height:9px;border-radius:99px;background:var(--ok);box-shadow:0 0 0 4px rgba(45,212,191,.15)}
-    .dot.lock{background:var(--warn);box-shadow:0 0 0 4px rgba(255,176,32,.15)}
-    .spacer{height:8px}
+    .spacer{height:10px}
 
-    /* Print rules: hide settings & toggles & admin UI; show signatures only in print */
+    /* Print rules: hide settings/toggles/admin; show signatures only in print */
     .printOnly{display:none}
     @media print{
       body{background:#fff;color:#000}
@@ -248,11 +266,19 @@
       .section header{background:#f7f7f7;color:#000}
       .content, input, select, textarea{color:#000}
       input,select,textarea{background:#fff;border:1px solid #bbb}
+      .box{border:1px solid #ddd;background:#fff}
       .printOnly{display:block !important}
       canvas{max-width:100% !important}
-      a{color:#000;text-decoration:none}
     }
 
+    .adminPanel{
+      display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+    }
+    .adminPanel input{
+      width:220px;
+      background:rgba(7,11,21,.65);
+    }
+    .small{font-size:12px;color:var(--muted)}
   </style>
 </head>
 
@@ -261,27 +287,30 @@
 
   <div class="topbar">
     <div class="brand">
-      <div class="logo">
+      <div class="logoBox" title="Place 'UMS logo.png' in the same folder as index.html">
         <img id="umsLogo" src="UMS logo.png" alt="UMS logo"
-             onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=&quot;color:rgba(255,255,255,.75);font-size:11px;padding:6px;text-align:center&quot;>UMS<br>Logo</div>';">
+             onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=&quot;color:#111;font-weight:800;font-size:12px;text-align:center;line-height:1.1&quot;>UMS<br>LOGO</div>';">
       </div>
       <div class="title">
         <h1>FST UMS – Staff Busyness Index Calculator</h1>
-        <div class="sub">Single-file tool for data entry, scoring, export (CSV/JSON) and dashboard integration.</div>
+        <div class="sub">Single-file tool (GitHub Pages). Admin can lock weights/mark scheme; staff only enter activities.</div>
       </div>
     </div>
 
     <div class="top-actions noPrint">
       <span class="pill">Mode: <strong id="modeText">Staff</strong></span>
       <span class="badge"><span id="lockDot" class="dot lock"></span><span id="lockText">Settings locked</span></span>
-      <button class="btn" id="btnAdminUnlock">Admin Unlock</button>
-      <button class="btn ghost" id="btnAdminLock" style="display:none;">Lock</button>
+
+      <div class="adminPanel">
+        <input type="password" id="adminPass" placeholder="Admin password (for Settings)">
+        <button class="btn warn" id="btnAdminUnlock">Unlock</button>
+        <button class="btn ghost" id="btnAdminLock" style="display:none;">Lock</button>
+      </div>
+
       <button class="btn" id="btnSaveLocal">Save</button>
       <button class="btn danger" id="btnReset">Reset</button>
     </div>
   </div>
-
-  <div class="spacer"></div>
 
   <!-- PROFILE -->
   <section class="section profile" id="secProfile">
@@ -309,12 +338,14 @@
             <option value="Administrative">Administrative Staff</option>
             <option value="Laboratory">Laboratory Staff</option>
           </select>
-          <div class="hint">Category will auto-apply ON/OFF sections and default weights.</div>
+          <div class="hint">Selecting category will auto-apply ON/OFF sections and default weights.</div>
         </div>
+
         <div>
           <label class="requiredMark">Programme/Unit</label>
           <input id="pUnit" placeholder="e.g., Mathematics with Economics / Finance Unit / Chemistry Lab"/>
         </div>
+
         <div>
           <label class="requiredMark">Grade</label>
           <select id="pGrade">
@@ -333,6 +364,7 @@
           <label class="requiredMark">Grade (Others) – please specify</label>
           <input id="pGradeOther" placeholder="Type grade here"/>
         </div>
+
         <div>
           <label class="requiredMark">Employment Status</label>
           <select id="pStatus">
@@ -347,6 +379,7 @@
           <label class="requiredMark">Status (Others) – please specify</label>
           <input id="pStatusOther" placeholder="Type status here"/>
         </div>
+
         <div>
           <label class="requiredMark">Reporting Period</label>
           <select id="pPeriod">
@@ -369,7 +402,10 @@
     <header>
       <div>
         <h2>Section Applicability (ON/OFF)</h2>
-        <div class="sub">Turn ON only relevant sections. The calculator will <b>auto re-normalize weights</b> using ON sections only.</div>
+        <div class="sub">
+          Turn ON only relevant sections. The calculator will <b>auto re-normalize weights</b> using ON sections only.
+          (This supports Academic, Administrative, and Laboratory roles fairly.)
+        </div>
       </div>
       <div class="row right noPrint">
         <span class="pill">Auto from Category</span>
@@ -390,80 +426,80 @@
     </div>
   </section>
 
-  <!-- SETTINGS (ADMIN LOCK) -->
+  <!-- SETTINGS (ADMIN ONLY) -->
   <section class="section settings" id="secSettings">
     <header>
       <div>
         <h2>Settings (Weights & Scoring Scheme) – Admin Only</h2>
-        <div class="sub">Locked by default. Admin must unlock to edit weights and mark schemes. Staff can only fill activities.</div>
-      </div>
-      <div class="row right noPrint">
-        <span class="pill">Weight baseline must sum to <strong>1.00</strong> (admin rule)</span>
+        <div class="sub">
+          Locked by default. Admin must unlock using password to edit.
+          <span class="small">Baseline weights must sum to 1.00.</span>
+        </div>
       </div>
     </header>
     <div class="content">
       <div id="msgSettings" class="notice warn" style="display:none;"></div>
 
       <div class="grid three">
-        <div><label class="requiredMark">Weight: Teaching (T)</label><input id="wT" type="number" step="0.01" min="0" value="0.30"/></div>
-        <div><label class="requiredMark">Weight: Supervision (SV)</label><input id="wSV" type="number" step="0.01" min="0" value="0.15"/></div>
-        <div><label class="requiredMark">Weight: Research (R)</label><input id="wR" type="number" step="0.01" min="0" value="0.20"/></div>
-        <div><label class="requiredMark">Weight: Publication (P)</label><input id="wP" type="number" step="0.01" min="0" value="0.10"/></div>
-        <div><label class="requiredMark">Weight: Administration (A)</label><input id="wA" type="number" step="0.01" min="0" value="0.15"/></div>
-        <div><label class="requiredMark">Weight: Services (S)</label><input id="wS" type="number" step="0.01" min="0" value="0.10"/></div>
-        <div><label class="requiredMark">Weight: Lab Operations (L)</label><input id="wL" type="number" step="0.01" min="0" value="0.00"/></div>
+        <div><label class="requiredMark">Weight: Teaching (T)</label><input class="adminOnly" id="wT" type="number" step="0.01" min="0" value="0.30"/></div>
+        <div><label class="requiredMark">Weight: Supervision (SV)</label><input class="adminOnly" id="wSV" type="number" step="0.01" min="0" value="0.15"/></div>
+        <div><label class="requiredMark">Weight: Research (R)</label><input class="adminOnly" id="wR" type="number" step="0.01" min="0" value="0.20"/></div>
+        <div><label class="requiredMark">Weight: Publication (P)</label><input class="adminOnly" id="wP" type="number" step="0.01" min="0" value="0.10"/></div>
+        <div><label class="requiredMark">Weight: Administration (A)</label><input class="adminOnly" id="wA" type="number" step="0.01" min="0" value="0.15"/></div>
+        <div><label class="requiredMark">Weight: Services (S)</label><input class="adminOnly" id="wS" type="number" step="0.01" min="0" value="0.10"/></div>
+        <div><label class="requiredMark">Weight: Lab Operations (L)</label><input class="adminOnly" id="wL" type="number" step="0.01" min="0" value="0.00"/></div>
       </div>
 
       <div class="spacer"></div>
       <div class="row noPrint">
-        <button class="btn" id="btnPresetAcademic">Preset: Academic</button>
-        <button class="btn" id="btnPresetAdmin">Preset: Administrative</button>
-        <button class="btn" id="btnPresetLab">Preset: Laboratory</button>
+        <button class="btn adminOnly" id="btnPresetAcademic">Preset: Academic</button>
+        <button class="btn adminOnly" id="btnPresetAdmin">Preset: Administrative</button>
+        <button class="btn adminOnly" id="btnPresetLab">Preset: Laboratory</button>
       </div>
 
       <div class="spacer"></div>
       <div class="notice">
-        <b>How weights are used:</b> During calculation, the system uses only ON sections and re-normalizes weights automatically. Baseline weights (admin) must still sum to 1.00.
+        <b>Important:</b> During calculation, the system uses only ON sections and re-normalizes weights automatically.
+        Baseline weights (admin) must still sum to <b>1.00</b>.
       </div>
 
       <div class="spacer"></div>
       <hr style="border:0;border-top:1px solid rgba(255,255,255,.10);margin:16px 0">
 
       <div class="grid three">
-        <div><label>Teaching – points per contact hour</label><input id="tHourW" type="number" step="0.1" min="0" value="1.0"/></div>
-        <div><label>Teaching – points per student (scaled /100)</label><input id="tStudW" type="number" step="0.1" min="0" value="0.6"/></div>
-        <div><label>Teaching – multiplier per credit hour</label><input id="tCreditW" type="number" step="0.1" min="0" value="0.4"/></div>
+        <div><label>Teaching – points per contact hour</label><input class="adminOnly" id="tHourW" type="number" step="0.1" min="0" value="1.0"/></div>
+        <div><label>Teaching – points per student (scaled /100)</label><input class="adminOnly" id="tStudW" type="number" step="0.1" min="0" value="0.6"/></div>
+        <div><label>Teaching – multiplier per credit</label><input class="adminOnly" id="tCreditW" type="number" step="0.1" min="0" value="0.4"/></div>
 
-        <div><label>Supervision – Undergraduate (per student)</label><input id="svUG" type="number" step="0.1" min="0" value="1.5"/></div>
-        <div><label>Supervision – Master (per student)</label><input id="svM" type="number" step="0.1" min="0" value="3.0"/></div>
-        <div><label>Supervision – PhD (per student)</label><input id="svPHD" type="number" step="0.1" min="0" value="4.5"/></div>
+        <div><label>Supervision – UG (per student)</label><input class="adminOnly" id="svUG" type="number" step="0.1" min="0" value="1.5"/></div>
+        <div><label>Supervision – Master (per student)</label><input class="adminOnly" id="svM" type="number" step="0.1" min="0" value="3.0"/></div>
+        <div><label>Supervision – PhD (per student)</label><input class="adminOnly" id="svPHD" type="number" step="0.1" min="0" value="4.5"/></div>
 
-        <div><label>Research – points per active grant (base)</label><input id="rBase" type="number" step="0.1" min="0" value="6"/></div>
-        <div><label>Research – level multiplier (Uni / Nat / Intl)</label><input id="rUniNatIntl" type="text" value="1.0,1.4,1.8"/></div>
-        <div><label>Research – role multiplier (PI / Co-I / Member)</label><input id="rRole" type="text" value="1.6,1.2,1.0"/></div>
+        <div><label>Research – base points per grant</label><input class="adminOnly" id="rBase" type="number" step="0.1" min="0" value="6"/></div>
+        <div><label>Research – level multipliers (Uni,Nat,Intl)</label><input class="adminOnly" id="rUniNatIntl" type="text" value="1.0,1.4,1.8"/></div>
+        <div><label>Research – role multipliers (PI,Co-I,Member)</label><input class="adminOnly" id="rRole" type="text" value="1.6,1.2,1.0"/></div>
 
-        <div><label>Publication – points per item (base)</label><input id="pBase" type="number" step="0.1" min="0" value="4"/></div>
-        <div><label>Publication – type multipliers (Journal/Book/Proceeding/Other)</label><input id="pType" type="text" value="1.5,1.8,1.0,0.8"/></div>
-        <div><label>Publication – indexed multiplier (Yes/No)</label><input id="pIdx" type="text" value="1.4,1.0"/></div>
+        <div><label>Publication – base points per item</label><input class="adminOnly" id="pBase" type="number" step="0.1" min="0" value="4"/></div>
+        <div><label>Publication – type multipliers (Journal,Book,Proceeding,Other)</label><input class="adminOnly" id="pType" type="text" value="1.5,1.8,1.0,0.8"/></div>
+        <div><label>Publication – indexed multipliers (Yes,No)</label><input class="adminOnly" id="pIdx" type="text" value="1.4,1.0"/></div>
 
-        <div><label>Admin – base points by level (Prog/Fac/Uni/State/Nat/Intl/Industry)</label><input id="aLevel" type="text" value="3,5,7,8,10,12,9"/></div>
-        <div><label>Admin – per meeting points</label><input id="aMeetW" type="number" step="0.1" min="0" value="1.5"/></div>
-        <div><label>Admin – per month points</label><input id="aMonthW" type="number" step="0.1" min="0" value="0.3"/></div>
+        <div><label>Admin – base points by level (Prog,Fac,Uni,State,Nat,Intl,Industry)</label><input class="adminOnly" id="aLevel" type="text" value="3,5,7,8,10,12,9"/></div>
+        <div><label>Admin – per meeting points</label><input class="adminOnly" id="aMeetW" type="number" step="0.1" min="0" value="1.5"/></div>
+        <div><label>Admin – per month points</label><input class="adminOnly" id="aMonthW" type="number" step="0.1" min="0" value="0.3"/></div>
 
-        <div><label>Services – points per hour</label><input id="sHourW" type="number" step="0.1" min="0" value="1.0"/></div>
-        <div><label>Services – points per participants (scaled /10)</label><input id="sPaxW" type="number" step="0.1" min="0" value="0.8"/></div>
-        <div><label>Services – role bonus (Lead / Member)</label><input id="sRoleBonus" type="text" value="4,1.5"/></div>
+        <div><label>Services – points per hour</label><input class="adminOnly" id="sHourW" type="number" step="0.1" min="0" value="1.0"/></div>
+        <div><label>Services – points per participants (scaled /10)</label><input class="adminOnly" id="sPaxW" type="number" step="0.1" min="0" value="0.8"/></div>
+        <div><label>Services – role bonus (Lead,Member)</label><input class="adminOnly" id="sRoleBonus" type="text" value="4,1.5"/></div>
 
-        <div><label>Lab Ops – points per volume</label><input id="lVolW" type="number" step="0.1" min="0" value="1.0"/></div>
-        <div><label>Lab Ops – points per hour</label><input id="lHourW" type="number" step="0.1" min="0" value="1.0"/></div>
-        <div><label>Lab Ops – complexity multipliers (Low/Med/High)</label><input id="lCx" type="text" value="1.0,1.3,1.6"/></div>
-
-        <div><label>Lab Ops – urgency multipliers (Normal/Tight/Critical)</label><input id="lUr" type="text" value="1.0,1.25,1.5"/></div>
+        <div><label>Lab Ops – points per volume</label><input class="adminOnly" id="lVolW" type="number" step="0.1" min="0" value="1.0"/></div>
+        <div><label>Lab Ops – points per hour</label><input class="adminOnly" id="lHourW" type="number" step="0.1" min="0" value="1.0"/></div>
+        <div><label>Lab Ops – multipliers (Complexity Low,Med,High)</label><input class="adminOnly" id="lCx" type="text" value="1.0,1.3,1.6"/></div>
+        <div><label>Lab Ops – multipliers (Urgency Normal,Tight,Critical)</label><input class="adminOnly" id="lUr" type="text" value="1.0,1.25,1.5"/></div>
       </div>
 
       <div class="spacer"></div>
       <div class="notice">
-        <b>Admin note:</b> To change the admin password, search for <code>ADMIN_PASSWORD</code> in this file and edit the value.
+        <b>Admin password location:</b> At the very top of this <code>index.html</code>, search for <code>ADMIN_PASSWORD</code>.
       </div>
     </div>
   </section>
@@ -473,10 +509,10 @@
     <header>
       <div>
         <h2>Teaching</h2>
-        <div class="sub">Course credit is auto-extracted from the <b>last digit</b> of course code (e.g., SJ24102 → credit=2). Contact hours are auto-computed.</div>
+        <div class="sub">Credit is auto-extracted from the <b>last digit</b> of course code (e.g., SJ24102 → credit=2). Contact hours are auto-computed.</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn secondary" id="addTeach">+ Add course</button>
+        <button class="btn" id="addTeach">+ Add course</button>
         <button class="btn ghost" id="clearTeach">Clear</button>
       </div>
     </header>
@@ -486,13 +522,13 @@
           <tr>
             <th style="width:14%">Course Code *</th>
             <th>Course Name *</th>
-            <th style="width:8%">Credit (auto)</th>
+            <th style="width:8%">Credit</th>
             <th style="width:10%">Students *</th>
-            <th style="width:10%">Lecture (hrs/wk) *</th>
+            <th style="width:10%">Lecture *</th>
             <th style="width:10%">Tutorial *</th>
             <th style="width:10%">Lab *</th>
             <th style="width:10%">Field *</th>
-            <th style="width:10%">Contact hrs (auto)</th>
+            <th style="width:10%">Contact hrs</th>
             <th style="width:6%">Del</th>
           </tr>
         </thead>
@@ -506,10 +542,10 @@
     <header>
       <div>
         <h2>Supervision</h2>
-        <div class="sub">Include active supervision load for the reporting period.</div>
+        <div class="sub">Include active supervision load for the reporting period (UG, Master, PhD).</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn secondary" id="addSv">+ Add supervision</button>
+        <button class="btn" id="addSv">+ Add supervision</button>
         <button class="btn ghost" id="clearSv">Clear</button>
       </div>
     </header>
@@ -539,7 +575,7 @@
         <div class="sub">Specify grant level, status, role, amount and duration.</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn secondary" id="addRes">+ Add grant</button>
+        <button class="btn" id="addRes">+ Add grant</button>
         <button class="btn ghost" id="clearRes">Clear</button>
       </div>
     </header>
@@ -568,10 +604,10 @@
     <header>
       <div>
         <h2>Publication</h2>
-        <div class="sub">Optional for some roles; if ON, record publication output for the reporting period.</div>
+        <div class="sub">If ON, record publication output for the reporting period.</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn secondary" id="addPub">+ Add publication</button>
+        <button class="btn" id="addPub">+ Add publication</button>
         <button class="btn ghost" id="clearPub">Clear</button>
       </div>
     </header>
@@ -579,7 +615,7 @@
       <table id="tblPub">
         <thead>
           <tr>
-            <th style="width:14%">Year *</th>
+            <th style="width:10%">Year *</th>
             <th>Title *</th>
             <th style="width:16%">Type *</th>
             <th style="width:14%">Indexed? *</th>
@@ -602,7 +638,7 @@
         <div class="sub">Include appointments (official/ad-hoc), level, duration (months) and meeting workload.</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn secondary" id="addAdmin">+ Add admin role</button>
+        <button class="btn" id="addAdmin">+ Add admin role</button>
         <button class="btn ghost" id="clearAdmin">Clear</button>
       </div>
     </header>
@@ -623,11 +659,8 @@
         </thead>
         <tbody></tbody>
       </table>
-
       <div class="spacer"></div>
-      <div class="notice">
-        Tip: For committee work like “AJK conference”, use Position = “Conference Committee” and describe pre-conference preparation in Notes.
-      </div>
+      <div class="notice">Tip: For conference committee work (AJK), use Position = “Conference Committee” and describe pre-conference preparation in Notes.</div>
     </div>
   </section>
 
@@ -639,7 +672,7 @@
         <div class="sub">Service to university / industry / community. Include start and end dates.</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn secondary" id="addSvc">+ Add service</button>
+        <button class="btn" id="addSvc">+ Add service</button>
         <button class="btn ghost" id="clearSvc">Clear</button>
       </div>
     </header>
@@ -667,10 +700,10 @@
     <header>
       <div>
         <h2>Lab Operations</h2>
-        <div class="sub">For laboratory staff or lab-support work. Scored using volume + hours × complexity × urgency.</div>
+        <div class="sub">For lab staff or lab-support work. Scored using (volume + hours) × complexity × urgency.</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn secondary" id="addLab">+ Add lab activity</button>
+        <button class="btn" id="addLab">+ Add lab activity</button>
         <button class="btn ghost" id="clearLab">Clear</button>
       </div>
     </header>
@@ -699,7 +732,7 @@
     <header>
       <div>
         <h2>Results</h2>
-        <div class="sub">Calculate index, review section scores, and export for dashboard. Print PDF is clean (no settings/toggles) with signatures.</div>
+        <div class="sub">Calculate index, view section contributions, export for dashboard, and print clean PDF (no settings/weights shown).</div>
       </div>
     </header>
     <div class="content">
@@ -726,6 +759,9 @@
       <div class="box">
         <div class="row" style="justify-content:space-between;align-items:flex-start">
           <div style="min-width:280px">
+            <div class="k">Dean View Summary (read-only)</div>
+            <div class="hint" id="outDean">—</div>
+            <div class="spacer"></div>
             <div class="k">Narrative Summary</div>
             <div class="hint" id="outNarr">—</div>
           </div>
@@ -740,8 +776,8 @@
       <div class="spacer"></div>
 
       <div class="row noPrint">
-        <button class="btn secondary" id="btnExportSummaryCSV">Export Summary CSV</button>
-        <button class="btn secondary" id="btnExportDetailedCSV">Export Detailed CSV</button>
+        <button class="btn" id="btnExportSummaryCSV">Export Summary CSV</button>
+        <button class="btn" id="btnExportDetailedCSV">Export Detailed CSV</button>
         <button class="btn" id="btnExportJSON">Export Full JSON</button>
       </div>
 
@@ -754,14 +790,14 @@
             <div>Name: <span id="printName"></span></div>
             <div>Staff ID: <span id="printId"></span></div>
             <div>Date printed: <span id="printDate"></span></div>
-            <div style="height:90px;border:1px solid #bbb;margin-top:10px;padding:8px">Staff Signature:</div>
+            <div style="height:110px;border:1px solid #bbb;margin-top:10px;padding:10px">Staff Signature:</div>
           </div>
           <div>
             <div style="font-weight:800;margin-bottom:8px">Dean Approval</div>
             <div>Faculty: Faculty of Science and Technology</div>
             <div>Dean: Prof. P.Geol. Ts. Dr. Rodeano Roslee</div>
             <div>Date: _______________________</div>
-            <div style="height:90px;border:1px solid #bbb;margin-top:10px;padding:8px">Dean Signature:</div>
+            <div style="height:110px;border:1px solid #bbb;margin-top:10px;padding:10px">Dean Signature:</div>
           </div>
         </div>
         <div style="margin-top:10px;font-size:11px;color:#555">© FST UMS</div>
@@ -780,20 +816,22 @@
 </div>
 
 <script>
-/* ============================================================
-   ADMIN PASSWORD (EDIT HERE ANYTIME)
-   Change this value to update the admin password.
-   ============================================================ */
-const ADMIN_PASSWORD = "FST-ADMIN";
-/* ============================================================ */
-
+/* ========================= Helpers ========================= */
 const $ = (id)=>document.getElementById(id);
 const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
 const n = (v)=>{ const x=parseFloat(v); return isNaN(x)?0:x; };
 const uid = ()=>Math.random().toString(16).slice(2)+Date.now().toString(16);
-const todayISO = ()=> new Date().toISOString().slice(0,10);
 
-let adminUnlocked = false;
+function showMsg(kind, html){
+  const el = $("msgGlobal");
+  el.className = "notice " + (kind==="bad"?"bad":kind==="ok"?"ok":"warn");
+  el.innerHTML = html;
+  el.style.display = "block";
+}
+function hideMsg(){ $("msgGlobal").style.display="none"; }
+
+/* ========================= State ========================= */
+let isAdmin = false;
 
 const state = {
   profile:{
@@ -807,11 +845,11 @@ const state = {
   scheme:{
     teaching:{ hourW:1.0, studW:0.6, creditW:0.4 },
     supervision:{ ug:1.5, m:3.0, phd:4.5 },
-    research:{ base:6, lvl:[1.0,1.4,1.8], role:[1.6,1.2,1.0] }, // Uni/Nat/Intl ; PI/Co-I/Member
-    publication:{ base:4, type:[1.5,1.8,1.0,0.8], idx:[1.4,1.0] }, // Journal/Book/Proceeding/Other ; Yes/No
-    admin:{ lvl:[3,5,7,8,10,12,9], meetW:1.5, monthW:0.3 }, // Prog/Fac/Uni/State/Nat/Intl/Industry
-    service:{ hourW:1.0, paxW:0.8, bonus:[4,1.5] }, // Lead/Member
-    lab:{ volW:1.0, hourW:1.0, cx:[1.0,1.3,1.6], ur:[1.0,1.25,1.5] } // Low/Med/High ; Normal/Tight/Critical
+    research:{ base:6, lvl:[1.0,1.4,1.8], role:[1.6,1.2,1.0] },
+    publication:{ base:4, type:[1.5,1.8,1.0,0.8], idx:[1.4,1.0] },
+    admin:{ lvl:[3,5,7,8,10,12,9], meetW:1.5, monthW:0.3 },
+    service:{ hourW:1.0, paxW:0.8, bonus:[4,1.5] },
+    lab:{ volW:1.0, hourW:1.0, cx:[1.0,1.3,1.6], ur:[1.0,1.25,1.5] }
   },
   data:{
     teaching:[],
@@ -825,44 +863,46 @@ const state = {
   audit:{ last_saved_at:null, last_calc_at:null }
 };
 
-function showMsg(kind, html){
-  const el = $("msgGlobal");
-  el.className = "notice " + (kind==="bad"?"bad":kind==="ok"?"ok":"warn");
-  el.innerHTML = html;
-  el.style.display = "block";
-}
-function hideMsg(){ $("msgGlobal").style.display="none"; }
-
+/* ========================= Admin lock ========================= */
 function setAdminUI(){
-  $("modeText").textContent = adminUnlocked ? "Admin" : "Staff";
-  $("btnAdminUnlock").style.display = adminUnlocked ? "none" : "inline-block";
-  $("btnAdminLock").style.display = adminUnlocked ? "inline-block" : "none";
-  $("lockDot").className = "dot " + (adminUnlocked ? "" : "lock");
-  $("lockText").textContent = adminUnlocked ? "Settings unlocked" : "Settings locked";
-  // lock/unlock settings inputs
-  const lockInputs = $("secSettings").querySelectorAll("input,select,textarea,button");
-  lockInputs.forEach(x=>{
-    if(x.id && (x.id.startsWith("btnPreset"))) x.disabled = !adminUnlocked;
-    else x.disabled = !adminUnlocked;
+  $("modeText").textContent = isAdmin ? "Admin" : "Staff";
+  $("btnAdminLock").style.display = isAdmin ? "inline-block" : "none";
+  $("lockDot").className = "dot " + (isAdmin ? "" : "lock");
+  $("lockText").textContent = isAdmin ? "Settings unlocked" : "Settings locked";
+
+  // lock/unlock adminOnly controls
+  document.querySelectorAll(".adminOnly").forEach(el=>{
+    el.disabled = !isAdmin;
   });
-
-  // Staff can still click Calculate/Print/Export
-  $("btnCalc").disabled = false;
-  $("btnPrint").disabled = false;
-  $("btnExportSummaryCSV").disabled = false;
-  $("btnExportDetailedCSV").disabled = false;
-  $("btnExportJSON").disabled = false;
-
-  // toggles: keep editable (policy: staff may turn on/off relevant sections)
-  // if you want toggles locked, set disabled here.
 }
 
+function unlockAdmin(){
+  const pw = $("adminPass").value;
+  if(pw === ADMIN_PASSWORD){
+    isAdmin = true;
+    setAdminUI();
+    showMsg("ok","<b>Admin unlocked:</b> You can now edit weights and scoring scheme.");
+  }else{
+    isAdmin = false;
+    setAdminUI();
+    showMsg("bad","<b>Access denied:</b> Wrong admin password.");
+  }
+}
+function lockAdmin(){
+  isAdmin = false;
+  $("adminPass").value = "";
+  setAdminUI();
+  showMsg("warn","<b>Locked:</b> Settings are now read-only.");
+}
+
+/* ========================= Parsing helpers ========================= */
 function parseCSVNums(str, expected){
   const arr = (str||"").split(",").map(s=>n(s.trim()));
   if(arr.length!==expected) return null;
   return arr;
 }
 
+/* ========================= Category templates ========================= */
 function applyTemplateByCategory(cat){
   if(cat==="Academic"){
     state.enabled = { T:true, SV:true, R:true, P:true, A:true, S:true, L:false };
@@ -879,6 +919,7 @@ function applyTemplateByCategory(cat){
   autosave();
 }
 
+/* ========================= Sync UI <-> State ========================= */
 function syncProfileFromUI(){
   state.profile.name = $("pName").value.trim();
   state.profile.staffId = $("pStaffId").value.trim();
@@ -901,7 +942,9 @@ function syncEnabledFromUI(){
   state.enabled.L = $("enLabOps").checked;
 }
 
-function syncWeightsFromUI(){
+function syncSettingsFromUI_ifAdmin(){
+  if(!isAdmin) return;
+
   state.weights.T = n($("wT").value);
   state.weights.SV = n($("wSV").value);
   state.weights.R = n($("wR").value);
@@ -951,8 +994,6 @@ function syncUIFromState(){
   $("pStatus").value = state.profile.status || "";
   $("pStatusOther").value = state.profile.statusOther || "";
   $("pPeriod").value = state.profile.period || "";
-
-  // show other wrappers
   $("pGradeOtherWrap").style.display = (state.profile.grade==="Others") ? "block" : "none";
   $("pStatusOtherWrap").style.display = (state.profile.status==="Others") ? "block" : "none";
 
@@ -1015,13 +1056,12 @@ function applySectionVisibility(){
   $("secLabOps").style.display = state.enabled.L ? "block" : "none";
 }
 
+/* ========================= Validation ========================= */
 function validateProfile(){
-  const req = ["pName","pStaffId","pCategory","pUnit","pGrade","pStatus","pPeriod"];
-  req.forEach(id=>$(id).classList.remove("err"));
-  $("pGradeOther").classList.remove("err");
-  $("pStatusOther").classList.remove("err");
+  const ids = ["pName","pStaffId","pCategory","pUnit","pGrade","pStatus","pPeriod","pGradeOther","pStatusOther"];
+  ids.forEach(id=>$(id).classList.remove("err"));
+  let ok=true;
 
-  let ok = true;
   if(!$("pName").value.trim()) ok=false, $("pName").classList.add("err");
   if(!$("pStaffId").value.trim()) ok=false, $("pStaffId").classList.add("err");
   if(!$("pCategory").value) ok=false, $("pCategory").classList.add("err");
@@ -1046,8 +1086,8 @@ function validateToggles(){
   return anyOn;
 }
 
-function validateWeightsBaseline(){
-  // admin baseline rule: sum must be 1.00
+function validateWeightsBaseline_ifAdmin(){
+  if(!isAdmin) return true;
   const sum = state.weights.T+state.weights.SV+state.weights.R+state.weights.P+state.weights.A+state.weights.S+state.weights.L;
   const ok = Math.abs(sum-1.00) <= 0.005;
   $("msgSettings").style.display = ok ? "none" : "block";
@@ -1056,7 +1096,6 @@ function validateWeightsBaseline(){
 }
 
 function getActiveWeights(){
-  // use only ON sections, then normalize
   const aw = {
     T: state.enabled.T ? state.weights.T : 0,
     SV: state.enabled.SV ? state.weights.SV : 0,
@@ -1072,14 +1111,90 @@ function getActiveWeights(){
   return aw;
 }
 
-/* ----------- TABLE RENDERING ----------- */
+function validateActivityTables(){
+  document.querySelectorAll("input.err,select.err,textarea.err").forEach(el=>el.classList.remove("err"));
+  let ok=true;
+
+  function requireText(el){ if(!el.value.trim()){ el.classList.add("err"); ok=false; } }
+  function requireNonNeg(el, strictPositive=false){
+    const v=n(el.value);
+    if(v<0 || (strictPositive && v<=0)){ el.classList.add("err"); ok=false; }
+  }
+  function requireDate(el){ if(!el.value){ el.classList.add("err"); ok=false; } }
+
+  if(state.enabled.T){
+    $("tblTeach").querySelectorAll("tbody tr").forEach(tr=>{
+      requireText(tr.querySelector('[data-k="code"]'));
+      requireText(tr.querySelector('[data-k="name"]'));
+      requireNonNeg(tr.querySelector('[data-k="students"]'), true);
+      ["lec","tut","lab","field"].forEach(k=>requireNonNeg(tr.querySelector(`[data-k="${k}"]`), false));
+    });
+  }
+  if(state.enabled.SV){
+    $("tblSv").querySelectorAll("tbody tr").forEach(tr=>{
+      requireText(tr.querySelector('[data-k="title"]'));
+      requireDate(tr.querySelector('[data-k="start"]'));
+      requireDate(tr.querySelector('[data-k="end"]'));
+    });
+  }
+  if(state.enabled.R){
+    $("tblRes").querySelectorAll("tbody tr").forEach(tr=>{
+      requireText(tr.querySelector('[data-k="code"]'));
+      requireText(tr.querySelector('[data-k="title"]'));
+      requireNonNeg(tr.querySelector('[data-k="amount"]'), true);
+      requireDate(tr.querySelector('[data-k="start"]'));
+      requireDate(tr.querySelector('[data-k="end"]'));
+    });
+  }
+  if(state.enabled.P){
+    $("tblPub").querySelectorAll("tbody tr").forEach(tr=>{
+      requireNonNeg(tr.querySelector('[data-k="year"]'), true);
+      requireText(tr.querySelector('[data-k="title"]'));
+      requireDate(tr.querySelector('[data-k="start"]'));
+      requireDate(tr.querySelector('[data-k="end"]'));
+    });
+  }
+  if(state.enabled.A){
+    $("tblAdmin").querySelectorAll("tbody tr").forEach(tr=>{
+      requireText(tr.querySelector('[data-k="pos"]'));
+      requireNonNeg(tr.querySelector('[data-k="months"]'), true);
+      requireNonNeg(tr.querySelector('[data-k="meetings"]'), false);
+      requireText(tr.querySelector('[data-k="notes"]'));
+      requireDate(tr.querySelector('[data-k="start"]'));
+      requireDate(tr.querySelector('[data-k="end"]'));
+    });
+  }
+  if(state.enabled.S){
+    $("tblSvc").querySelectorAll("tbody tr").forEach(tr=>{
+      requireText(tr.querySelector('[data-k="activity"]'));
+      requireNonNeg(tr.querySelector('[data-k="hours"]'), true);
+      requireNonNeg(tr.querySelector('[data-k="participants"]'), true);
+      requireDate(tr.querySelector('[data-k="start"]'));
+      requireDate(tr.querySelector('[data-k="end"]'));
+    });
+  }
+  if(state.enabled.L){
+    $("tblLab").querySelectorAll("tbody tr").forEach(tr=>{
+      requireText(tr.querySelector('[data-k="desc"]'));
+      requireNonNeg(tr.querySelector('[data-k="volume"]'), true);
+      requireNonNeg(tr.querySelector('[data-k="hours"]'), true);
+      requireDate(tr.querySelector('[data-k="start"]'));
+      requireDate(tr.querySelector('[data-k="end"]'));
+    });
+  }
+
+  if(!ok) showMsg("warn","<b>Validation:</b> Please fill all required fields (no empty/negative values). Highlighted boxes require attention.");
+  return ok;
+}
+
+/* ========================= Tables ========================= */
 function ensureSeed(){
   if(state.data.teaching.length===0) state.data.teaching.push({id:uid(), code:"", name:"", credit:0, students:0, lec:0, tut:0, lab:0, field:0});
   if(state.data.supervision.length===0) state.data.supervision.push({id:uid(), level:"Undergraduate", title:"", role:"Main", status:"Active", start:"", end:""});
   if(state.data.research.length===0) state.data.research.push({id:uid(), code:"", title:"", level:"University", status:"Active", role:"PI", amount:0, start:"", end:""});
   if(state.data.publication.length===0) state.data.publication.push({id:uid(), year:(new Date()).getFullYear(), title:"", type:"Journal", indexed:"Yes", role:"First/Corresponding", start:"", end:""});
   if(state.data.admin.length===0) state.data.admin.push({id:uid(), pos:"", type:"Official", level:"Faculty", months:0, meetings:0, notes:"", start:"", end:""});
-  if(state.data.service.length===0) state.data.service.push({id:uid(), type:"Service to University", activity:"", role:"Lead", hours:0, pax:0, start:"", end:""});
+  if(state.data.service.length===0) state.data.service.push({id:uid(), type:"Service to University", activity:"", role:"Lead", hours:0, participants:0, start:"", end:""});
   if(state.data.lab.length===0) state.data.lab.push({id:uid(), type:"Equipment/Maintenance", desc:"", volume:0, cx:"Medium", ur:"Normal", hours:0, start:"", end:""});
 }
 
@@ -1090,6 +1205,16 @@ function creditFromCode(code){
 }
 function contactHoursRow(r){
   return Math.max(0,n(r.lec))+Math.max(0,n(r.tut))+Math.max(0,n(r.lab))+Math.max(0,n(r.field));
+}
+
+function renderAll(){
+  renderTeaching();
+  renderSv();
+  renderRes();
+  renderPub();
+  renderAdmin();
+  renderSvc();
+  renderLab();
 }
 
 function renderTeaching(){
@@ -1124,6 +1249,7 @@ function renderTeaching(){
     tr.addEventListener("input",(e)=>{
       const k=e.target.getAttribute("data-k"); if(!k) return;
       const obj=state.data.teaching.find(x=>x.id===tr.dataset.id); if(!obj) return;
+
       if(k==="code"){
         obj.code=e.target.value.toUpperCase();
         obj.credit=creditFromCode(obj.code);
@@ -1389,7 +1515,7 @@ function renderSvc(){
         </select>
       </td>
       <td><input data-k="hours" type="number" min="0" step="0.5"/></td>
-      <td><input data-k="pax" type="number" min="0" step="1"/></td>
+      <td><input data-k="participants" type="number" min="0" step="1"/></td>
       <td><input data-k="start" type="date"/></td>
       <td><input data-k="end" type="date"/></td>
       <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
@@ -1399,7 +1525,7 @@ function renderSvc(){
     tr.querySelector('[data-k="activity"]').value=r.activity;
     tr.querySelector('[data-k="role"]').value=r.role;
     tr.querySelector('[data-k="hours"]').value=r.hours;
-    tr.querySelector('[data-k="pax"]').value=r.pax;
+    tr.querySelector('[data-k="participants"]').value=r.participants;
     tr.querySelector('[data-k="start"]').value=r.start;
     tr.querySelector('[data-k="end"]').value=r.end;
 
@@ -1407,7 +1533,7 @@ function renderSvc(){
       const k=e.target.getAttribute("data-k"); if(!k) return;
       const obj=state.data.service.find(x=>x.id===tr.dataset.id); if(!obj) return;
       if(k==="hours") obj.hours=Math.max(0,n(e.target.value)), e.target.value=obj.hours;
-      else if(k==="pax") obj.pax=Math.max(0,Math.floor(n(e.target.value))), e.target.value=obj.pax;
+      else if(k==="participants") obj.participants=Math.max(0,Math.floor(n(e.target.value))), e.target.value=obj.participants;
       else obj[k]=e.target.value;
       autosave();
     });
@@ -1453,6 +1579,7 @@ function renderLab(){
       <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
     `;
     tb.appendChild(tr);
+
     tr.querySelector('[data-k="type"]').value=r.type;
     tr.querySelector('[data-k="desc"]').value=r.desc;
     tr.querySelector('[data-k="volume"]').value=r.volume;
@@ -1479,18 +1606,14 @@ function renderLab(){
   });
 }
 
-function renderAll(){
-  renderTeaching(); renderSv(); renderRes(); renderPub(); renderAdmin(); renderSvc(); renderLab();
-}
-
-/* ----------- ADD/CLEAR ----------- */
+/* ========================= Add/Clear ========================= */
 function addRow(kind){
   if(kind==="teach") state.data.teaching.push({id:uid(), code:"", name:"", credit:0, students:0, lec:0, tut:0, lab:0, field:0});
   if(kind==="sv") state.data.supervision.push({id:uid(), level:"Undergraduate", title:"", role:"Main", status:"Active", start:"", end:""});
   if(kind==="res") state.data.research.push({id:uid(), code:"", title:"", level:"University", status:"Active", role:"PI", amount:0, start:"", end:""});
   if(kind==="pub") state.data.publication.push({id:uid(), year:(new Date()).getFullYear(), title:"", type:"Journal", indexed:"Yes", role:"First/Corresponding", start:"", end:""});
   if(kind==="admin") state.data.admin.push({id:uid(), pos:"", type:"Official", level:"Faculty", months:0, meetings:0, notes:"", start:"", end:""});
-  if(kind==="svc") state.data.service.push({id:uid(), type:"Service to University", activity:"", role:"Lead", hours:0, pax:0, start:"", end:""});
+  if(kind==="svc") state.data.service.push({id:uid(), type:"Service to University", activity:"", role:"Lead", hours:0, participants:0, start:"", end:""});
   if(kind==="lab") state.data.lab.push({id:uid(), type:"Equipment/Maintenance", desc:"", volume:0, cx:"Medium", ur:"Normal", hours:0, start:"", end:""});
   renderAll(); autosave();
 }
@@ -1505,7 +1628,7 @@ function clearKind(kind){
   ensureSeed(); renderAll(); autosave();
 }
 
-/* ----------- SCORING ----------- */
+/* ========================= Scoring ========================= */
 function scoreTeaching(){
   const sc=state.scheme.teaching;
   let total=0;
@@ -1578,7 +1701,7 @@ function scoreService(){
   let total=0;
   state.data.service.forEach(x=>{
     const hrs = Math.max(0,n(x.hours));
-    const pax = Math.max(0,n(x.pax));
+    const pax = Math.max(0,n(x.participants));
     const ri = roleMap[x.role] ?? 1;
     total += (hrs*sc.hourW) + ((pax/10)*sc.paxW) + sc.bonus[ri];
   });
@@ -1600,90 +1723,7 @@ function scoreLab(){
   return total;
 }
 
-/* ----------- VALIDATION (activities required) ----------- */
-function validateActivityTables(){
-  // remove previous errors
-  document.querySelectorAll("input.err,select.err,textarea.err").forEach(el=>el.classList.remove("err"));
-
-  let ok=true;
-
-  function requireText(inputEl){
-    if(!inputEl.value.trim()){ inputEl.classList.add("err"); ok=false; }
-  }
-  function requireNonNeg(inputEl, strictPositive=false){
-    const v=n(inputEl.value);
-    if(v<0 || (strictPositive && v<=0)){ inputEl.classList.add("err"); ok=false; }
-  }
-  function requireDate(inputEl){
-    if(!inputEl.value){ inputEl.classList.add("err"); ok=false; }
-  }
-
-  if(state.enabled.T){
-    $("tblTeach").querySelectorAll("tbody tr").forEach(tr=>{
-      requireText(tr.querySelector('[data-k="code"]'));
-      requireText(tr.querySelector('[data-k="name"]'));
-      requireNonNeg(tr.querySelector('[data-k="students"]'), true);
-      ["lec","tut","lab","field"].forEach(k=>requireNonNeg(tr.querySelector(`[data-k="${k}"]`), false));
-    });
-  }
-  if(state.enabled.SV){
-    $("tblSv").querySelectorAll("tbody tr").forEach(tr=>{
-      requireText(tr.querySelector('[data-k="title"]'));
-      requireDate(tr.querySelector('[data-k="start"]'));
-      requireDate(tr.querySelector('[data-k="end"]'));
-    });
-  }
-  if(state.enabled.R){
-    $("tblRes").querySelectorAll("tbody tr").forEach(tr=>{
-      requireText(tr.querySelector('[data-k="code"]'));
-      requireText(tr.querySelector('[data-k="title"]'));
-      requireNonNeg(tr.querySelector('[data-k="amount"]'), true);
-      requireDate(tr.querySelector('[data-k="start"]'));
-      requireDate(tr.querySelector('[data-k="end"]'));
-    });
-  }
-  if(state.enabled.P){
-    $("tblPub").querySelectorAll("tbody tr").forEach(tr=>{
-      requireNonNeg(tr.querySelector('[data-k="year"]'), true);
-      requireText(tr.querySelector('[data-k="title"]'));
-      requireDate(tr.querySelector('[data-k="start"]'));
-      requireDate(tr.querySelector('[data-k="end"]'));
-    });
-  }
-  if(state.enabled.A){
-    $("tblAdmin").querySelectorAll("tbody tr").forEach(tr=>{
-      requireText(tr.querySelector('[data-k="pos"]'));
-      requireNonNeg(tr.querySelector('[data-k="months"]'), true);
-      requireNonNeg(tr.querySelector('[data-k="meetings"]'), false);
-      requireText(tr.querySelector('[data-k="notes"]'));
-      requireDate(tr.querySelector('[data-k="start"]'));
-      requireDate(tr.querySelector('[data-k="end"]'));
-    });
-  }
-  if(state.enabled.S){
-    $("tblSvc").querySelectorAll("tbody tr").forEach(tr=>{
-      requireText(tr.querySelector('[data-k="activity"]'));
-      requireNonNeg(tr.querySelector('[data-k="hours"]'), true);
-      requireNonNeg(tr.querySelector('[data-k="pax"]'), true);
-      requireDate(tr.querySelector('[data-k="start"]'));
-      requireDate(tr.querySelector('[data-k="end"]'));
-    });
-  }
-  if(state.enabled.L){
-    $("tblLab").querySelectorAll("tbody tr").forEach(tr=>{
-      requireText(tr.querySelector('[data-k="desc"]'));
-      requireNonNeg(tr.querySelector('[data-k="volume"]'), true);
-      requireNonNeg(tr.querySelector('[data-k="hours"]'), true);
-      requireDate(tr.querySelector('[data-k="start"]'));
-      requireDate(tr.querySelector('[data-k="end"]'));
-    });
-  }
-
-  if(!ok) showMsg("warn","<b>Validation:</b> Please fill all required fields (no empty/negative values). Highlighted boxes require attention.");
-  return ok;
-}
-
-/* ----------- CALCULATE ----------- */
+/* ========================= Results ========================= */
 let chart=null;
 
 function bandFromIndex(x){
@@ -1705,7 +1745,6 @@ function narrative(scores, aw){
   ].filter(x=>x[3]);
 
   items.sort((a,b)=> (b[1]*b[2]) - (a[1]*a[2]));
-
   const top = items[0];
   const second = items[1] || null;
   const last = items[items.length-1];
@@ -1717,27 +1756,60 @@ function narrative(scores, aw){
   return `Most of the busyness is driven by: ${topText}${secondText?`, followed by ${secondText}`:""}. The lowest contribution is from: ${lowText}. Consider balancing workload by shifting tasks away from the top driver(s) or increasing support in that section.`;
 }
 
+function deanViewSummary(index, band, aw){
+  const on = Object.entries(state.enabled).filter(([k,v])=>v).map(([k])=>k).join(", ");
+  const w = Object.entries(aw).filter(([k,v])=>v>0).map(([k,v])=>`${k}:${v.toFixed(2)}`).join(" | ");
+  return `Name: ${state.profile.name} | ID: ${state.profile.staffId} | Category: ${state.profile.category} | Period: ${state.profile.period} | ON sections: ${on} | Normalized weights: ${w} | Index: ${index.toFixed(1)} (${band.label})`;
+}
+
+function drawChart(scores, aw){
+  const labels=[], vals=[], colors=[];
+  const pushIf=(on,label,raw,w,color)=>{
+    if(!on) return;
+    labels.push(label);
+    vals.push(raw*w);
+    colors.push(color);
+  };
+  pushIf(state.enabled.T, "Teaching", scores.T, aw.T, "rgba(167,139,250,.85)");
+  pushIf(state.enabled.SV, "Supervision", scores.SV, aw.SV, "rgba(56,189,248,.85)");
+  pushIf(state.enabled.R, "Research", scores.R, aw.R, "rgba(52,211,153,.85)");
+  pushIf(state.enabled.P, "Publication", scores.P, aw.P, "rgba(244,114,182,.85)");
+  pushIf(state.enabled.A, "Administration", scores.A, aw.A, "rgba(251,191,36,.85)");
+  pushIf(state.enabled.S, "Services", scores.S, aw.S, "rgba(251,113,133,.85)");
+  pushIf(state.enabled.L, "Lab Ops", scores.L, aw.L, "rgba(34,197,94,.85)");
+
+  const ctx=$("chart").getContext("2d");
+  if(chart) chart.destroy();
+  chart=new Chart(ctx,{
+    type:"bar",
+    data:{ labels, datasets:[{ label:"Weighted contribution (raw score × normalized weight)", data:vals, backgroundColor:colors, borderColor:colors, borderWidth:1 }] },
+    options:{
+      responsive:true,
+      plugins:{ legend:{ labels:{ color:"#eaf0ff"} } },
+      scales:{
+        x:{ ticks:{ color:"#eaf0ff"} , grid:{ color:"rgba(255,255,255,.08)" } },
+        y:{ ticks:{ color:"#eaf0ff"} , grid:{ color:"rgba(255,255,255,.08)" } }
+      }
+    }
+  });
+}
+
 function calculate(){
   hideMsg();
   syncProfileFromUI();
   syncEnabledFromUI();
-  if(adminUnlocked) syncWeightsFromUI(); // only admin can change settings
+  syncSettingsFromUI_ifAdmin();
 
   if(!validateProfile()) return;
   if(!validateToggles()) return;
-
-  // staff can calculate even if baseline weights not 1.00, but admin should keep it valid
-  // if admin mode, enforce
-  if(adminUnlocked){
-    if(!validateWeightsBaseline()){
-      showMsg("warn","<b>Admin action required:</b> Fix weights baseline to sum 1.00 before using.");
-      return;
-    }
-  }
-
   applySectionVisibility();
   ensureSeed();
   renderAll();
+
+  if(!validateWeightsBaseline_ifAdmin()) {
+    showMsg("warn","<b>Admin validation:</b> Fix weights so baseline sum is 1.00.");
+    return;
+  }
 
   if(!validateActivityTables()) return;
 
@@ -1775,7 +1847,7 @@ function calculate(){
   $("outBand").textContent = b.label;
 
   $("outNarr").textContent = narrative(scores, aw);
-
+  $("outDean").textContent = deanViewSummary(index, b, aw);
   drawChart(scores, aw);
 
   state.audit.last_calc_at = new Date().toISOString();
@@ -1784,64 +1856,15 @@ function calculate(){
   showMsg("ok", `<b>Calculated:</b> Index = <b>${index.toFixed(1)}</b> (${b.label}). Active weights were re-normalized automatically based on ON sections.`);
 }
 
-function drawChart(scores, aw){
-  const labels = [];
-  const vals = [];
-  const colors = [];
-
-  function pushIf(on, label, raw, w, color){
-    if(!on) return;
-    labels.push(label);
-    vals.push(raw*w); // show weighted contribution
-    colors.push(color);
-  }
-
-  pushIf(state.enabled.T, "Teaching", scores.T, aw.T, "rgba(167,139,250,.85)");
-  pushIf(state.enabled.SV, "Supervision", scores.SV, aw.SV, "rgba(56,189,248,.85)");
-  pushIf(state.enabled.R, "Research", scores.R, aw.R, "rgba(52,211,153,.85)");
-  pushIf(state.enabled.P, "Publication", scores.P, aw.P, "rgba(244,114,182,.85)");
-  pushIf(state.enabled.A, "Administration", scores.A, aw.A, "rgba(251,191,36,.85)");
-  pushIf(state.enabled.S, "Services", scores.S, aw.S, "rgba(251,113,133,.85)");
-  pushIf(state.enabled.L, "Lab Ops", scores.L, aw.L, "rgba(34,197,94,.85)");
-
-  const ctx = $("chart").getContext("2d");
-  if(chart) chart.destroy();
-
-  chart = new Chart(ctx,{
-    type:"bar",
-    data:{
-      labels,
-      datasets:[{
-        label:"Weighted contribution (raw score × normalized weight)",
-        data: vals,
-        backgroundColor: colors,
-        borderColor: colors,
-        borderWidth: 1
-      }]
-    },
-    options:{
-      responsive:true,
-      plugins:{
-        legend:{ labels:{ color:"#eaf0ff"} }
-      },
-      scales:{
-        x:{ ticks:{ color:"#eaf0ff"} , grid:{ color:"rgba(255,255,255,.08)" } },
-        y:{ ticks:{ color:"#eaf0ff"} , grid:{ color:"rgba(255,255,255,.08)" } }
-      }
-    }
-  });
-}
-
-/* ----------- PRINT (clean) ----------- */
+/* ========================= Print ========================= */
 function printPDF(){
-  // fill print only fields
   $("printName").textContent = state.profile.name || "";
   $("printId").textContent = state.profile.staffId || "";
   $("printDate").textContent = new Date().toLocaleString();
   window.print();
 }
 
-/* ----------- MANUAL PDF ----------- */
+/* ========================= Manual PDF ========================= */
 function manualPDF(){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({unit:"pt", format:"a4"});
@@ -1869,42 +1892,40 @@ function manualPDF(){
   doc.setTextColor(0,0,0);
 
   write("Overview", 13, true);
-  write("This manual explains how each section score is computed and how the overall index is calculated. The system supports role-based ON/OFF sections with automatic weight re-normalization.", 11);
+  write("This manual explains how each section score is computed and how the overall index is calculated. The tool supports Academic, Administrative, and Laboratory staff via section ON/OFF and automatic weight re-normalization.", 11);
 
   y += 8;
   write("1) Section ON/OFF and Weight Re-normalization", 13, true);
   write("Let baseline weights be w_T, w_SV, w_R, w_P, w_A, w_S, w_L. If some sections are OFF, the system uses only ON weights and normalizes them:", 11);
   write("w'_i = w_i / (sum of w over ON sections).", 11);
-  write("This ensures fairness across Academic, Administrative, and Laboratory staff.", 11);
 
   y += 8;
   write("2) Overall Index", 13, true);
   write("Overall Index = Σ( Score_section × NormalizedWeight_section ).", 11);
-  write("The chart shows weighted contributions per section.", 11);
 
   y += 10;
-  write("3) Example (Administrative Staff)", 13, true);
-  write("Sections ON: Administration (A) and Services (S). Baseline weights: w_A=0.60, w_S=0.40. Normalized weights remain w'_A=0.60, w'_S=0.40.", 11);
-  write("Example Administration score A=28.9 and Services score S=19.2.", 11);
-  write("Index = 28.9×0.60 + 19.2×0.40 = 25.02.", 11);
+  write("3) Example (Laboratory Staff)", 13, true);
+  write("Sections ON: Administration (A), Services (S), Lab Operations (L). Example baseline weights: A=0.45, S=0.25, L=0.30.", 11);
+  write("Example scores: A=30, S=18, L=22.", 11);
+  write("Index = 30×0.45 + 18×0.25 + 22×0.30 = 13.5 + 4.5 + 6.6 = 24.6.", 11);
 
   y += 10;
   write("4) Section Score Logic (high-level)", 13, true);
-  write("Teaching: contact hours + student volume + credit multiplier (credit auto-read from last digit of course code).", 11);
-  write("Supervision: UG/Master/PhD weights × role × status.", 11);
+  write("Teaching: (contact hours×hourW) + (students/100×studW) + (credit×creditW). Credit auto-read from last digit of course code.", 11);
+  write("Supervision: UG/Master/PhD base × role × status.", 11);
   write("Research: base × grant level × role × status.", 11);
   write("Publication: base × type × indexed × role.", 11);
-  write("Administration: level base + meetings + months (official vs ad-hoc bonus).", 11);
-  write("Services: hours + participants + role bonus, with start/end dates recorded.", 11);
-  write("Lab Operations: (volume + hours) × complexity × urgency multipliers.", 11);
+  write("Administration: level base + meetings×meetW + months×monthW, with official/ad-hoc bonus.", 11);
+  write("Services: hours×hourW + (participants/10)×paxW + role bonus.", 11);
+  write("Lab Ops: (volume×volW + hours×hourW) × complexity × urgency multipliers.", 11);
 
   y += 14;
-  write("Note: Admin can adjust all weights and scoring parameters in the Settings section after unlocking with the admin password.", 11);
+  write("Admin can adjust weights and scoring parameters in Settings after unlocking with admin password.", 11);
 
   doc.save("FST_UMS_Busyness_Index_Manual.pdf");
 }
 
-/* ----------- EXPORTS ----------- */
+/* ========================= Export ========================= */
 function download(filename, content, mime="text/plain"){
   const blob = new Blob([content], {type:mime});
   const url = URL.createObjectURL(blob);
@@ -1941,7 +1962,6 @@ function exportSummaryCSV(){
 }
 
 function exportDetailedCSV(){
-  // one combined detailed file
   const lines = [];
   const pushSection = (name, arr)=>{
     lines.push(`SECTION,${name}`);
@@ -1966,11 +1986,7 @@ function exportDetailedCSV(){
 
 function exportJSON(){
   const payload = {
-    meta:{
-      generated_at: new Date().toISOString(),
-      app:"FST UMS Staff Busyness Index",
-      version:"1.0"
-    },
+    meta:{ generated_at:new Date().toISOString(), app:"FST UMS Staff Busyness Index", version:"1.0" },
     profile: state.profile,
     enabled_sections: state.enabled,
     baseline_weights: state.weights,
@@ -1978,23 +1994,18 @@ function exportJSON(){
     scheme: state.scheme,
     data: state.data,
     results:{
-      T: $("outT").textContent,
-      SV: $("outSV").textContent,
-      R: $("outR").textContent,
-      P: $("outP").textContent,
-      A: $("outA").textContent,
-      S: $("outS").textContent,
-      L: $("outL").textContent,
-      index: $("outIndex").textContent,
-      band: $("outBand").textContent,
-      narrative: $("outNarr").textContent
+      T:$("outT").textContent, SV:$("outSV").textContent, R:$("outR").textContent,
+      P:$("outP").textContent, A:$("outA").textContent, S:$("outS").textContent, L:$("outL").textContent,
+      index:$("outIndex").textContent, band:$("outBand").textContent,
+      dean_summary:$("outDean").textContent,
+      narrative:$("outNarr").textContent
     },
     audit: state.audit
   };
   download("FST_UMS_Busyness_Full.json", JSON.stringify(payload,null,2), "application/json");
 }
 
-/* ----------- STORAGE ----------- */
+/* ========================= Storage ========================= */
 function autosave(){
   state.audit.last_saved_at = new Date().toISOString();
   localStorage.setItem("fst_busyness_v1", JSON.stringify(state));
@@ -2002,7 +2013,7 @@ function autosave(){
 function saveNow(){
   syncProfileFromUI();
   syncEnabledFromUI();
-  if(adminUnlocked) syncWeightsFromUI();
+  syncSettingsFromUI_ifAdmin();
   autosave();
   showMsg("ok","<b>Saved locally:</b> Data stored in your browser (localStorage).");
 }
@@ -2015,32 +2026,14 @@ function loadLocal(){
   }catch(e){}
 }
 
-/* ----------- RESET ----------- */
+/* ========================= Reset ========================= */
 function resetAll(){
   if(!confirm("Reset all data? This will clear local saved data for this tool on this browser.")) return;
   localStorage.removeItem("fst_busyness_v1");
   location.reload();
 }
 
-/* ----------- ADMIN UNLOCK ----------- */
-function unlockAdmin(){
-  const pw = prompt("Enter admin password to unlock Settings:");
-  if(pw===null) return;
-  if(pw===ADMIN_PASSWORD){
-    adminUnlocked = true;
-    setAdminUI();
-    showMsg("ok","<b>Admin unlocked:</b> You can now edit weights and mark scheme.");
-  }else{
-    showMsg("bad","<b>Access denied:</b> Incorrect password.");
-  }
-}
-function lockAdmin(){
-  adminUnlocked = false;
-  setAdminUI();
-  showMsg("warn","<b>Locked:</b> Settings are now read-only.");
-}
-
-/* ----------- INIT ----------- */
+/* ========================= Init ========================= */
 function init(){
   loadLocal();
   ensureSeed();
@@ -2049,7 +2042,7 @@ function init(){
   renderAll();
   setAdminUI();
 
-  // profile other fields
+  // Profile other fields
   $("pGrade").addEventListener("change", ()=>{
     $("pGradeOtherWrap").style.display = ($("pGrade").value==="Others") ? "block" : "none";
   });
@@ -2057,13 +2050,13 @@ function init(){
     $("pStatusOtherWrap").style.display = ($("pStatus").value==="Others") ? "block" : "none";
   });
 
-  // category template
+  // Category template
   $("pCategory").addEventListener("change", ()=>{
     syncProfileFromUI();
     if(state.profile.category) applyTemplateByCategory(state.profile.category);
   });
 
-  // toggles
+  // Toggles
   ["enTeaching","enSupervision","enResearch","enPublication","enAdministration","enServices","enLabOps"].forEach(id=>{
     $(id).addEventListener("change", ()=>{
       syncEnabledFromUI();
@@ -2072,7 +2065,11 @@ function init(){
     });
   });
 
-  // buttons add/clear
+  // Admin
+  $("btnAdminUnlock").addEventListener("click",(e)=>{ e.preventDefault(); unlockAdmin(); });
+  $("btnAdminLock").addEventListener("click",(e)=>{ e.preventDefault(); lockAdmin(); });
+
+  // Add/Clear
   $("addTeach").onclick=(e)=>{e.preventDefault(); addRow("teach");};
   $("clearTeach").onclick=(e)=>{e.preventDefault(); clearKind("teach");};
   $("addSv").onclick=(e)=>{e.preventDefault(); addRow("sv");};
@@ -2088,26 +2085,23 @@ function init(){
   $("addLab").onclick=(e)=>{e.preventDefault(); addRow("lab");};
   $("clearLab").onclick=(e)=>{e.preventDefault(); clearKind("lab");};
 
-  // calc/print/manual/export
+  // Calculate / Print / Manual / Export
   $("btnCalc").onclick=(e)=>{e.preventDefault(); calculate();};
-  $("btnPrint").onclick=(e)=>{e.preventDefault(); printPDF();};
+  $("btnPrint").onclick=(e)=>{e.preventDefault(); syncProfileFromUI(); printPDF();};
   $("btnManual").onclick=(e)=>{e.preventDefault(); manualPDF();};
   $("btnExportSummaryCSV").onclick=(e)=>{e.preventDefault(); exportSummaryCSV();};
   $("btnExportDetailedCSV").onclick=(e)=>{e.preventDefault(); exportDetailedCSV();};
   $("btnExportJSON").onclick=(e)=>{e.preventDefault(); exportJSON();};
 
-  // top actions
-  $("btnAdminUnlock").onclick=(e)=>{e.preventDefault(); unlockAdmin();};
-  $("btnAdminLock").onclick=(e)=>{e.preventDefault(); lockAdmin();};
+  // Save / Reset
   $("btnSaveLocal").onclick=(e)=>{e.preventDefault(); saveNow();};
   $("btnReset").onclick=(e)=>{e.preventDefault(); resetAll();};
 
-  // presets (admin only)
-  $("btnPresetAcademic").onclick=(e)=>{e.preventDefault(); if(!adminUnlocked) return; applyTemplateByCategory("Academic");};
-  $("btnPresetAdmin").onclick=(e)=>{e.preventDefault(); if(!adminUnlocked) return; applyTemplateByCategory("Administrative");};
-  $("btnPresetLab").onclick=(e)=>{e.preventDefault(); if(!adminUnlocked) return; applyTemplateByCategory("Laboratory");};
+  // Presets (admin only)
+  $("btnPresetAcademic").onclick=(e)=>{e.preventDefault(); if(!isAdmin) return; applyTemplateByCategory("Academic");};
+  $("btnPresetAdmin").onclick=(e)=>{e.preventDefault(); if(!isAdmin) return; applyTemplateByCategory("Administrative");};
+  $("btnPresetLab").onclick=(e)=>{e.preventDefault(); if(!isAdmin) return; applyTemplateByCategory("Laboratory");};
 
-  // first message
   hideMsg();
 }
 init();
