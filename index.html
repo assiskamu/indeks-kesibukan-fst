@@ -16,7 +16,7 @@
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- jsPDF for manual PDF -->
+  <!-- jsPDF for manual + report PDFs -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
   <style>
@@ -66,16 +66,17 @@
       position:sticky;top:10px;z-index:20;
       backdrop-filter: blur(10px);
     }
-    .brand{display:flex;align-items:center;gap:14px}
+    .brand{display:flex;align-items:center;gap:14px;min-width:280px}
     .logoBox{
-      width:120px;height:72px;               /* bigger logo */
+      width:120px;height:72px;
       border-radius:14px;
-      background:#ffffff;                    /* white background */
+      background:#ffffff;
       overflow:hidden;
       display:flex;align-items:center;justify-content:center;
-      border:none;                           /* no border */
-      box-shadow:none;                       /* no border feel */
+      border:none;
+      box-shadow:none;
       padding:8px;
+      flex:0 0 auto;
     }
     .logoBox img{width:100%;height:100%;object-fit:contain}
 
@@ -93,6 +94,7 @@
       cursor:pointer; font-weight:650;
       transition: transform .08s ease, background .2s ease, border .2s ease;
       user-select:none;
+      white-space:nowrap;
     }
     .btn:hover{background:rgba(255,255,255,.10)}
     .btn:active{transform: translateY(1px)}
@@ -202,6 +204,32 @@
       .logoBox{width:110px;height:66px}
     }
 
+    /* Phone-first polish */
+    @media(max-width:640px){
+      .wrap{padding:14px 12px 86px}
+      .topbar{
+        flex-direction:column;
+        align-items:stretch;
+        gap:10px;
+        position:relative;
+        top:auto;
+      }
+      .brand{min-width:unset}
+      .title h1{font-size:14px}
+      .title .sub{font-size:12px}
+      .top-actions{
+        width:100%;
+        justify-content:flex-start;
+      }
+      .adminPanel{width:100%}
+      .adminPanel input{width:100% !important}
+      .btn{flex:1 1 auto}
+      .pill,.badge{width:100%;justify-content:center}
+      .logoBox{width:108px;height:64px}
+      .content{padding:14px}
+      th,td{padding:8px 6px}
+    }
+
     label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
     input,select,textarea{
       width:100%;
@@ -212,15 +240,31 @@
       padding:10px 10px;
       outline:none;
     }
-    textarea{min-height:70px;resize:vertical}
+    textarea{min-height:42px;resize:vertical}
+    textarea.autoGrow{
+      resize:none;
+      overflow:hidden;
+      min-height:42px;
+    }
     input.err, select.err, textarea.err{border-color: rgba(255,91,110,.85) !important; box-shadow: 0 0 0 3px rgba(255,91,110,.18)}
     .hint{font-size:12px;color:var(--muted);margin-top:6px}
     .requiredMark::after{content:" *"; color: var(--warn); font-weight:800}
 
-    table{width:100%;border-collapse:collapse}
+    .tableWrap{
+      width:100%;
+      overflow:auto;
+      -webkit-overflow-scrolling:touch;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(7,11,21,.18);
+    }
+    table{width:100%;border-collapse:collapse;min-width:980px}
+    @media(max-width:720px){
+      table{min-width:980px}
+    }
     th,td{border-bottom:1px solid rgba(255,255,255,.10);padding:10px 8px;vertical-align:top}
     th{font-size:12px;color:var(--muted);text-align:left}
-    td input, td select{padding:8px 8px;border-radius:10px}
+    td input, td select, td textarea{padding:8px 8px;border-radius:10px}
 
     .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .row.right{justify-content:flex-end}
@@ -238,6 +282,7 @@
       grid-template-columns:repeat(4, minmax(0,1fr));
     }
     @media(max-width:900px){ .kpi{grid-template-columns:repeat(2, minmax(0,1fr))} }
+    @media(max-width:520px){ .kpi{grid-template-columns:1fr} }
     .box{
       border:1px solid rgba(255,255,255,.12);
       background:rgba(7,11,21,.40);
@@ -256,8 +301,7 @@
 
     .spacer{height:10px}
 
-    /* Print rules: hide settings/toggles/admin; show signatures only in print */
-    .printOnly{display:none}
+    /* Keep print CSS minimal because Print button generates a B/W professional PDF via jsPDF */
     @media print{
       body{background:#fff;color:#000}
       .topbar,.noPrint,#secSettings,#secToggles{display:none !important}
@@ -267,7 +311,6 @@
       .content, input, select, textarea{color:#000}
       input,select,textarea{background:#fff;border:1px solid #bbb}
       .box{border:1px solid #ddd;background:#fff}
-      .printOnly{display:block !important}
       canvas{max-width:100% !important}
     }
 
@@ -343,7 +386,7 @@
 
         <div>
           <label class="requiredMark">Programme/Unit</label>
-          <input id="pUnit" placeholder="e.g., Mathematics with Economics / Finance Unit / Chemistry Lab"/>
+          <textarea id="pUnit" class="autoGrow" rows="1" placeholder="e.g., Mathematics with Economics / Finance Unit / Chemistry Lab"></textarea>
         </div>
 
         <div>
@@ -362,7 +405,7 @@
         </div>
         <div id="pGradeOtherWrap" style="display:none;">
           <label class="requiredMark">Grade (Others) – please specify</label>
-          <input id="pGradeOther" placeholder="Type grade here"/>
+          <textarea id="pGradeOther" class="autoGrow" rows="1" placeholder="Type grade here"></textarea>
         </div>
 
         <div>
@@ -377,7 +420,7 @@
         </div>
         <div id="pStatusOtherWrap" style="display:none;">
           <label class="requiredMark">Status (Others) – please specify</label>
-          <input id="pStatusOther" placeholder="Type status here"/>
+          <textarea id="pStatusOther" class="autoGrow" rows="1" placeholder="Type status here"></textarea>
         </div>
 
         <div>
@@ -517,23 +560,26 @@
       </div>
     </header>
     <div class="content">
-      <table id="tblTeach">
-        <thead>
-          <tr>
-            <th style="width:14%">Course Code *</th>
-            <th>Course Name *</th>
-            <th style="width:8%">Credit</th>
-            <th style="width:10%">Students *</th>
-            <th style="width:10%">Lecture *</th>
-            <th style="width:10%">Tutorial *</th>
-            <th style="width:10%">Lab *</th>
-            <th style="width:10%">Field *</th>
-            <th style="width:10%">Contact hrs</th>
-            <th style="width:6%">Del</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <div class="tableWrap">
+        <table id="tblTeach">
+          <thead>
+            <tr>
+              <th style="width:14%">Course Code *</th>
+              <th>Course Name *</th>
+              <th style="width:8%">Credit</th>
+              <th style="width:10%">Students *</th>
+              <th style="width:10%">Lecture *</th>
+              <th style="width:10%">Tutorial *</th>
+              <th style="width:10%">Lab *</th>
+              <th style="width:10%">Field *</th>
+              <th style="width:10%">Contact hrs</th>
+              <th style="width:6%">Del</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="hint">On phone: swipe left/right on the table if needed.</div>
     </div>
   </section>
 
@@ -550,20 +596,23 @@
       </div>
     </header>
     <div class="content">
-      <table id="tblSv">
-        <thead>
-          <tr>
-            <th style="width:18%">Level *</th>
-            <th>Student / Project *</th>
-            <th style="width:14%">Role *</th>
-            <th style="width:12%">Status *</th>
-            <th style="width:12%">Start *</th>
-            <th style="width:12%">End *</th>
-            <th style="width:8%">Del</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <div class="tableWrap">
+        <table id="tblSv">
+          <thead>
+            <tr>
+              <th style="width:18%">Level *</th>
+              <th>Student / Project *</th>
+              <th style="width:14%">Role *</th>
+              <th style="width:12%">Status *</th>
+              <th style="width:12%">Start *</th>
+              <th style="width:12%">End *</th>
+              <th style="width:8%">Del</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="hint">On phone: swipe left/right on the table if needed.</div>
     </div>
   </section>
 
@@ -580,22 +629,25 @@
       </div>
     </header>
     <div class="content">
-      <table id="tblRes">
-        <thead>
-          <tr>
-            <th style="width:14%">Grant Code *</th>
-            <th>Title *</th>
-            <th style="width:14%">Level *</th>
-            <th style="width:12%">Status *</th>
-            <th style="width:12%">Role *</th>
-            <th style="width:12%">Amount (RM) *</th>
-            <th style="width:10%">Start *</th>
-            <th style="width:10%">End *</th>
-            <th style="width:6%">Del</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <div class="tableWrap">
+        <table id="tblRes">
+          <thead>
+            <tr>
+              <th style="width:14%">Grant Code *</th>
+              <th>Title *</th>
+              <th style="width:14%">Level *</th>
+              <th style="width:12%">Status *</th>
+              <th style="width:12%">Role *</th>
+              <th style="width:12%">Amount (RM) *</th>
+              <th style="width:10%">Start *</th>
+              <th style="width:10%">End *</th>
+              <th style="width:6%">Del</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="hint">On phone: swipe left/right on the table if needed.</div>
     </div>
   </section>
 
@@ -612,21 +664,24 @@
       </div>
     </header>
     <div class="content">
-      <table id="tblPub">
-        <thead>
-          <tr>
-            <th style="width:10%">Year *</th>
-            <th>Title *</th>
-            <th style="width:16%">Type *</th>
-            <th style="width:14%">Indexed? *</th>
-            <th style="width:14%">Role *</th>
-            <th style="width:12%">Start *</th>
-            <th style="width:12%">End *</th>
-            <th style="width:6%">Del</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <div class="tableWrap">
+        <table id="tblPub">
+          <thead>
+            <tr>
+              <th style="width:10%">Year *</th>
+              <th>Title *</th>
+              <th style="width:16%">Type *</th>
+              <th style="width:14%">Indexed? *</th>
+              <th style="width:14%">Role *</th>
+              <th style="width:12%">Start *</th>
+              <th style="width:12%">End *</th>
+              <th style="width:6%">Del</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="hint">On phone: swipe left/right on the table if needed.</div>
     </div>
   </section>
 
@@ -643,24 +698,27 @@
       </div>
     </header>
     <div class="content">
-      <table id="tblAdmin">
-        <thead>
-          <tr>
-            <th style="width:18%">Position *</th>
-            <th style="width:14%">Type *</th>
-            <th style="width:18%">Level *</th>
-            <th style="width:10%">Months *</th>
-            <th style="width:10%">Meetings *</th>
-            <th>Notes *</th>
-            <th style="width:10%">Start *</th>
-            <th style="width:10%">End *</th>
-            <th style="width:6%">Del</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <div class="tableWrap">
+        <table id="tblAdmin">
+          <thead>
+            <tr>
+              <th style="width:18%">Position *</th>
+              <th style="width:14%">Type *</th>
+              <th style="width:18%">Level *</th>
+              <th style="width:10%">Months *</th>
+              <th style="width:10%">Meetings *</th>
+              <th>Notes *</th>
+              <th style="width:10%">Start *</th>
+              <th style="width:10%">End *</th>
+              <th style="width:6%">Del</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
       <div class="spacer"></div>
       <div class="notice">Tip: For conference committee work (AJK), use Position = “Conference Committee” and describe pre-conference preparation in Notes.</div>
+      <div class="hint">On phone: swipe left/right on the table if needed.</div>
     </div>
   </section>
 
@@ -677,21 +735,24 @@
       </div>
     </header>
     <div class="content">
-      <table id="tblSvc">
-        <thead>
-          <tr>
-            <th style="width:18%">Service Type *</th>
-            <th>Activity *</th>
-            <th style="width:12%">Role *</th>
-            <th style="width:10%">Hours *</th>
-            <th style="width:10%">Participants *</th>
-            <th style="width:12%">Start *</th>
-            <th style="width:12%">End *</th>
-            <th style="width:6%">Del</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <div class="tableWrap">
+        <table id="tblSvc">
+          <thead>
+            <tr>
+              <th style="width:18%">Service Type *</th>
+              <th>Activity *</th>
+              <th style="width:12%">Role *</th>
+              <th style="width:10%">Hours *</th>
+              <th style="width:10%">Participants *</th>
+              <th style="width:12%">Start *</th>
+              <th style="width:12%">End *</th>
+              <th style="width:6%">Del</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="hint">On phone: swipe left/right on the table if needed.</div>
     </div>
   </section>
 
@@ -708,22 +769,25 @@
       </div>
     </header>
     <div class="content">
-      <table id="tblLab">
-        <thead>
-          <tr>
-            <th style="width:18%">Type *</th>
-            <th>Description *</th>
-            <th style="width:10%">Volume *</th>
-            <th style="width:12%">Complexity *</th>
-            <th style="width:12%">Urgency *</th>
-            <th style="width:10%">Hours *</th>
-            <th style="width:12%">Start *</th>
-            <th style="width:12%">End *</th>
-            <th style="width:6%">Del</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <div class="tableWrap">
+        <table id="tblLab">
+          <thead>
+            <tr>
+              <th style="width:18%">Type *</th>
+              <th>Description *</th>
+              <th style="width:10%">Volume *</th>
+              <th style="width:12%">Complexity *</th>
+              <th style="width:12%">Urgency *</th>
+              <th style="width:10%">Hours *</th>
+              <th style="width:12%">Start *</th>
+              <th style="width:12%">End *</th>
+              <th style="width:6%">Del</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="hint">On phone: swipe left/right on the table if needed.</div>
     </div>
   </section>
 
@@ -732,7 +796,7 @@
     <header>
       <div>
         <h2>Results</h2>
-        <div class="sub">Calculate index, view section contributions, export for dashboard, and print clean PDF (no settings/weights shown).</div>
+        <div class="sub">Calculate index, view section contributions, export for dashboard, and generate professional black & white PDF report.</div>
       </div>
     </header>
     <div class="content">
@@ -781,32 +845,11 @@
         <button class="btn" id="btnExportJSON">Export Full JSON</button>
       </div>
 
-      <!-- PRINT-ONLY SIGNATURES -->
-      <div class="printOnly" style="margin-top:16px">
-        <hr style="border:0;border-top:1px solid #ddd;margin:16px 0">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
-          <div>
-            <div style="font-weight:800;margin-bottom:8px">Staff Declaration</div>
-            <div>Name: <span id="printName"></span></div>
-            <div>Staff ID: <span id="printId"></span></div>
-            <div>Date printed: <span id="printDate"></span></div>
-            <div style="height:110px;border:1px solid #bbb;margin-top:10px;padding:10px">Staff Signature:</div>
-          </div>
-          <div>
-            <div style="font-weight:800;margin-bottom:8px">Dean Approval</div>
-            <div>Faculty: Faculty of Science and Technology</div>
-            <div>Dean: Prof. P.Geol. Ts. Dr. Rodeano Roslee</div>
-            <div>Date: _______________________</div>
-            <div style="height:110px;border:1px solid #bbb;margin-top:10px;padding:10px">Dean Signature:</div>
-          </div>
-        </div>
-        <div style="margin-top:10px;font-size:11px;color:#555">© FST UMS</div>
-      </div>
-
       <div class="spacer"></div>
 
       <div class="box">
         <canvas id="chart" height="120"></canvas>
+        <div class="hint">Chart is for on-screen view only. The PDF report is black & white.</div>
       </div>
 
     </div>
@@ -830,8 +873,20 @@ function showMsg(kind, html){
 }
 function hideMsg(){ $("msgGlobal").style.display="none"; }
 
+function autosizeTextarea(el){
+  if(!el) return;
+  if(el.tagName !== "TEXTAREA") return;
+  el.style.height = "auto";
+  const max = 320; // keep reasonable on table rows
+  el.style.height = Math.min(el.scrollHeight, max) + "px";
+}
+function autosizeAllTextareas(root=document){
+  root.querySelectorAll("textarea.autoGrow").forEach(t=>autosizeTextarea(t));
+}
+
 /* ========================= State ========================= */
 let isAdmin = false;
+let lastCalc = null; // store last calculated results for PDF/report/manual
 
 const state = {
   profile:{
@@ -870,7 +925,6 @@ function setAdminUI(){
   $("lockDot").className = "dot " + (isAdmin ? "" : "lock");
   $("lockText").textContent = isAdmin ? "Settings unlocked" : "Settings locked";
 
-  // lock/unlock adminOnly controls
   document.querySelectorAll(".adminOnly").forEach(el=>{
     el.disabled = !isAdmin;
   });
@@ -917,6 +971,7 @@ function applyTemplateByCategory(cat){
   syncUIFromState();
   applySectionVisibility();
   autosave();
+  autosizeAllTextareas();
 }
 
 /* ========================= Sync UI <-> State ========================= */
@@ -984,7 +1039,6 @@ function syncSettingsFromUI_ifAdmin(){
 }
 
 function syncUIFromState(){
-  // profile
   $("pName").value = state.profile.name || "";
   $("pStaffId").value = state.profile.staffId || "";
   $("pCategory").value = state.profile.category || "";
@@ -997,7 +1051,6 @@ function syncUIFromState(){
   $("pGradeOtherWrap").style.display = (state.profile.grade==="Others") ? "block" : "none";
   $("pStatusOtherWrap").style.display = (state.profile.status==="Others") ? "block" : "none";
 
-  // enabled
   $("enTeaching").checked = !!state.enabled.T;
   $("enSupervision").checked = !!state.enabled.SV;
   $("enResearch").checked = !!state.enabled.R;
@@ -1006,7 +1059,6 @@ function syncUIFromState(){
   $("enServices").checked = !!state.enabled.S;
   $("enLabOps").checked = !!state.enabled.L;
 
-  // weights
   $("wT").value = state.weights.T.toFixed(2);
   $("wSV").value = state.weights.SV.toFixed(2);
   $("wR").value = state.weights.R.toFixed(2);
@@ -1015,7 +1067,6 @@ function syncUIFromState(){
   $("wS").value = state.weights.S.toFixed(2);
   $("wL").value = state.weights.L.toFixed(2);
 
-  // scheme
   $("tHourW").value = state.scheme.teaching.hourW;
   $("tStudW").value = state.scheme.teaching.studW;
   $("tCreditW").value = state.scheme.teaching.creditW;
@@ -1215,6 +1266,7 @@ function renderAll(){
   renderAdmin();
   renderSvc();
   renderLab();
+  autosizeAllTextareas();
 }
 
 function renderTeaching(){
@@ -1224,7 +1276,7 @@ function renderTeaching(){
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
       <td><input data-k="code" placeholder="e.g., SJ24102"/></td>
-      <td><input data-k="name" placeholder="Course name"/></td>
+      <td><textarea data-k="name" class="autoGrow" rows="1" placeholder="Course name"></textarea></td>
       <td><input data-k="credit" disabled/></td>
       <td><input data-k="students" type="number" min="0" step="1"/></td>
       <td><input data-k="lec" type="number" min="0" step="0.5"/></td>
@@ -1254,8 +1306,10 @@ function renderTeaching(){
         obj.code=e.target.value.toUpperCase();
         obj.credit=creditFromCode(obj.code);
         tr.querySelector('[data-k="credit"]').value=obj.credit;
-      } else if(k==="name"){ obj.name=e.target.value; }
-      else if(["students","lec","tut","lab","field"].includes(k)){
+      } else if(k==="name"){
+        obj.name=e.target.value;
+        autosizeTextarea(e.target);
+      } else if(["students","lec","tut","lab","field"].includes(k)){
         obj[k]=Math.max(0,n(e.target.value)); e.target.value=obj[k];
         tr.querySelector('[data-k="contact"]').value=contactHoursRow(obj).toFixed(1);
       }
@@ -1283,7 +1337,7 @@ function renderSv(){
           <option>PhD</option>
         </select>
       </td>
-      <td><input data-k="title" placeholder="Student name / project"/></td>
+      <td><textarea data-k="title" class="autoGrow" rows="1" placeholder="Student name / project"></textarea></td>
       <td>
         <select data-k="role">
           <option>Main</option>
@@ -1312,6 +1366,7 @@ function renderSv(){
       const k=e.target.getAttribute("data-k"); if(!k) return;
       const obj=state.data.supervision.find(x=>x.id===tr.dataset.id); if(!obj) return;
       obj[k]=e.target.value;
+      if(k==="title") autosizeTextarea(e.target);
       autosave();
     });
     tr.addEventListener("click",(e)=>{
@@ -1329,7 +1384,7 @@ function renderRes(){
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
       <td><input data-k="code" placeholder="Grant code"/></td>
-      <td><input data-k="title" placeholder="Grant title"/></td>
+      <td><textarea data-k="title" class="autoGrow" rows="1" placeholder="Grant title"></textarea></td>
       <td>
         <select data-k="level">
           <option>University</option>
@@ -1371,6 +1426,7 @@ function renderRes(){
       const obj=state.data.research.find(x=>x.id===tr.dataset.id); if(!obj) return;
       if(k==="amount") obj.amount=Math.max(0,n(e.target.value)), e.target.value=obj.amount;
       else obj[k]=e.target.value;
+      if(k==="title") autosizeTextarea(e.target);
       autosave();
     });
     tr.addEventListener("click",(e)=>{
@@ -1388,7 +1444,7 @@ function renderPub(){
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
       <td><input data-k="year" type="number" min="1990" step="1"/></td>
-      <td><input data-k="title" placeholder="Publication title"/></td>
+      <td><textarea data-k="title" class="autoGrow" rows="1" placeholder="Publication title"></textarea></td>
       <td>
         <select data-k="type">
           <option>Journal</option>
@@ -1427,6 +1483,7 @@ function renderPub(){
       const obj=state.data.publication.find(x=>x.id===tr.dataset.id); if(!obj) return;
       if(k==="year") obj.year=Math.max(1990, Math.floor(n(e.target.value)||new Date().getFullYear())), e.target.value=obj.year;
       else obj[k]=e.target.value;
+      if(k==="title") autosizeTextarea(e.target);
       autosave();
     });
     tr.addEventListener("click",(e)=>{
@@ -1443,7 +1500,7 @@ function renderAdmin(){
   state.data.admin.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
-      <td><input data-k="pos" placeholder="Position / appointment"/></td>
+      <td><textarea data-k="pos" class="autoGrow" rows="1" placeholder="Position / appointment"></textarea></td>
       <td>
         <select data-k="type">
           <option>Official</option>
@@ -1463,7 +1520,7 @@ function renderAdmin(){
       </td>
       <td><input data-k="months" type="number" min="0" step="1"/></td>
       <td><input data-k="meetings" type="number" min="0" step="1"/></td>
-      <td><input data-k="notes" placeholder="Key workload notes"/></td>
+      <td><textarea data-k="notes" class="autoGrow" rows="1" placeholder="Key workload notes"></textarea></td>
       <td><input data-k="start" type="date"/></td>
       <td><input data-k="end" type="date"/></td>
       <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
@@ -1483,6 +1540,7 @@ function renderAdmin(){
       const obj=state.data.admin.find(x=>x.id===tr.dataset.id); if(!obj) return;
       if(k==="months"||k==="meetings"){ obj[k]=Math.max(0,Math.floor(n(e.target.value))); e.target.value=obj[k]; }
       else obj[k]=e.target.value;
+      if(k==="pos"||k==="notes") autosizeTextarea(e.target);
       autosave();
     });
     tr.addEventListener("click",(e)=>{
@@ -1507,7 +1565,7 @@ function renderSvc(){
           <option>Other</option>
         </select>
       </td>
-      <td><input data-k="activity" placeholder="Describe activity"/></td>
+      <td><textarea data-k="activity" class="autoGrow" rows="1" placeholder="Describe activity"></textarea></td>
       <td>
         <select data-k="role">
           <option>Lead</option>
@@ -1535,6 +1593,7 @@ function renderSvc(){
       if(k==="hours") obj.hours=Math.max(0,n(e.target.value)), e.target.value=obj.hours;
       else if(k==="participants") obj.participants=Math.max(0,Math.floor(n(e.target.value))), e.target.value=obj.participants;
       else obj[k]=e.target.value;
+      if(k==="activity") autosizeTextarea(e.target);
       autosave();
     });
     tr.addEventListener("click",(e)=>{
@@ -1561,7 +1620,7 @@ function renderLab(){
           <option>Other</option>
         </select>
       </td>
-      <td><input data-k="desc" placeholder="Describe briefly"/></td>
+      <td><textarea data-k="desc" class="autoGrow" rows="1" placeholder="Describe briefly"></textarea></td>
       <td><input data-k="volume" type="number" min="0" step="1"/></td>
       <td>
         <select data-k="cx">
@@ -1595,6 +1654,7 @@ function renderLab(){
       if(k==="volume") obj.volume=Math.max(0,Math.floor(n(e.target.value))), e.target.value=obj.volume;
       else if(k==="hours") obj.hours=Math.max(0,n(e.target.value)), e.target.value=obj.hours;
       else obj[k]=e.target.value;
+      if(k==="desc") autosizeTextarea(e.target);
       autosave();
     });
     tr.addEventListener("click",(e)=>{
@@ -1800,23 +1860,23 @@ function calculate(){
   syncEnabledFromUI();
   syncSettingsFromUI_ifAdmin();
 
-  if(!validateProfile()) return;
-  if(!validateToggles()) return;
+  if(!validateProfile()) return false;
+  if(!validateToggles()) return false;
   applySectionVisibility();
   ensureSeed();
   renderAll();
 
   if(!validateWeightsBaseline_ifAdmin()) {
     showMsg("warn","<b>Admin validation:</b> Fix weights so baseline sum is 1.00.");
-    return;
+    return false;
   }
 
-  if(!validateActivityTables()) return;
+  if(!validateActivityTables()) return false;
 
   const aw = getActiveWeights();
   if(!aw){
     showMsg("bad","<b>Error:</b> Active weights are zero. Turn ON sections and ensure weights are not all zero.");
-    return;
+    return false;
   }
 
   const scores = {
@@ -1853,74 +1913,559 @@ function calculate(){
   state.audit.last_calc_at = new Date().toISOString();
   autosave();
 
+  lastCalc = { scores, aw, index, band:b };
+
   showMsg("ok", `<b>Calculated:</b> Index = <b>${index.toFixed(1)}</b> (${b.label}). Active weights were re-normalized automatically based on ON sections.`);
+  return true;
 }
 
-/* ========================= Print ========================= */
-function printPDF(){
-  $("printName").textContent = state.profile.name || "";
-  $("printId").textContent = state.profile.staffId || "";
-  $("printDate").textContent = new Date().toLocaleString();
-  window.print();
+/* ========================= Professional B/W Report PDF (Print PDF) ========================= */
+function reportPDF(){
+  // Always calculate first to ensure latest values & validation
+  const ok = calculate();
+  if(!ok) return;
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:"pt", format:"a4"});
+  const W = doc.internal.pageSize.getWidth();
+  const H = doc.internal.pageSize.getHeight();
+  const m = 44;
+  let y = 40;
+
+  const line = (x1,y1,x2,y2)=>doc.line(x1,y1,x2,y2);
+  const rect = (x,y,w,h)=>doc.rect(x,y,w,h);
+  const text = (t,x,y,opts={})=>doc.text(String(t), x, y, opts);
+
+  const setFont = (size=10, bold=false)=>{
+    doc.setFont("helvetica", bold?"bold":"normal");
+    doc.setFontSize(size);
+    doc.setTextColor(0,0,0);
+  };
+
+  const addPageIfNeeded = (need=0)=>{
+    if(y + need > H - m){
+      doc.addPage();
+      y = m;
+      header(true);
+    }
+  };
+
+  const header = (isContinued=false)=>{
+    setFont(12,true);
+    text("FACULTY OF SCIENCE AND TECHNOLOGY (FST), UNIVERSITI MALAYSIA SABAH", m, 40);
+    setFont(10,false);
+    text("STAFF BUSYNESS INDEX – REPORT (BLACK & WHITE)", m, 58);
+    setFont(9,false);
+    text(isContinued ? "Continued" : `Generated: ${new Date().toLocaleString()}`, W - m, 58, {align:"right"});
+    line(m, 66, W - m, 66);
+    y = 82;
+  };
+
+  const sectionTitle = (title)=>{
+    addPageIfNeeded(52);
+    setFont(10,true);
+    doc.setFillColor(245,245,245);
+    doc.rect(m, y-14, W-2*m, 22, "F");
+    doc.setDrawColor(0,0,0);
+    rect(m, y-14, W-2*m, 22);
+    text(title, m+10, y);
+    y += 34;
+  };
+
+  const kvTable = (rows)=>{
+    const col1 = m;
+    const col2 = m + 170;
+    const colW = (W - 2*m) - 170;
+    const rowH = 18;
+
+    addPageIfNeeded(rows.length*rowH + 12);
+    setFont(9,false);
+    doc.setDrawColor(0,0,0);
+    rows.forEach(([k,v])=>{
+      rect(col1, y-12, 170, rowH);
+      rect(col2, y-12, colW, rowH);
+      setFont(9,true); text(k, col1+8, y);
+      setFont(9,false);
+      const vv = (v===undefined || v===null) ? "" : String(v);
+      const lines = doc.splitTextToSize(vv, colW-16);
+      text(lines[0] || "", col2+8, y);
+      y += rowH;
+    });
+    y += 10;
+  };
+
+  const simpleTable = (headers, rows, colWidths)=>{
+    const rowH = 18;
+    addPageIfNeeded((rows.length+2)*rowH + 8);
+
+    // header
+    setFont(9,true);
+    let x = m;
+    doc.setFillColor(245,245,245);
+    doc.rect(m, y-12, W-2*m, rowH, "F");
+    doc.setDrawColor(0,0,0);
+    rect(m, y-12, W-2*m, rowH);
+    headers.forEach((h,i)=>{
+      text(h, x+6, y);
+      x += colWidths[i];
+    });
+    y += rowH;
+
+    // rows
+    setFont(9,false);
+    rows.forEach(r=>{
+      addPageIfNeeded(rowH+2);
+      let x2 = m;
+      rect(m, y-12, W-2*m, rowH);
+      r.forEach((cell,i)=>{
+        text(String(cell), x2+6, y);
+        x2 += colWidths[i];
+      });
+      y += rowH;
+    });
+    y += 10;
+  };
+
+  // Start
+  header(false);
+
+  sectionTitle("A. Staff Profile");
+  kvTable([
+    ["Full Name", state.profile.name],
+    ["Staff ID", state.profile.staffId],
+    ["Staff Category", state.profile.category],
+    ["Programme/Unit", state.profile.unit],
+    ["Grade", state.profile.grade==="Others" ? state.profile.gradeOther : state.profile.grade],
+    ["Employment Status", state.profile.status==="Others" ? state.profile.statusOther : state.profile.status],
+    ["Reporting Period", state.profile.period],
+  ]);
+
+  sectionTitle("B. Section Applicability & Normalized Weights");
+  const onSections = Object.entries(state.enabled).filter(([k,v])=>v).map(([k])=>k).join(", ");
+  const aw = lastCalc.aw;
+  const weightsText = Object.entries(aw).filter(([k,v])=>v>0).map(([k,v])=>`${k} = ${v.toFixed(2)}`).join("   |   ");
+  kvTable([
+    ["Sections ON", onSections],
+    ["Normalized Weights (w')", weightsText],
+    ["Normalization Formula", "w'_i = (en_i × w_i) / Σ(en × w)"],
+  ]);
+
+  sectionTitle("C. Scores & Index");
+  const s = lastCalc.scores;
+  const rows = [];
+  const pushRow = (code, name, enabled, score, weight)=>{
+    if(!enabled) return;
+    rows.push([code, name, score.toFixed(1), weight.toFixed(2), (score*weight).toFixed(1)]);
+  };
+  pushRow("T","Teaching", state.enabled.T, s.T, aw.T);
+  pushRow("SV","Supervision", state.enabled.SV, s.SV, aw.SV);
+  pushRow("R","Research", state.enabled.R, s.R, aw.R);
+  pushRow("P","Publication", state.enabled.P, s.P, aw.P);
+  pushRow("A","Administration", state.enabled.A, s.A, aw.A);
+  pushRow("S","Services", state.enabled.S, s.S, aw.S);
+  pushRow("L","Lab Operations", state.enabled.L, s.L, aw.L);
+
+  simpleTable(
+    ["Code","Section","Raw Score","w'","Contribution"],
+    rows,
+    [44, 190, 80, 44, (W-2*m) - (44+190+80+44)]
+  );
+
+  kvTable([
+    ["Overall Busyness Index", lastCalc.index.toFixed(1)],
+    ["Band/Interpretation", lastCalc.band.label],
+    ["Index Formula", "Index = Σ(Score_i × w'_i), clamped to [0,100]"],
+  ]);
+
+  sectionTitle("D. Narrative Summary");
+  setFont(9,false);
+  const narrLines = doc.splitTextToSize($("outNarr").textContent || "", W-2*m-16);
+  addPageIfNeeded(narrLines.length*14 + 20);
+  rect(m, y-12, W-2*m, Math.max(44, narrLines.length*14 + 18));
+  text(narrLines, m+8, y);
+  y += Math.max(44, narrLines.length*14 + 18) + 10;
+
+  sectionTitle("E. Staff Declaration & Dean Approval");
+  addPageIfNeeded(160);
+  const boxW = (W - 2*m - 14) / 2;
+  const boxH = 150;
+
+  // Staff declaration
+  rect(m, y-12, boxW, boxH);
+  setFont(10,true); text("Staff Declaration", m+10, y+6);
+  setFont(9,false);
+  text(`Name: ${state.profile.name || ""}`, m+10, y+28);
+  text(`Staff ID: ${state.profile.staffId || ""}`, m+10, y+46);
+  text(`Date: _______________________`, m+10, y+64);
+  rect(m+10, y+78, boxW-20, 50);
+  setFont(8,false); text("Signature", m+14, y+140);
+
+  // Dean approval
+  const xR = m + boxW + 14;
+  rect(xR, y-12, boxW, boxH);
+  setFont(10,true); text("Dean Approval", xR+10, y+6);
+  setFont(9,false);
+  text("Faculty: Faculty of Science and Technology", xR+10, y+28);
+  text("Dean: Prof. P.Geol. Ts. Dr. Rodeano Roslee", xR+10, y+46);
+  text("Date: _______________________", xR+10, y+64);
+  rect(xR+10, y+78, boxW-20, 50);
+  setFont(8,false); text("Signature", xR+14, y+140);
+
+  y += boxH + 10;
+  setFont(8,false);
+  text("© FST UMS. This report is generated from the Staff Busyness Index Calculator (single-file web tool).", m, H - 28);
+
+  doc.save(`FST_UMS_Busyness_Report_${(state.profile.staffId||"staff")}.pdf`);
 }
 
-/* ========================= Manual PDF ========================= */
+/* ========================= Manual PDF (detailed + equations + 3 staff examples) ========================= */
 function manualPDF(){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({unit:"pt", format:"a4"});
   const W = doc.internal.pageSize.getWidth();
   const H = doc.internal.pageSize.getHeight();
-  const m = 48;
-  let y = 56;
+  const m = 44;
+  let y = 46;
 
-  const write = (t, size=11, bold=false)=>{
-    doc.setFont("helvetica", bold?"bold":"normal");
-    doc.setFontSize(size);
-    const lines = doc.splitTextToSize(t, W-m*2);
-    lines.forEach(line=>{
-      if(y>H-m){ doc.addPage(); y=m; }
-      doc.text(line, m, y);
-      y += size + 6;
-    });
+  const addPageIfNeeded = (need=0)=>{
+    if(y + need > H - m){
+      doc.addPage();
+      y = m;
+      pageHeader(true);
+    }
   };
 
-  doc.setFont("helvetica","bold"); doc.setFontSize(16);
-  doc.text("FST UMS Staff Busyness Index – Calculation Manual", m, 38);
-  doc.setFont("helvetica","normal"); doc.setFontSize(10);
-  doc.setTextColor(90,90,90);
-  doc.text("© FST UMS", W-m, 38, {align:"right"});
-  doc.setTextColor(0,0,0);
+  const pageHeader = (continued=false)=>{
+    doc.setFont("helvetica","bold"); doc.setFontSize(14);
+    doc.text("FST UMS Staff Busyness Index – Calculation Manual", m, 34);
+    doc.setFont("helvetica","normal"); doc.setFontSize(9);
+    doc.setTextColor(80,80,80);
+    doc.text(continued ? "Continued" : `Generated: ${new Date().toLocaleString()}`, W-m, 34, {align:"right"});
+    doc.setTextColor(0,0,0);
+    doc.line(m, 42, W-m, 42);
+    y = 60;
+  };
 
-  write("Overview", 13, true);
-  write("This manual explains how each section score is computed and how the overall index is calculated. The tool supports Academic, Administrative, and Laboratory staff via section ON/OFF and automatic weight re-normalization.", 11);
+  const title = (t)=>{
+    addPageIfNeeded(34);
+    doc.setFillColor(245,245,245);
+    doc.rect(m, y-14, W-2*m, 22, "F");
+    doc.setDrawColor(0,0,0);
+    doc.rect(m, y-14, W-2*m, 22);
+    doc.setFont("helvetica","bold"); doc.setFontSize(10);
+    doc.text(t, m+10, y);
+    y += 30;
+  };
 
-  y += 8;
-  write("1) Section ON/OFF and Weight Re-normalization", 13, true);
-  write("Let baseline weights be w_T, w_SV, w_R, w_P, w_A, w_S, w_L. If some sections are OFF, the system uses only ON weights and normalizes them:", 11);
-  write("w'_i = w_i / (sum of w over ON sections).", 11);
+  const para = (t, size=9)=>{
+    doc.setFont("helvetica","normal");
+    doc.setFontSize(size);
+    const lines = doc.splitTextToSize(t, W-2*m);
+    addPageIfNeeded(lines.length*(size+5) + 10);
+    lines.forEach(line=>{
+      doc.text(line, m, y);
+      y += size + 5;
+    });
+    y += 6;
+  };
 
-  y += 8;
-  write("2) Overall Index", 13, true);
-  write("Overall Index = Σ( Score_section × NormalizedWeight_section ).", 11);
+  const mono = (t)=>{
+    doc.setFont("courier","normal"); doc.setFontSize(9);
+    const lines = doc.splitTextToSize(t, W-2*m-16);
+    addPageIfNeeded(lines.length*14 + 20);
+    doc.rect(m, y-12, W-2*m, lines.length*14 + 14);
+    lines.forEach((line,i)=>{
+      doc.text(line, m+8, y + i*14);
+    });
+    y += lines.length*14 + 18;
+    doc.setFont("helvetica","normal");
+  };
 
-  y += 10;
-  write("3) Example (Laboratory Staff)", 13, true);
-  write("Sections ON: Administration (A), Services (S), Lab Operations (L). Example baseline weights: A=0.45, S=0.25, L=0.30.", 11);
-  write("Example scores: A=30, S=18, L=22.", 11);
-  write("Index = 30×0.45 + 18×0.25 + 22×0.30 = 13.5 + 4.5 + 6.6 = 24.6.", 11);
+  const bullet = (items)=>{
+    doc.setFont("helvetica","normal"); doc.setFontSize(9);
+    items.forEach(it=>{
+      const lines = doc.splitTextToSize(it, W-2*m-18);
+      addPageIfNeeded(lines.length*14 + 8);
+      doc.text("•", m, y);
+      doc.text(lines, m+12, y);
+      y += lines.length*14;
+    });
+    y += 8;
+  };
 
-  y += 10;
-  write("4) Section Score Logic (high-level)", 13, true);
-  write("Teaching: (contact hours×hourW) + (students/100×studW) + (credit×creditW). Credit auto-read from last digit of course code.", 11);
-  write("Supervision: UG/Master/PhD base × role × status.", 11);
-  write("Research: base × grant level × role × status.", 11);
-  write("Publication: base × type × indexed × role.", 11);
-  write("Administration: level base + meetings×meetW + months×monthW, with official/ad-hoc bonus.", 11);
-  write("Services: hours×hourW + (participants/10)×paxW + role bonus.", 11);
-  write("Lab Ops: (volume×volW + hours×hourW) × complexity × urgency multipliers.", 11);
+  const table2 = (rows)=>{
+    const leftW = 190;
+    const rightW = (W - 2*m) - leftW;
+    const rowH = 18;
+    addPageIfNeeded(rows.length*rowH + 18);
+    doc.setFont("helvetica","normal"); doc.setFontSize(9);
+    rows.forEach(([k,v])=>{
+      doc.rect(m, y-12, leftW, rowH);
+      doc.rect(m+leftW, y-12, rightW, rowH);
+      doc.setFont("helvetica","bold"); doc.text(String(k), m+8, y);
+      doc.setFont("helvetica","normal");
+      const vv = String(v ?? "");
+      const lines = doc.splitTextToSize(vv, rightW-16);
+      doc.text(lines[0] || "", m+leftW+8, y);
+      y += rowH;
+    });
+    y += 8;
+  };
 
-  y += 14;
-  write("Admin can adjust weights and scoring parameters in Settings after unlocking with admin password.", 11);
+  pageHeader(false);
+
+  title("1. Purpose and Overview");
+  para("This manual explains (i) how each section score is computed, (ii) how section ON/OFF affects the normalized weights, and (iii) how the overall Busyness Index is calculated. It includes worked examples for Academic, Administrative, and Laboratory staff categories.");
+
+  title("2. Notation");
+  bullet([
+    "Baseline weights: w_T, w_SV, w_R, w_P, w_A, w_S, w_L (admin inputs). Baseline weights must sum to 1.00.",
+    "Enable indicator: en_i ∈ {0,1} where i ∈ {T, SV, R, P, A, S, L}. ON = 1, OFF = 0.",
+    "Normalized weight: w'_i after removing OFF sections.",
+    "Raw section score: Score_i computed from activity entries.",
+  ]);
+
+  title("3. Section ON/OFF and Weight Re-normalization");
+  para("When some sections are OFF, the calculator automatically re-normalizes weights so that only ON sections share 100% of the total weight.");
+  mono(
+`Normalization:
+w'_i = (en_i × w_i) / Σ(en_k × w_k)
+
+Where:
+- en_i = 1 if section i is ON, else 0
+- Σ(en_k × w_k) is the sum of baseline weights over ON sections
+- If Σ(...) = 0, calculation cannot proceed (at least one ON section is required).`
+  );
+
+  title("4. Overall Busyness Index");
+  para("The overall index is computed as the weighted sum of section scores using normalized weights. The index is clamped to the range 0–100.");
+  mono(
+`Overall Index:
+Index = clamp( Σ(Score_i × w'_i), 0, 100 )`
+  );
+
+  title("5. Section Scoring Formulas (Mathematical Details)");
+  para("Default scoring parameters are shown in the Settings section (admin-only). The formulas below follow the current calculator logic.");
+
+  // Teaching
+  para("5.1 Teaching (T)");
+  mono(
+`For each course j:
+Credit_j = last digit of CourseCode_j
+ContactHours_j = Lec_j + Tut_j + Lab_j + Field_j
+
+CourseScore_j = (ContactHours_j × hourW) +
+                ((Students_j / 100) × studW) +
+                (Credit_j × creditW)
+
+Teaching Score:
+Score_T = Σ CourseScore_j`
+  );
+  table2([
+    ["Default hourW", state.scheme.teaching.hourW],
+    ["Default studW", state.scheme.teaching.studW],
+    ["Default creditW", state.scheme.teaching.creditW],
+  ]);
+
+  // Supervision
+  para("5.2 Supervision (SV)");
+  mono(
+`For each supervision record k:
+Base(level_k) = {UG: ug, Master: m, PhD: phd}
+RoleMult = 1.0 if Main, else 0.6
+StatusMult = 1.0 if Active, else 0.5
+
+RecordScore_k = Base(level_k) × RoleMult × StatusMult
+
+Supervision Score:
+Score_SV = Σ RecordScore_k`
+  );
+  table2([
+    ["Default UG (ug)", state.scheme.supervision.ug],
+    ["Default Master (m)", state.scheme.supervision.m],
+    ["Default PhD (phd)", state.scheme.supervision.phd],
+  ]);
+
+  // Research
+  para("5.3 Research (R)");
+  mono(
+`For each grant record g:
+LevelMult = {University: lvl[0], National: lvl[1], International: lvl[2]}
+RoleMult  = {PI: role[0], Co-I: role[1], Member: role[2]}
+StatusMult = 1.0 if Active, 0.6 if Applied, 0.3 if Ended
+
+GrantScore_g = base × LevelMult × RoleMult × StatusMult
+
+Research Score:
+Score_R = Σ GrantScore_g`
+  );
+  table2([
+    ["Default base", state.scheme.research.base],
+    ["Default lvl (Uni,Nat,Intl)", state.scheme.research.lvl.join(", ")],
+    ["Default role (PI,Co-I,Member)", state.scheme.research.role.join(", ")],
+  ]);
+
+  // Publication
+  para("5.4 Publication (P)");
+  mono(
+`For each publication item p:
+TypeMult = {Journal, Book/Chapter, Proceeding, Other} → type[]
+IdxMult  = {Yes, No} → idx[]
+RoleMult = 1.2 if First/Corresponding, else 1.0
+
+ItemScore_p = base × TypeMult × IdxMult × RoleMult
+
+Publication Score:
+Score_P = Σ ItemScore_p`
+  );
+  table2([
+    ["Default base", state.scheme.publication.base],
+    ["Default type (J,Book,Proc,Other)", state.scheme.publication.type.join(", ")],
+    ["Default idx (Yes,No)", state.scheme.publication.idx.join(", ")],
+  ]);
+
+  // Admin
+  para("5.5 Administration (A)");
+  mono(
+`For each admin record a:
+LevelBase = lvl[levelIndex]
+Meetings = meetings_a
+Months   = months_a
+TypeBonus = 1.0 if Official, else 0.7
+
+RecordScore_a = (LevelBase + Meetings×meetW + Months×monthW) × TypeBonus
+
+Administration Score:
+Score_A = Σ RecordScore_a`
+  );
+  table2([
+    ["Default lvl bases", state.scheme.admin.lvl.join(", ")],
+    ["Default meetW", state.scheme.admin.meetW],
+    ["Default monthW", state.scheme.admin.monthW],
+  ]);
+
+  // Services
+  para("5.6 Services (S)");
+  mono(
+`For each service record s:
+RoleBonus = bonus[Lead] if Lead, else bonus[Member]
+RecordScore_s = (Hours×hourW) + ((Participants/10)×paxW) + RoleBonus
+
+Services Score:
+Score_S = Σ RecordScore_s`
+  );
+  table2([
+    ["Default hourW", state.scheme.service.hourW],
+    ["Default paxW", state.scheme.service.paxW],
+    ["Default role bonus (Lead,Member)", state.scheme.service.bonus.join(", ")],
+  ]);
+
+  // Lab Ops
+  para("5.7 Lab Operations (L)");
+  mono(
+`For each lab activity ℓ:
+Base = (Volume×volW) + (Hours×hourW)
+ComplexityMult = cx[Low/Med/High]
+UrgencyMult    = ur[Normal/Tight/Critical]
+
+RecordScore_ℓ = Base × ComplexityMult × UrgencyMult
+
+Lab Ops Score:
+Score_L = Σ RecordScore_ℓ`
+  );
+  table2([
+    ["Default volW", state.scheme.lab.volW],
+    ["Default hourW", state.scheme.lab.hourW],
+    ["Default cx (Low,Med,High)", state.scheme.lab.cx.join(", ")],
+    ["Default ur (Normal,Tight,Critical)", state.scheme.lab.ur.join(", ")],
+  ]);
+
+  title("6. Worked Examples (3 Staff Categories)");
+  para("The examples below use simple illustrative entries. Your actual calculator will compute scores using the same formulas, then apply normalized weights based on ON sections.");
+
+  // Example 1: Academic
+  para("6.1 Example – Academic Staff (All ON except Lab Ops)");
+  mono(
+`Sections ON: T, SV, R, P, A, S (Lab Ops OFF)
+Baseline weights (example): T=0.30, SV=0.15, R=0.20, P=0.10, A=0.15, S=0.10
+Since Lab Ops is OFF and baseline L=0.00, normalized weights remain the same.
+
+Sample Teaching (1 course):
+Course code SJ24102 → Credit=2
+Lec=3, Tut=1, Lab=0, Field=0 → ContactHours=4
+Students=120
+CourseScore = (4×1.0) + ((120/100)×0.6) + (2×0.4)
+          = 4.0 + 0.72 + 0.8 = 5.52
+So Score_T = 5.52
+
+Assume (illustration) other section scores:
+Score_SV = 6.00
+Score_R  = 12.00
+Score_P  = 9.00
+Score_A  = 10.00
+Score_S  = 8.00
+
+Index = Σ(Score_i × w'_i)
+      = 5.52×0.30 + 6.00×0.15 + 12×0.20 + 9×0.10 + 10×0.15 + 8×0.10
+      = 1.656 + 0.900 + 2.400 + 0.900 + 1.500 + 0.800
+      = 8.156`
+  );
+  para("Note: The index is clamped to [0,100]. The small number above is purely illustrative—your real scores can be larger depending on workload entries.");
+
+  // Example 2: Administrative
+  para("6.2 Example – Administrative Staff (Only Administration + Services ON)");
+  mono(
+`Sections ON: A, S
+Baseline weights (example): A=0.60, S=0.40
+Normalized weights: w'_A=0.60/(0.60+0.40)=0.60, w'_S=0.40/(1.00)=0.40
+
+Sample Administration (1 record):
+Level=Faculty → LevelBase=5 (from default aLevel)
+Meetings=8, Months=6, Type=Official
+RecordScore_A = (5 + 8×1.5 + 6×0.3) × 1.0
+              = (5 + 12 + 1.8) = 18.8
+So Score_A = 18.8
+
+Sample Services (1 record):
+Hours=10, Participants=80, Role=Lead
+RecordScore_S = 10×1.0 + (80/10)×0.8 + 4
+              = 10 + 6.4 + 4 = 20.4
+So Score_S = 20.4
+
+Index = 18.8×0.60 + 20.4×0.40
+      = 11.28 + 8.16 = 19.44`
+  );
+
+  // Example 3: Laboratory
+  para("6.3 Example – Laboratory Staff (Administration + Services + Lab Ops ON)");
+  mono(
+`Sections ON: A, S, L
+Baseline weights (example): A=0.45, S=0.25, L=0.30
+Normalized weights (sum=1.00): same as baseline
+
+Sample Lab Ops (1 record):
+Volume=25, Hours=12
+Complexity=High → cx=1.6
+Urgency=Tight → ur=1.25
+Base = 25×1.0 + 12×1.0 = 37
+RecordScore_L = 37 × 1.6 × 1.25 = 74.0
+So Score_L = 74.0
+
+Assume:
+Score_A = 22.0
+Score_S = 18.0
+
+Index = 22×0.45 + 18×0.25 + 74×0.30
+      = 9.90 + 4.50 + 22.20
+      = 36.60`
+  );
+
+  title("7. Notes for Admin");
+  bullet([
+    "Baseline weights must sum to 1.00. Normalization happens automatically during calculation based on ON sections.",
+    "Changing scoring scheme parameters changes how raw section scores are computed.",
+    "This is a front-end-only tool (static hosting). Do not store sensitive information in it."
+  ]);
 
   doc.save("FST_UMS_Busyness_Index_Manual.pdf");
 }
@@ -2041,13 +2586,23 @@ function init(){
   applySectionVisibility();
   renderAll();
   setAdminUI();
+  autosizeAllTextareas();
+
+  // Autosize listener (covers manual typing too)
+  document.addEventListener("input", (e)=>{
+    if(e.target && e.target.tagName==="TEXTAREA" && e.target.classList.contains("autoGrow")){
+      autosizeTextarea(e.target);
+    }
+  });
 
   // Profile other fields
   $("pGrade").addEventListener("change", ()=>{
     $("pGradeOtherWrap").style.display = ($("pGrade").value==="Others") ? "block" : "none";
+    autosizeAllTextareas();
   });
   $("pStatus").addEventListener("change", ()=>{
     $("pStatusOtherWrap").style.display = ($("pStatus").value==="Others") ? "block" : "none";
+    autosizeAllTextareas();
   });
 
   // Category template
@@ -2085,9 +2640,9 @@ function init(){
   $("addLab").onclick=(e)=>{e.preventDefault(); addRow("lab");};
   $("clearLab").onclick=(e)=>{e.preventDefault(); clearKind("lab");};
 
-  // Calculate / Print / Manual / Export
+  // Calculate / Report PDF / Manual / Export
   $("btnCalc").onclick=(e)=>{e.preventDefault(); calculate();};
-  $("btnPrint").onclick=(e)=>{e.preventDefault(); syncProfileFromUI(); printPDF();};
+  $("btnPrint").onclick=(e)=>{e.preventDefault(); syncProfileFromUI(); reportPDF();};
   $("btnManual").onclick=(e)=>{e.preventDefault(); manualPDF();};
   $("btnExportSummaryCSV").onclick=(e)=>{e.preventDefault(); exportSummaryCSV();};
   $("btnExportDetailedCSV").onclick=(e)=>{e.preventDefault(); exportDetailedCSV();};
