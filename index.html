@@ -1,286 +1,1331 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-  <meta charset="UTF-8">
-  <title>Kalkulator Indeks Kesibukan Staf FST</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Indeks Kesibukan Staf FST (Fleksibel) – UMS</title>
 
   <!-- Chart.js (graf) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f5f7fb;
-      margin: 0;
-      padding: 0;
-      color: #222;
+    :root{
+      --bg:#07122a;
+      --bg2:#0b1b3d;
+      --card:#0f2555cc;
+      --card2:#0b1e46cc;
+      --line:#24427d;
+      --text:#eaf0ff;
+      --muted:#bcd0ff;
+      --accent:#2dd4bf;
+      --accent2:#60a5fa;
+      --warn:#fbbf24;
+      --danger:#fb7185;
+      --good:#34d399;
+      --shadow: 0 10px 30px rgba(0,0,0,.28);
+      --radius:16px;
+    }
+    *{box-sizing:border-box;font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+    body{
+      margin:0; background: radial-gradient(1200px 600px at 20% 0%, #12306c 0%, var(--bg) 55%) fixed;
+      color:var(--text);
+    }
+    a{color:var(--accent2)}
+    .wrap{max-width:1200px;margin:20px auto;padding:18px;}
+    .topbar{
+      display:flex;gap:14px;align-items:center;justify-content:space-between;
+      background: linear-gradient(135deg, rgba(45,212,191,.14), rgba(96,165,250,.12));
+      border:1px solid rgba(96,165,250,.25);
+      border-radius: var(--radius);
+      padding:14px 16px;
+      box-shadow: var(--shadow);
+    }
+    .brand{display:flex;gap:12px;align-items:center;min-width:0;}
+    .logo{
+      width:46px;height:46px;border-radius:12px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      display:flex;align-items:center;justify-content:center;
+      overflow:hidden;
+    }
+    .logo img{width:100%;height:100%;object-fit:contain;padding:6px}
+    .titlebox{min-width:0}
+    .title{
+      font-size:1.05rem;font-weight:750;letter-spacing:.2px;margin:0;line-height:1.2;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    .subtitle{margin:3px 0 0;color:var(--muted);font-size:.86rem}
+    .chiprow{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .chip{
+      padding:7px 10px;border-radius:999px;font-size:.78rem;font-weight:650;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(15,37,85,.6);
+      color: var(--text);
+    }
+    .chip strong{color:var(--accent)}
+    .grid{
+      display:grid;grid-template-columns: 1.05fr .95fr;gap:16px;margin-top:16px;
+    }
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr;} }
+
+    .card{
+      background: linear-gradient(180deg, rgba(15,37,85,.78), rgba(9,24,56,.78));
+      border: 1px solid rgba(96,165,250,.20);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:14px;
+    }
+    .card h2{margin:0 0 10px;font-size:1.02rem}
+    .card p{margin:8px 0;color:var(--muted);font-size:.9rem;line-height:1.4}
+
+    .sectionhead{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 0 10px;
+    }
+    .sectionhead .hint{color:var(--muted);font-size:.82rem}
+    .btnrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    button{
+      border:none;cursor:pointer;border-radius:999px;padding:9px 12px;
+      background: rgba(45,212,191,.16);
+      color:var(--text);
+      font-weight:750;
+      border:1px solid rgba(45,212,191,.35);
+    }
+    button.secondary{
+      background: rgba(96,165,250,.14);
+      border:1px solid rgba(96,165,250,.35);
+    }
+    button.ghost{
+      background: transparent;border:1px solid rgba(255,255,255,.18);
+      color: var(--muted);
+    }
+    button.danger{
+      background: rgba(251,113,133,.14);
+      border:1px solid rgba(251,113,133,.45);
+    }
+    button:active{transform: translateY(1px)}
+    .mini{
+      font-size:.8rem;padding:7px 10px;border-radius:999px;
     }
 
-    .container {
-      max-width: 1000px;
-      margin: 30px auto;
-      padding: 20px;
+    .formgrid{
+      display:grid;grid-template-columns:repeat(4, minmax(0,1fr));gap:10px;
+    }
+    @media (max-width: 980px){ .formgrid{grid-template-columns:repeat(2, minmax(0,1fr));} }
+    @media (max-width: 520px){ .formgrid{grid-template-columns:1fr;} }
+    .fg label{display:block;font-size:.78rem;color:var(--muted);margin:0 0 4px}
+    .fg input, .fg select{
+      width:100%;padding:9px 10px;border-radius:12px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.16);
+      color:var(--text);
+      outline:none;
+    }
+    .fg input::placeholder{color:rgba(234,240,255,.5)}
+    .fg input:focus, .fg select:focus{border-color: rgba(45,212,191,.55); box-shadow: 0 0 0 2px rgba(45,212,191,.15);}
+
+    table{width:100%;border-collapse:separate;border-spacing:0;margin-top:10px;overflow:hidden;border-radius:14px}
+    thead th{
+      font-size:.78rem;color:rgba(234,240,255,.9);text-align:left;padding:10px;
+      background: rgba(96,165,250,.14);
+      border-bottom:1px solid rgba(255,255,255,.12);
+    }
+    tbody td{
+      padding:8px 10px; border-bottom:1px solid rgba(255,255,255,.08);
+      background: rgba(15,37,85,.35);
+      vertical-align:top;
+    }
+    tbody tr:last-child td{border-bottom:none}
+    td .cell{display:flex;flex-direction:column;gap:6px}
+    td input, td select{
+      width:100%; padding:8px 9px;border-radius:10px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.14);
+      color:var(--text);
+      outline:none;
+      font-size:.86rem;
     }
 
-    .card {
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:7px 10px;border-radius:999px;font-size:.82rem;font-weight:800;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(9,24,56,.45);
     }
+    .pill .dot{width:9px;height:9px;border-radius:99px;background:var(--good)}
+    .pill.low .dot{background:var(--accent2)}
+    .pill.normal .dot{background:var(--good)}
+    .pill.high .dot{background:var(--warn)}
+    .pill.over .dot{background:var(--danger)}
 
-    h1 {
-      margin-top: 0;
+    .scoregrid{
+      display:grid;grid-template-columns:repeat(4, minmax(0,1fr));gap:10px;margin-top:10px;
     }
-
-    h2 {
-      margin-top: 20px;
-      font-size: 1.1rem;
+    @media (max-width: 980px){ .scoregrid{grid-template-columns:repeat(2, minmax(0,1fr));} }
+    .scorebox{
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:14px;
+      padding:10px;
     }
+    .scorebox .k{font-size:.78rem;color:var(--muted)}
+    .scorebox .v{font-size:1.2rem;font-weight:850;margin-top:3px}
+    .scorebox .s{font-size:.78rem;color:rgba(234,240,255,.72);margin-top:2px}
 
-    label {
-      display: block;
-      margin-top: 10px;
-      font-size: 0.9rem;
+    .footer{
+      margin-top:16px;color:rgba(234,240,255,.65);font-size:.78rem;line-height:1.5;
+      padding:12px 2px;
     }
-
-    input {
-      width: 100%;
-      padding: 8px;
-      margin-top: 4px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+    .hr{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
+    .note{
+      background: rgba(45,212,191,.10);
+      border: 1px solid rgba(45,212,191,.25);
+      padding:10px 12px;border-radius:14px;color:rgba(234,240,255,.86);font-size:.86rem;
     }
-
-    button {
-      margin-top: 15px;
-      padding: 10px 20px;
-      border-radius: 20px;
-      border: none;
-      cursor: pointer;
-      font-size: 0.9rem;
-    }
-
-    .btn-primary {
-      background: #0d6efd;
-      color: white;
-    }
-
-    .btn-secondary {
-      background: #e2e6f0;
-      margin-left: 10px;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .badge {
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-weight: 600;
-      color: white;
-      display: inline-block;
-    }
-
-    .low { background: #0d6efd; }
-    .normal { background: #28a745; }
-    .high { background: #ffc107; color: #333; }
-    .overload { background: #dc3545; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      font-size: 0.9rem;
-    }
-
-    th, td {
-      border: 1px solid #ddd;
-      padding: 6px;
-      text-align: left;
-    }
-
-    th {
-      background: #f1f4fb;
+    .warnbox{
+      background: rgba(251,191,36,.12);
+      border: 1px solid rgba(251,191,36,.25);
+      padding:10px 12px;border-radius:14px;color:rgba(234,240,255,.9);font-size:.86rem;
     }
   </style>
 </head>
 
 <body>
-<div class="container">
+<div class="wrap">
 
-  <div class="card">
-    <h1>Kalkulator Indeks Kesibukan Staf FST</h1>
-    <p>
-      Masukkan maklumat pengajaran, penyelidikan dan pentadbiran.
-      Sistem akan mengira <strong>Indeks Kesibukan Staf (0–100)</strong>.
-    </p>
-
-    <form id="sbiForm">
-
-      <h2>Pengajaran & Penyeliaan (T)</h2>
-      <label>Kursus UG
-        <input type="number" id="ug" value="0" min="0">
-      </label>
-
-      <label>Kursus PG
-        <input type="number" id="pg" value="0" min="0">
-      </label>
-
-      <label>Pelajar Master
-        <input type="number" id="master" value="0" min="0">
-      </label>
-
-      <label>Pelajar PhD
-        <input type="number" id="phd" value="0" min="0">
-      </label>
-
-      <h2>Penyelidikan & Geran (R)</h2>
-      <label>Geran sebagai PI
-        <input type="number" id="pi" value="0" min="0">
-      </label>
-
-      <label>Geran sebagai Co-Researcher
-        <input type="number" id="co" value="0" min="0">
-      </label>
-
-      <label>Artikel Jurnal (setahun)
-        <input type="number" id="paper" value="0" min="0">
-      </label>
-
-      <h2>Pentadbiran & Jawatan (A)</h2>
-      <label>Jawatan utama
-        <input type="number" id="adminMain" value="0" min="0">
-      </label>
-
-      <label>Jawatankuasa / tugas lain
-        <input type="number" id="adminOther" value="0" min="0">
-      </label>
-
-      <button type="submit" class="btn-primary">Kira Indeks</button>
-      <button type="reset" class="btn-secondary">Set Semula</button>
-    </form>
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo" title="Logo UMS (letak fail di assets/ums-logo.png)">
+        <img src="assets/ums-logo.png" alt="UMS"/>
+      </div>
+      <div class="titlebox">
+        <p class="title">Indeks Kesibukan Staf FST – Kalkulator Fleksibel</p>
+        <p class="subtitle">Input berbutir (kursus/geran/jawatan/khidmat) + pemberat boleh ubah + export CSV</p>
+      </div>
+    </div>
+    <div class="chiprow">
+      <div class="chip">Mode: <strong>Staf</strong></div>
+      <div class="chip">Skala: <strong>0–100</strong></div>
+      <div class="chip">Simpan: <strong>Auto</strong></div>
+    </div>
   </div>
 
-  <div id="result" class="card hidden">
-    <h2>Keputusan</h2>
+  <div class="grid">
 
-    <p>
-      <strong>Indeks Kesibukan:</strong>
-      <span id="indexValue">0</span> / 100
-    </p>
+    <!-- LEFT: INPUT + SETTINGS -->
+    <div class="card">
+      <div class="sectionhead">
+        <h2>1) Tetapan Pemberat & Markah</h2>
+        <div class="btnrow">
+          <button class="ghost mini" id="btnResetDefaults">Reset Default</button>
+          <button class="secondary mini" id="btnSaveSettings">Simpan Tetapan</button>
+          <button class="ghost mini" id="btnLoadSettings">Load Tetapan</button>
+        </div>
+      </div>
 
-    <p>
-      <span id="zoneBadge" class="badge normal">Zon Normal</span>
-    </p>
+      <div class="note">
+        Tip: Ubah pemberat/markah di sini untuk selaraskan dengan dasar fakulti. Semua pengiraan akan dikemaskini automatik.
+      </div>
 
-    <table>
-      <tr>
-        <th>Dimensi</th>
-        <th>Skor</th>
-      </tr>
-      <tr>
-        <td>Pengajaran (T)</td>
-        <td id="tScore">0</td>
-      </tr>
-      <tr>
-        <td>Penyelidikan (R)</td>
-        <td id="rScore">0</td>
-      </tr>
-      <tr>
-        <td>Pentadbiran (A)</td>
-        <td id="aScore">0</td>
-      </tr>
-    </table>
+      <div class="hr"></div>
 
-    <canvas id="chart" height="120"></canvas>
+      <h3 style="margin:0 0 8px;font-size:.98rem">A. Pemberat Dimensi (jumlah sebaiknya = 1.00)</h3>
+      <div class="formgrid">
+        <div class="fg">
+          <label>Pengajaran & Penyeliaan (T)</label>
+          <input id="wT" type="number" step="0.01" value="0.40" />
+        </div>
+        <div class="fg">
+          <label>Penyelidikan & Geran (R)</label>
+          <input id="wR" type="number" step="0.01" value="0.30" />
+        </div>
+        <div class="fg">
+          <label>Pentadbiran & Jawatan (A)</label>
+          <input id="wA" type="number" step="0.01" value="0.20" />
+        </div>
+        <div class="fg">
+          <label>Khidmat/Komuniti/Lain (S)</label>
+          <input id="wS" type="number" step="0.01" value="0.10" />
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <h3 style="margin:0 0 8px;font-size:.98rem">B. Markah Kursus (T) – komponen boleh ubah</h3>
+      <div class="formgrid">
+        <div class="fg">
+          <label>Skor per kredit (creditWeight)</label>
+          <input id="tCreditW" type="number" step="0.1" value="5" />
+        </div>
+        <div class="fg">
+          <label>Skor per pelajar (studentWeight)</label>
+          <input id="tStudentW" type="number" step="0.01" value="0.10" />
+        </div>
+        <div class="fg">
+          <label>Skor per sesi Kuliah</label>
+          <input id="tLectureW" type="number" step="0.1" value="1.0" />
+        </div>
+        <div class="fg">
+          <label>Skor per sesi Tutorial</label>
+          <input id="tTutorialW" type="number" step="0.1" value="0.8" />
+        </div>
+        <div class="fg">
+          <label>Skor per sesi Lab</label>
+          <input id="tLabW" type="number" step="0.1" value="1.2" />
+        </div>
+        <div class="fg">
+          <label>Skor per sesi Fieldwork</label>
+          <input id="tFieldW" type="number" step="0.1" value="1.5" />
+        </div>
+        <div class="fg">
+          <label>Multiplier Kursus PG</label>
+          <input id="tPgMult" type="number" step="0.05" value="1.20" />
+        </div>
+        <div class="fg">
+          <label>Cap maksimum dimensi T</label>
+          <input id="capT" type="number" step="1" value="100" />
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <h3 style="margin:0 0 8px;font-size:.98rem">C. Markah Geran (R)</h3>
+      <div class="formgrid">
+        <div class="fg">
+          <label>Skor PI</label>
+          <input id="rPI" type="number" step="1" value="25" />
+        </div>
+        <div class="fg">
+          <label>Skor Co-I</label>
+          <input id="rCo" type="number" step="1" value="12" />
+        </div>
+        <div class="fg">
+          <label>Skor Ahli</label>
+          <input id="rMem" type="number" step="1" value="6" />
+        </div>
+        <div class="fg">
+          <label>Bonus Stage: Active</label>
+          <input id="rActive" type="number" step="1" value="8" />
+        </div>
+        <div class="fg">
+          <label>Bonus Stage: Applied/Submitted</label>
+          <input id="rApplied" type="number" step="1" value="4" />
+        </div>
+        <div class="fg">
+          <label>Skor per artikel (optional)</label>
+          <input id="rPaperW" type="number" step="0.5" value="4" />
+        </div>
+        <div class="fg">
+          <label>Cap maksimum dimensi R</label>
+          <input id="capR" type="number" step="1" value="100" />
+        </div>
+        <div class="fg">
+          <label>Nota</label>
+          <input value="Jumlah geran RM tidak wajib (boleh tambah kemudian)" disabled />
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <h3 style="margin:0 0 8px;font-size:.98rem">D. Markah Pentadbiran/Jawatan (A)</h3>
+      <div class="formgrid">
+        <div class="fg">
+          <label>Skor Jawatan Utama (Level 1)</label>
+          <input id="aL1" type="number" step="1" value="35" />
+        </div>
+        <div class="fg">
+          <label>Skor Jawatan Pertengahan (Level 2)</label>
+          <input id="aL2" type="number" step="1" value="18" />
+        </div>
+        <div class="fg">
+          <label>Skor Jawatankuasa/Ahli (Level 3)</label>
+          <input id="aL3" type="number" step="1" value="8" />
+        </div>
+        <div class="fg">
+          <label>Multiplier Intensiti (Normal=1)</label>
+          <input id="aIntMult" type="number" step="0.1" value="1.0" />
+        </div>
+        <div class="fg">
+          <label>Skor per bulan tempoh (optional)</label>
+          <input id="aMonthW" type="number" step="0.2" value="0.5" />
+        </div>
+        <div class="fg">
+          <label>Cap maksimum dimensi A</label>
+          <input id="capA" type="number" step="1" value="100" />
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <h3 style="margin:0 0 8px;font-size:.98rem">E. Markah Khidmat/Komuniti/Lain (S)</h3>
+      <div class="formgrid">
+        <div class="fg">
+          <label>Skor per jam aktiviti</label>
+          <input id="sHourW" type="number" step="0.1" value="1.0" />
+        </div>
+        <div class="fg">
+          <label>Skor per 10 peserta</label>
+          <input id="sPaxW" type="number" step="0.1" value="0.8" />
+        </div>
+        <div class="fg">
+          <label>Bonus peranan (Lead)</label>
+          <input id="sLead" type="number" step="0.5" value="4" />
+        </div>
+        <div class="fg">
+          <label>Bonus peranan (Member)</label>
+          <input id="sMember" type="number" step="0.5" value="1.5" />
+        </div>
+        <div class="fg">
+          <label>Cap maksimum dimensi S</label>
+          <input id="capS" type="number" step="1" value="100" />
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="sectionhead">
+        <h2>2) Aktiviti Pengajaran (Kursus)</h2>
+        <div class="btnrow">
+          <button id="addCourse" class="mini">➕ Tambah kursus</button>
+          <button id="clearCourses" class="ghost mini">Kosongkan</button>
+        </div>
+      </div>
+      <div class="hint" style="color:var(--muted);font-size:.84rem">
+        Kredit auto diambil daripada <strong>digit terakhir kod kursus</strong> (contoh: “SBM123<strong>3</strong>” → 3 kredit). Jika tiada digit, kredit = 0 dan boleh override.
+      </div>
+
+      <table id="courseTable">
+        <thead>
+          <tr>
+            <th style="width:12%">Tahap</th>
+            <th style="width:16%">Kod</th>
+            <th>Nama Kursus</th>
+            <th style="width:9%">Kredit</th>
+            <th style="width:10%">Pelajar</th>
+            <th style="width:9%">Kuliah</th>
+            <th style="width:9%">Tut</th>
+            <th style="width:9%">Lab</th>
+            <th style="width:10%">Field</th>
+            <th style="width:8%">Padam</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div class="hr"></div>
+
+      <div class="sectionhead">
+        <h2>3) Aktiviti Penyelidikan (Geran + Artikel)</h2>
+        <div class="btnrow">
+          <button id="addGrant" class="mini">➕ Tambah geran</button>
+          <button id="clearGrants" class="ghost mini">Kosongkan</button>
+        </div>
+      </div>
+
+      <div class="formgrid" style="margin-top:10px">
+        <div class="fg">
+          <label>Bilangan artikel jurnal (optional)</label>
+          <input id="paperCount" type="number" min="0" value="0" />
+        </div>
+      </div>
+
+      <table id="grantTable">
+        <thead>
+          <tr>
+            <th style="width:16%">Kod Geran</th>
+            <th>Tajuk</th>
+            <th style="width:12%">Peranan</th>
+            <th style="width:14%">Stage/Status</th>
+            <th style="width:12%">Jumlah (RM)</th>
+            <th style="width:8%">Padam</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div class="hr"></div>
+
+      <div class="sectionhead">
+        <h2>4) Pentadbiran & Jawatan</h2>
+        <div class="btnrow">
+          <button id="addAdmin" class="mini">➕ Tambah jawatan</button>
+          <button id="clearAdmin" class="ghost mini">Kosongkan</button>
+        </div>
+      </div>
+
+      <table id="adminTable">
+        <thead>
+          <tr>
+            <th>Jawatan</th>
+            <th style="width:12%">Level</th>
+            <th style="width:12%">Intensiti</th>
+            <th style="width:12%">Tempoh (bulan)</th>
+            <th style="width:8%">Padam</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div class="hr"></div>
+
+      <div class="sectionhead">
+        <h2>5) Khidmat/Komuniti/Lain</h2>
+        <div class="btnrow">
+          <button id="addService" class="mini">➕ Tambah aktiviti</button>
+          <button id="clearService" class="ghost mini">Kosongkan</button>
+        </div>
+      </div>
+
+      <table id="serviceTable">
+        <thead>
+          <tr>
+            <th>Aktiviti</th>
+            <th style="width:14%">Peranan</th>
+            <th style="width:14%">Jam</th>
+            <th style="width:16%">Peserta</th>
+            <th style="width:8%">Padam</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div class="hr"></div>
+
+      <div class="btnrow">
+        <button id="btnExportCSV" class="secondary">Export CSV (ringkas)</button>
+        <button id="btnExportJSON" class="ghost">Export JSON (full)</button>
+        <button id="btnClearAll" class="danger">Reset semua data</button>
+      </div>
+
+      <div class="footer">
+        Penafian: Alat ini untuk pemantauan dalaman & perancangan agihan tugasan. Sila patuhi dasar privasi data staf.
+      </div>
+    </div>
+
+    <!-- RIGHT: SUMMARY / DASHBOARD -->
+    <div class="card">
+      <div class="sectionhead">
+        <h2>Ringkasan Indeks & Dashboard Mini</h2>
+        <div class="hint">Auto-kira setiap perubahan</div>
+      </div>
+
+      <div class="warnbox" id="weightWarning" style="display:none">
+        Peringatan: Jumlah pemberat dimensi (T+R+A+S) bukan 1.00. Sistem akan tetap kira tetapi disyorkan laras semula.
+      </div>
+
+      <div class="scoregrid">
+        <div class="scorebox">
+          <div class="k">Skor T (Pengajaran)</div>
+          <div class="v" id="outT">0.0</div>
+          <div class="s">Cap: <span id="capTOut">100</span></div>
+        </div>
+        <div class="scorebox">
+          <div class="k">Skor R (Penyelidikan)</div>
+          <div class="v" id="outR">0.0</div>
+          <div class="s">Cap: <span id="capROut">100</span></div>
+        </div>
+        <div class="scorebox">
+          <div class="k">Skor A (Pentadbiran)</div>
+          <div class="v" id="outA">0.0</div>
+          <div class="s">Cap: <span id="capAOut">100</span></div>
+        </div>
+        <div class="scorebox">
+          <div class="k">Skor S (Khidmat/Lain)</div>
+          <div class="v" id="outS">0.0</div>
+          <div class="s">Cap: <span id="capSOut">100</span></div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
+        <div>
+          <div style="font-size:.86rem;color:var(--muted)">Indeks Kesibukan Keseluruhan</div>
+          <div style="font-size:2.2rem;font-weight:900;letter-spacing:.4px">
+            <span id="outIndex">0.0</span><span style="font-size:.92rem;color:rgba(234,240,255,.72)"> / 100</span>
+          </div>
+        </div>
+        <div>
+          <span id="zonePill" class="pill normal">
+            <span class="dot"></span><span id="zoneText">Normal</span>
+          </span>
+        </div>
+      </div>
+
+      <p id="zoneDesc" style="margin-top:10px"></p>
+
+      <div class="hr"></div>
+
+      <h3 style="margin:0 0 8px;font-size:.98rem">Graf Ringkas</h3>
+      <canvas id="miniChart" height="140"></canvas>
+
+      <div class="hr"></div>
+
+      <h3 style="margin:0 0 8px;font-size:.98rem">Ringkasan Aktiviti</h3>
+      <div class="scoregrid">
+        <div class="scorebox">
+          <div class="k">Bil. Kursus</div>
+          <div class="v" id="countCourse">0</div>
+          <div class="s">UG/PG</div>
+        </div>
+        <div class="scorebox">
+          <div class="k">Bil. Geran</div>
+          <div class="v" id="countGrant">0</div>
+          <div class="s">PI/Co/Member</div>
+        </div>
+        <div class="scorebox">
+          <div class="k">Bil. Jawatan</div>
+          <div class="v" id="countAdmin">0</div>
+          <div class="s">Level 1–3</div>
+        </div>
+        <div class="scorebox">
+          <div class="k">Aktiviti Khidmat</div>
+          <div class="v" id="countService">0</div>
+          <div class="s">Jam/Peserta</div>
+        </div>
+      </div>
+
+      <div class="footer">
+        Nota: Kredit kursus auto-baca digit terakhir kod (boleh override). Jika struktur kod kursus FST berbeza, kita boleh ubah fungsi parser.
+      </div>
+    </div>
+
   </div>
-
 </div>
 
 <script>
-let chartObj = null;
+/* ===========================
+   UTIL
+=========================== */
+function n(v){ const x = parseFloat(v); return Number.isFinite(x) ? x : 0; }
+function clamp(x, lo, hi){ return Math.max(lo, Math.min(hi, x)); }
+function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
+function downloadText(filename, text){
+  const blob = new Blob([text], {type:"text/plain;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 500);
+}
 
-document.getElementById("sbiForm").addEventListener("submit", function(e){
-  e.preventDefault();
+/* ===========================
+   STATE
+=========================== */
+const DEFAULTS = {
+  weights: {T:0.40, R:0.30, A:0.20, S:0.10},
+  caps: {T:100, R:100, A:100, S:100},
+  courseW: {credit:5, student:0.10, lecture:1.0, tutorial:0.8, lab:1.2, field:1.5, pgMult:1.20},
+  grantW: {PI:25, CO:12, MEM:6, ACTIVE:8, APPLIED:4, paperW:4},
+  adminW: {L1:35, L2:18, L3:8, intMult:1.0, monthW:0.5},
+  serviceW: {hourW:1.0, pax10W:0.8, lead:4, member:1.5},
+  data: {courses:[], grants:[], admin:[], service:[], paperCount:0}
+};
 
-  const ug = +ugInput();
-  const pg = +pgInput();
-  const master = +masterInput();
-  const phd = +phdInput();
+let state = structuredClone(DEFAULTS);
 
-  const pi = +piInput();
-  const co = +coInput();
-  const paper = +paperInput();
+const LS_KEY = "fst_busyness_index_v1";
 
-  const adminMain = +adminMainInput();
-  const adminOther = +adminOtherInput();
+/* ===========================
+   DOM HELPERS
+=========================== */
+const el = (id)=>document.getElementById(id);
 
-  let T = Math.min(100, ug*10 + pg*15 + master*5 + phd*8);
-  let R = Math.min(100, pi*20 + co*10 + paper*5);
-  let A = Math.min(100, adminMain*40 + adminOther*10);
+function readSettingsFromUI(){
+  state.weights.T = n(el("wT").value);
+  state.weights.R = n(el("wR").value);
+  state.weights.A = n(el("wA").value);
+  state.weights.S = n(el("wS").value);
 
-  let index = Math.round((0.4*T + 0.3*R + 0.3*A)*10)/10;
+  state.courseW.credit = n(el("tCreditW").value);
+  state.courseW.student = n(el("tStudentW").value);
+  state.courseW.lecture = n(el("tLectureW").value);
+  state.courseW.tutorial = n(el("tTutorialW").value);
+  state.courseW.lab = n(el("tLabW").value);
+  state.courseW.field = n(el("tFieldW").value);
+  state.courseW.pgMult = n(el("tPgMult").value);
 
-  document.getElementById("tScore").textContent = T;
-  document.getElementById("rScore").textContent = R;
-  document.getElementById("aScore").textContent = A;
-  document.getElementById("indexValue").textContent = index;
+  state.grantW.PI = n(el("rPI").value);
+  state.grantW.CO = n(el("rCo").value);
+  state.grantW.MEM = n(el("rMem").value);
+  state.grantW.ACTIVE = n(el("rActive").value);
+  state.grantW.APPLIED = n(el("rApplied").value);
+  state.grantW.paperW = n(el("rPaperW").value);
 
-  const badge = document.getElementById("zoneBadge");
-  badge.className = "badge";
+  state.adminW.L1 = n(el("aL1").value);
+  state.adminW.L2 = n(el("aL2").value);
+  state.adminW.L3 = n(el("aL3").value);
+  state.adminW.intMult = n(el("aIntMult").value);
+  state.adminW.monthW = n(el("aMonthW").value);
 
-  if (index < 40) {
-    badge.textContent = "Kurang Beban";
-    badge.classList.add("low");
-  } else if (index < 70) {
-    badge.textContent = "Normal";
-    badge.classList.add("normal");
-  } else if (index < 90) {
-    badge.textContent = "Tinggi";
-    badge.classList.add("high");
+  state.serviceW.hourW = n(el("sHourW").value);
+  state.serviceW.pax10W = n(el("sPaxW").value);
+  state.serviceW.lead = n(el("sLead").value);
+  state.serviceW.member = n(el("sMember").value);
+
+  state.caps.T = n(el("capT").value);
+  state.caps.R = n(el("capR").value);
+  state.caps.A = n(el("capA").value);
+  state.caps.S = n(el("capS").value);
+
+  state.data.paperCount = n(el("paperCount").value);
+}
+
+function writeSettingsToUI(){
+  el("wT").value = state.weights.T;
+  el("wR").value = state.weights.R;
+  el("wA").value = state.weights.A;
+  el("wS").value = state.weights.S;
+
+  el("tCreditW").value = state.courseW.credit;
+  el("tStudentW").value = state.courseW.student;
+  el("tLectureW").value = state.courseW.lecture;
+  el("tTutorialW").value = state.courseW.tutorial;
+  el("tLabW").value = state.courseW.lab;
+  el("tFieldW").value = state.courseW.field;
+  el("tPgMult").value = state.courseW.pgMult;
+
+  el("rPI").value = state.grantW.PI;
+  el("rCo").value = state.grantW.CO;
+  el("rMem").value = state.grantW.MEM;
+  el("rActive").value = state.grantW.ACTIVE;
+  el("rApplied").value = state.grantW.APPLIED;
+  el("rPaperW").value = state.grantW.paperW;
+
+  el("aL1").value = state.adminW.L1;
+  el("aL2").value = state.adminW.L2;
+  el("aL3").value = state.adminW.L3;
+  el("aIntMult").value = state.adminW.intMult;
+  el("aMonthW").value = state.adminW.monthW;
+
+  el("sHourW").value = state.serviceW.hourW;
+  el("sPaxW").value = state.serviceW.pax10W;
+  el("sLead").value = state.serviceW.lead;
+  el("sMember").value = state.serviceW.member;
+
+  el("capT").value = state.caps.T;
+  el("capR").value = state.caps.R;
+  el("capA").value = state.caps.A;
+  el("capS").value = state.caps.S;
+
+  el("paperCount").value = state.data.paperCount;
+
+  el("capTOut").textContent = state.caps.T;
+  el("capROut").textContent = state.caps.R;
+  el("capAOut").textContent = state.caps.A;
+  el("capSOut").textContent = state.caps.S;
+}
+
+/* ===========================
+   CREDIT PARSER (kod kursus)
+   Default: digit terakhir
+=========================== */
+function inferCreditFromCourseCode(code){
+  if(!code) return 0;
+  const m = String(code).trim().match(/(\d)(?!.*\d)/); // last digit
+  return m ? n(m[1]) : 0;
+}
+
+/* ===========================
+   TABLE RENDERERS
+=========================== */
+function renderCourses(){
+  const tb = el("courseTable").querySelector("tbody");
+  tb.innerHTML = "";
+  state.data.courses.forEach(row=>{
+    const tr = document.createElement("tr");
+    tr.dataset.id = row.id;
+    tr.innerHTML = `
+      <td>
+        <select data-k="level">
+          <option value="UG">UG</option>
+          <option value="PG">PG</option>
+        </select>
+      </td>
+      <td><input data-k="code" placeholder="cth: SBM1233" /></td>
+      <td><input data-k="name" placeholder="Nama kursus" /></td>
+      <td><input data-k="credit" type="number" min="0" step="1" /></td>
+      <td><input data-k="students" type="number" min="0" step="1" /></td>
+      <td><input data-k="lecture" type="number" min="0" step="1" /></td>
+      <td><input data-k="tutorial" type="number" min="0" step="1" /></td>
+      <td><input data-k="lab" type="number" min="0" step="1" /></td>
+      <td><input data-k="field" type="number" min="0" step="1" /></td>
+      <td><button class="danger mini" data-act="del">✖</button></td>
+    `;
+    tb.appendChild(tr);
+
+    // init values
+    tr.querySelector('[data-k="level"]').value = row.level ?? "UG";
+    tr.querySelector('[data-k="code"]').value = row.code ?? "";
+    tr.querySelector('[data-k="name"]').value = row.name ?? "";
+    tr.querySelector('[data-k="credit"]').value = row.credit ?? 0;
+    tr.querySelector('[data-k="students"]').value = row.students ?? 0;
+    tr.querySelector('[data-k="lecture"]').value = row.lecture ?? 0;
+    tr.querySelector('[data-k="tutorial"]').value = row.tutorial ?? 0;
+    tr.querySelector('[data-k="lab"]').value = row.lab ?? 0;
+    tr.querySelector('[data-k="field"]').value = row.field ?? 0;
+
+    // listeners
+    tr.addEventListener("input", (e)=>{
+      const k = e.target.getAttribute("data-k");
+      if(!k) return;
+      const id = tr.dataset.id;
+      const obj = state.data.courses.find(x=>x.id===id);
+      if(!obj) return;
+
+      if(k==="code"){
+        obj.code = e.target.value;
+        // auto-fill credit ONLY if user hasn't overridden (credit === inferred or empty)
+        const inferred = inferCreditFromCourseCode(obj.code);
+        const creditInput = tr.querySelector('[data-k="credit"]');
+        const currentCredit = n(creditInput.value);
+        // heuristic: if current credit is 0 and inferred>0, auto update
+        if(currentCredit===0 && inferred>0){
+          obj.credit = inferred;
+          creditInput.value = inferred;
+        }
+      } else if(k==="name" || k==="level"){
+        obj[k] = e.target.value;
+      } else {
+        obj[k] = n(e.target.value);
+      }
+      autoSaveData();
+      computeAndRender();
+    });
+
+    tr.addEventListener("click", (e)=>{
+      if(e.target?.getAttribute("data-act")==="del"){
+        const id = tr.dataset.id;
+        state.data.courses = state.data.courses.filter(x=>x.id!==id);
+        autoSaveData();
+        renderCourses();
+        computeAndRender();
+      }
+    });
+  });
+}
+
+function renderGrants(){
+  const tb = el("grantTable").querySelector("tbody");
+  tb.innerHTML = "";
+  state.data.grants.forEach(row=>{
+    const tr = document.createElement("tr");
+    tr.dataset.id = row.id;
+    tr.innerHTML = `
+      <td><input data-k="code" placeholder="cth: FRGS/..." /></td>
+      <td><input data-k="title" placeholder="Tajuk ringkas" /></td>
+      <td>
+        <select data-k="role">
+          <option value="PI">PI</option>
+          <option value="CO">Co-I</option>
+          <option value="MEM">Member</option>
+        </select>
+      </td>
+      <td>
+        <select data-k="stage">
+          <option value="ACTIVE">Active</option>
+          <option value="APPLIED">Applied/Submitted</option>
+          <option value="ENDED">Ended</option>
+        </select>
+      </td>
+      <td><input data-k="amount" type="number" min="0" step="1000" placeholder="optional"/></td>
+      <td><button class="danger mini" data-act="del">✖</button></td>
+    `;
+    tb.appendChild(tr);
+
+    tr.querySelector('[data-k="code"]').value = row.code ?? "";
+    tr.querySelector('[data-k="title"]').value = row.title ?? "";
+    tr.querySelector('[data-k="role"]').value = row.role ?? "PI";
+    tr.querySelector('[data-k="stage"]').value = row.stage ?? "ACTIVE";
+    tr.querySelector('[data-k="amount"]').value = row.amount ?? "";
+
+    tr.addEventListener("input", (e)=>{
+      const k = e.target.getAttribute("data-k");
+      if(!k) return;
+      const obj = state.data.grants.find(x=>x.id===tr.dataset.id);
+      if(!obj) return;
+      if(k==="code" || k==="title" || k==="role" || k==="stage"){
+        obj[k] = e.target.value;
+      } else {
+        obj[k] = n(e.target.value);
+      }
+      autoSaveData();
+      computeAndRender();
+    });
+
+    tr.addEventListener("click", (e)=>{
+      if(e.target?.getAttribute("data-act")==="del"){
+        state.data.grants = state.data.grants.filter(x=>x.id!==tr.dataset.id);
+        autoSaveData();
+        renderGrants();
+        computeAndRender();
+      }
+    });
+  });
+}
+
+function renderAdmin(){
+  const tb = el("adminTable").querySelector("tbody");
+  tb.innerHTML = "";
+  state.data.admin.forEach(row=>{
+    const tr = document.createElement("tr");
+    tr.dataset.id = row.id;
+    tr.innerHTML = `
+      <td><input data-k="position" placeholder="cth: Ketua Program" /></td>
+      <td>
+        <select data-k="level">
+          <option value="L1">Level 1</option>
+          <option value="L2">Level 2</option>
+          <option value="L3">Level 3</option>
+        </select>
+      </td>
+      <td>
+        <select data-k="intensity">
+          <option value="1">Normal (1.0)</option>
+          <option value="1.2">Tinggi (1.2)</option>
+          <option value="1.5">Sangat tinggi (1.5)</option>
+        </select>
+      </td>
+      <td><input data-k="months" type="number" min="0" step="1" value="0"/></td>
+      <td><button class="danger mini" data-act="del">✖</button></td>
+    `;
+    tb.appendChild(tr);
+
+    tr.querySelector('[data-k="position"]').value = row.position ?? "";
+    tr.querySelector('[data-k="level"]').value = row.level ?? "L3";
+    tr.querySelector('[data-k="intensity"]').value = String(row.intensity ?? 1);
+    tr.querySelector('[data-k="months"]').value = row.months ?? 0;
+
+    tr.addEventListener("input",(e)=>{
+      const k = e.target.getAttribute("data-k");
+      if(!k) return;
+      const obj = state.data.admin.find(x=>x.id===tr.dataset.id);
+      if(!obj) return;
+      if(k==="position" || k==="level"){
+        obj[k] = e.target.value;
+      } else if(k==="intensity"){
+        obj[k] = n(e.target.value);
+      } else {
+        obj[k] = n(e.target.value);
+      }
+      autoSaveData();
+      computeAndRender();
+    });
+
+    tr.addEventListener("click",(e)=>{
+      if(e.target?.getAttribute("data-act")==="del"){
+        state.data.admin = state.data.admin.filter(x=>x.id!==tr.dataset.id);
+        autoSaveData();
+        renderAdmin();
+        computeAndRender();
+      }
+    });
+  });
+}
+
+function renderService(){
+  const tb = el("serviceTable").querySelector("tbody");
+  tb.innerHTML = "";
+  state.data.service.forEach(row=>{
+    const tr = document.createElement("tr");
+    tr.dataset.id = row.id;
+    tr.innerHTML = `
+      <td><input data-k="activity" placeholder="cth: Program komuniti / bengkel / panel" /></td>
+      <td>
+        <select data-k="role">
+          <option value="LEAD">Lead</option>
+          <option value="MEMBER">Member</option>
+        </select>
+      </td>
+      <td><input data-k="hours" type="number" min="0" step="0.5" /></td>
+      <td><input data-k="pax" type="number" min="0" step="1" /></td>
+      <td><button class="danger mini" data-act="del">✖</button></td>
+    `;
+    tb.appendChild(tr);
+
+    tr.querySelector('[data-k="activity"]').value = row.activity ?? "";
+    tr.querySelector('[data-k="role"]').value = row.role ?? "LEAD";
+    tr.querySelector('[data-k="hours"]').value = row.hours ?? 0;
+    tr.querySelector('[data-k="pax"]').value = row.pax ?? 0;
+
+    tr.addEventListener("input",(e)=>{
+      const k = e.target.getAttribute("data-k");
+      if(!k) return;
+      const obj = state.data.service.find(x=>x.id===tr.dataset.id);
+      if(!obj) return;
+      if(k==="activity" || k==="role"){
+        obj[k] = e.target.value;
+      } else {
+        obj[k] = n(e.target.value);
+      }
+      autoSaveData();
+      computeAndRender();
+    });
+
+    tr.addEventListener("click",(e)=>{
+      if(e.target?.getAttribute("data-act")==="del"){
+        state.data.service = state.data.service.filter(x=>x.id!==tr.dataset.id);
+        autoSaveData();
+        renderService();
+        computeAndRender();
+      }
+    });
+  });
+}
+
+/* ===========================
+   SCORING
+=========================== */
+function scoreCourses(){
+  const w = state.courseW;
+  let total = 0;
+  state.data.courses.forEach(c=>{
+    const credit = n(c.credit);
+    const students = n(c.students);
+    const lecture = n(c.lecture);
+    const tutorial = n(c.tutorial);
+    const lab = n(c.lab);
+    const field = n(c.field);
+
+    let base =
+      (credit * w.credit) +
+      (students * w.student) +
+      (lecture * w.lecture) +
+      (tutorial * w.tutorial) +
+      (lab * w.lab) +
+      (field * w.field);
+
+    if((c.level || "UG") === "PG") base *= w.pgMult;
+
+    total += base;
+  });
+  return clamp(total, 0, n(state.caps.T));
+}
+
+function scoreResearch(){
+  const w = state.grantW;
+  let total = 0;
+
+  // grants
+  state.data.grants.forEach(g=>{
+    const role = (g.role || "PI").toUpperCase();
+    const stage = (g.stage || "ACTIVE").toUpperCase();
+
+    let s = 0;
+    if(role==="PI") s += w.PI;
+    else if(role==="CO") s += w.CO;
+    else s += w.MEM;
+
+    if(stage==="ACTIVE") s += w.ACTIVE;
+    else if(stage==="APPLIED") s += w.APPLIED;
+
+    total += s;
+  });
+
+  // papers (optional)
+  total += n(state.data.paperCount) * w.paperW;
+
+  return clamp(total, 0, n(state.caps.R));
+}
+
+function scoreAdmin(){
+  const w = state.adminW;
+  let total = 0;
+  state.data.admin.forEach(a=>{
+    let base = 0;
+    const lvl = (a.level || "L3").toUpperCase();
+    if(lvl==="L1") base += w.L1;
+    else if(lvl==="L2") base += w.L2;
+    else base += w.L3;
+
+    const intensity = n(a.intensity) || 1;
+    const months = n(a.months);
+
+    base = base * intensity * (w.intMult || 1);
+    base += months * (w.monthW || 0);
+
+    total += base;
+  });
+  return clamp(total, 0, n(state.caps.A));
+}
+
+function scoreService(){
+  const w = state.serviceW;
+  let total = 0;
+  state.data.service.forEach(s=>{
+    const hours = n(s.hours);
+    const pax = n(s.pax);
+    const role = (s.role || "LEAD").toUpperCase();
+
+    let base = hours * w.hourW + (pax/10) * w.pax10W;
+    if(role==="LEAD") base += w.lead;
+    else base += w.member;
+
+    total += base;
+  });
+  return clamp(total, 0, n(state.caps.S));
+}
+
+function classify(index){
+  if(index < 40){
+    return {key:"low", label:"Kurang Beban", desc:"Julat rendah. Boleh dipertimbangkan untuk tugasan tambahan jika sesuai."};
+  } else if(index < 70){
+    return {key:"normal", label:"Normal", desc:"Julat seimbang. Beban kerja dianggap normal."};
+  } else if(index < 90){
+    return {key:"high", label:"Tinggi", desc:"Kesibukan tinggi. Berhati-hati menambah tugasan baharu."};
   } else {
-    badge.textContent = "Overload";
-    badge.classList.add("overload");
+    return {key:"over", label:"Overload", desc:"Sangat tinggi. Pertimbangkan agihan semula tugasan/sokongan tambahan."};
   }
+}
 
-  document.getElementById("result").classList.remove("hidden");
+/* ===========================
+   SUMMARY RENDER
+=========================== */
+let chart = null;
+function computeAndRender(){
+  readSettingsFromUI();
 
-  drawChart(T, R, A, index);
-});
+  // weight sum warning
+  const wsum = state.weights.T + state.weights.R + state.weights.A + state.weights.S;
+  el("weightWarning").style.display = (Math.abs(wsum - 1) > 0.01) ? "block" : "none";
 
-function drawChart(T,R,A,I){
-  const ctx = document.getElementById("chart").getContext("2d");
-  if (chartObj) chartObj.destroy();
+  // compute
+  const T = scoreCourses();
+  const R = scoreResearch();
+  const A = scoreAdmin();
+  const S = scoreService();
 
-  chartObj = new Chart(ctx, {
+  const index = clamp(
+    (T * state.weights.T) +
+    (R * state.weights.R) +
+    (A * state.weights.A) +
+    (S * state.weights.S),
+    0, 100
+  );
+
+  // outputs
+  el("outT").textContent = T.toFixed(1);
+  el("outR").textContent = R.toFixed(1);
+  el("outA").textContent = A.toFixed(1);
+  el("outS").textContent = S.toFixed(1);
+  el("outIndex").textContent = index.toFixed(1);
+
+  el("capTOut").textContent = state.caps.T;
+  el("capROut").textContent = state.caps.R;
+  el("capAOut").textContent = state.caps.A;
+  el("capSOut").textContent = state.caps.S;
+
+  const cls = classify(index);
+  el("zoneText").textContent = cls.label;
+  el("zoneDesc").textContent = cls.desc;
+
+  const pill = el("zonePill");
+  pill.className = "pill " + cls.key;
+
+  // counts
+  el("countCourse").textContent = state.data.courses.length;
+  el("countGrant").textContent = state.data.grants.length;
+  el("countAdmin").textContent = state.data.admin.length;
+  el("countService").textContent = state.data.service.length;
+
+  // chart
+  try{
+    drawChart(T,R,A,S,index);
+  }catch(e){
+    // Chart.js mungkin disekat oleh network
+    // Still okay: semua angka tetap keluar
+    console.warn("Graf tidak dipaparkan (Chart.js mungkin gagal load).", e);
+  }
+}
+
+function drawChart(T,R,A,S,index){
+  const ctx = el("miniChart").getContext("2d");
+  if(chart) chart.destroy();
+
+  chart = new Chart(ctx, {
     type: "bar",
     data: {
-      labels: ["T", "R", "A", "Indeks"],
+      labels: ["T (Pengajaran)","R (Penyelidikan)","A (Pentadbiran)","S (Khidmat)","Indeks"],
       datasets: [{
-        data: [T, R, A, I]
+        data: [T,R,A,S,index]
       }]
     },
     options: {
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, max: 100 } }
+      responsive: true,
+      plugins: { legend: { display:false } },
+      scales: { y: { beginAtZero:true, max: 100 } }
     }
   });
 }
 
-const ugInput = ()=>document.getElementById("ug").value;
-const pgInput = ()=>document.getElementById("pg").value;
-const masterInput = ()=>document.getElementById("master").value;
-const phdInput = ()=>document.getElementById("phd").value;
-const piInput = ()=>document.getElementById("pi").value;
-const coInput = ()=>document.getElementById("co").value;
-const paperInput = ()=>document.getElementById("paper").value;
-const adminMainInput = ()=>document.getElementById("adminMain").value;
-const adminOtherInput = ()=>document.getElementById("adminOther").value;
-</script>
+/* ===========================
+   SAVE / LOAD
+=========================== */
+function autoSaveData(){
+  // save only data (not necessarily settings, but we can store all)
+  localStorage.setItem(LS_KEY, JSON.stringify(state));
+}
+function loadAll(){
+  const raw = localStorage.getItem(LS_KEY);
+  if(!raw) return false;
+  try{
+    const obj = JSON.parse(raw);
+    if(!obj || !obj.weights) return false;
+    state = obj;
+    return true;
+  }catch{
+    return false;
+  }
+}
 
+/* ===========================
+   ADD ROW HANDLERS
+=========================== */
+function addCourseRow(){
+  state.data.courses.push({id: uid(), level:"UG", code:"", name:"", credit:0, students:0, lecture:0, tutorial:0, lab:0, field:0});
+  renderCourses(); autoSaveData(); computeAndRender();
+}
+function addGrantRow(){
+  state.data.grants.push({id: uid(), code:"", title:"", role:"PI", stage:"ACTIVE", amount:0});
+  renderGrants(); autoSaveData(); computeAndRender();
+}
+function addAdminRow(){
+  state.data.admin.push({id: uid(), position:"", level:"L3", intensity:1, months:0});
+  renderAdmin(); autoSaveData(); computeAndRender();
+}
+function addServiceRow(){
+  state.data.service.push({id: uid(), activity:"", role:"LEAD", hours:0, pax:0});
+  renderService(); autoSaveData(); computeAndRender();
+}
+
+/* ===========================
+   EXPORTS
+=========================== */
+function exportCSV(){
+  // Ringkas untuk dashboard: satu rekod ringkas
+  readSettingsFromUI();
+  const T = scoreCourses();
+  const R = scoreResearch();
+  const A = scoreAdmin();
+  const S = scoreService();
+  const index = clamp((T*state.weights.T)+(R*state.weights.R)+(A*state.weights.A)+(S*state.weights.S),0,100);
+  const zone = classify(index).label;
+
+  // CSV: single row + metadata ringkas (tanpa data peribadi)
+  const headers = [
+    "timestamp","score_T","score_R","score_A","score_S","index_total","zone",
+    "count_courses","count_grants","count_admin","count_service","paper_count"
+  ];
+  const row = [
+    new Date().toISOString(),
+    T.toFixed(1), R.toFixed(1), A.toFixed(1), S.toFixed(1),
+    index.toFixed(1), zone,
+    state.data.courses.length,
+    state.data.grants.length,
+    state.data.admin.length,
+    state.data.service.length,
+    n(state.data.paperCount)
+  ];
+  const csv = headers.join(",") + "\n" + row.join(",");
+  downloadText("fst_busyness_index_summary.csv", csv);
+}
+
+function exportJSON(){
+  downloadText("fst_busyness_index_full.json", JSON.stringify(state, null, 2));
+}
+
+/* ===========================
+   INIT
+=========================== */
+function init(){
+  // try load from LS first
+  if(loadAll()){
+    // loaded
+  } else {
+    state = structuredClone(DEFAULTS);
+  }
+
+  writeSettingsToUI();
+
+  // at least 1 row each for user friendliness
+  if(state.data.courses.length===0) state.data.courses.push({id: uid(), level:"UG", code:"", name:"", credit:0, students:0, lecture:0, tutorial:0, lab:0, field:0});
+  if(state.data.grants.length===0) state.data.grants.push({id: uid(), code:"", title:"", role:"PI", stage:"ACTIVE", amount:0});
+  if(state.data.admin.length===0) state.data.admin.push({id: uid(), position:"", level:"L3", intensity:1, months:0});
+  if(state.data.service.length===0) state.data.service.push({id: uid(), activity:"", role:"LEAD", hours:0, pax:0});
+
+  renderCourses();
+  renderGrants();
+  renderAdmin();
+  renderService();
+
+  // listeners for settings inputs
+  const allInputs = document.querySelectorAll("input, select");
+  allInputs.forEach(inp=>{
+    inp.addEventListener("input", ()=>{
+      autoSaveData();
+      computeAndRender();
+    });
+  });
+
+  // buttons
+  el("addCourse").addEventListener("click",(e)=>{e.preventDefault(); addCourseRow();});
+  el("clearCourses").addEventListener("click",(e)=>{e.preventDefault(); state.data.courses=[]; autoSaveData(); renderCourses(); computeAndRender();});
+
+  el("addGrant").addEventListener("click",(e)=>{e.preventDefault(); addGrantRow();});
+  el("clearGrants").addEventListener("click",(e)=>{e.preventDefault(); state.data.grants=[]; autoSaveData(); renderGrants(); computeAndRender();});
+
+  el("addAdmin").addEventListener("click",(e)=>{e.preventDefault(); addAdminRow();});
+  el("clearAdmin").addEventListener("click",(e)=>{e.preventDefault(); state.data.admin=[]; autoSaveData(); renderAdmin(); computeAndRender();});
+
+  el("addService").addEventListener("click",(e)=>{e.preventDefault(); addServiceRow();});
+  el("clearService").addEventListener("click",(e)=>{e.preventDefault(); state.data.service=[]; autoSaveData(); renderService(); computeAndRender();});
+
+  el("btnExportCSV").addEventListener("click",(e)=>{e.preventDefault(); exportCSV();});
+  el("btnExportJSON").addEventListener("click",(e)=>{e.preventDefault(); exportJSON();});
+
+  el("btnClearAll").addEventListener("click",(e)=>{
+    e.preventDefault();
+    if(confirm("Reset semua data & tetapan?")) {
+      state = structuredClone(DEFAULTS);
+      autoSaveData();
+      writeSettingsToUI();
+      renderCourses(); renderGrants(); renderAdmin(); renderService();
+      computeAndRender();
+      location.reload();
+    }
+  });
+
+  el("btnResetDefaults").addEventListener("click",(e)=>{
+    e.preventDefault();
+    state = structuredClone(DEFAULTS);
+    autoSaveData();
+    writeSettingsToUI();
+    renderCourses(); renderGrants(); renderAdmin(); renderService();
+    computeAndRender();
+  });
+
+  el("btnSaveSettings").addEventListener("click",(e)=>{
+    e.preventDefault();
+    readSettingsFromUI();
+    autoSaveData();
+    alert("Tetapan disimpan (local browser).");
+  });
+
+  el("btnLoadSettings").addEventListener("click",(e)=>{
+    e.preventDefault();
+    if(loadAll()){
+      writeSettingsToUI();
+      renderCourses(); renderGrants(); renderAdmin(); renderService();
+      computeAndRender();
+      alert("Tetapan/data dimuatkan daripada browser (localStorage).");
+    } else {
+      alert("Tiada tetapan tersimpan ditemui.");
+    }
+  });
+
+  computeAndRender();
+}
+
+init();
+</script>
 </body>
 </html>
