@@ -3,136 +3,138 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>FST UMS Staff Busyness Index (Flexible Calculator)</title>
+  <title>FST UMS Staff Busyness Index</title>
 
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     :root{
-      --bg:#0b1020;
-      --text:#eaf0ff;
-      --muted:#b8c6ff;
-      --line:rgba(255,255,255,.12);
+      --bg0:#070A14;
+      --bg1:#0B1022;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.08);
+      --line: rgba(255,255,255,.14);
+      --text: #ECF2FF;
+      --muted:#B9C7FF;
 
-      /* section palettes */
-      --c-profile:#60a5fa;
-      --c-settings:#2dd4bf;
-      --c-teaching:#a78bfa;
-      --c-research:#34d399;
-      --c-admin:#fbbf24;
-      --c-service:#fb7185;
-      --c-pub:#f472b6;
+      /* Section accents */
+      --a-profile:#60A5FA;
+      --a-settings:#22C55E;
+      --a-teaching:#A78BFA;
+      --a-research:#34D399;
+      --a-admin:#FBBF24;
+      --a-service:#FB7185;
+      --a-results:#2DD4BF;
 
-      --card:#0f1630;
-      --shadow:0 10px 30px rgba(0,0,0,.35);
-      --radius:16px;
+      --danger:#FB7185;
+      --warn:#FBBF24;
+      --ok:#34D399;
+      --info:#60A5FA;
 
-      --danger:#fb7185;
-      --warn:#fbbf24;
-      --ok:#34d399;
-      --info:#60a5fa;
+      --radius:18px;
+      --shadow: 0 16px 40px rgba(0,0,0,.40);
     }
 
-    *{ box-sizing:border-box; font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    *{ box-sizing:border-box; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
     body{
       margin:0;
-      background: radial-gradient(1200px 600px at 18% 0%, #172a66 0%, var(--bg) 60%) fixed;
       color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 15% 0%, rgba(96,165,250,.28) 0%, rgba(7,10,20,0) 55%),
+        radial-gradient(900px 600px at 80% 8%, rgba(34,197,94,.18) 0%, rgba(7,10,20,0) 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg0));
+      background-attachment: fixed;
     }
-    a{ color: #93c5fd; }
     .wrap{ max-width: 1200px; margin: 18px auto; padding: 14px; }
-    .topbar{
-      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
-      background: linear-gradient(135deg, rgba(96,165,250,.16), rgba(45,212,191,.12));
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: var(--radius);
+
+    .top{
+      display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;
       padding: 14px 16px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.14);
+      background: linear-gradient(135deg, rgba(96,165,250,.18), rgba(45,212,191,.12));
       box-shadow: var(--shadow);
     }
     .brand{ display:flex; align-items:center; gap:12px; min-width: 260px; }
     .logo{
-      width:48px; height:48px;
-      border-radius: 14px;
+      width:52px; height:52px; border-radius: 16px;
       background: rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.14);
       overflow:hidden; display:flex; align-items:center; justify-content:center;
     }
     .logo img{ width:100%; height:100%; object-fit:contain; padding:6px; }
-    .title h1{ margin:0; font-size: 1.05rem; font-weight: 850; letter-spacing:.2px; }
-    .title p{ margin:3px 0 0; color: var(--muted); font-size: .86rem; }
+    .tbox h1{ margin:0; font-size:1.12rem; font-weight: 950; letter-spacing:.2px; }
+    .tbox p{ margin:4px 0 0; color: var(--muted); font-size:.88rem; }
 
-    .modes{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+    .mode{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;
+    }
     .pill{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:7px 10px; border-radius:999px;
+      display:inline-flex; gap:8px; align-items:center;
+      padding: 7px 10px; border-radius: 999px;
       border:1px solid rgba(255,255,255,.16);
-      background: rgba(15,22,48,.6);
-      font-size: .82rem;
-      color: var(--text);
-      font-weight: 750;
+      background: rgba(255,255,255,.06);
+      font-size:.82rem; font-weight: 900;
     }
     .dot{ width:9px; height:9px; border-radius:999px; background: var(--ok); }
+
     .btn{
-      border:none; cursor:pointer; border-radius:999px;
-      padding:9px 12px;
-      font-weight: 850;
+      border:none; cursor:pointer;
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-weight: 950;
       color: var(--text);
       background: rgba(96,165,250,.18);
-      border:1px solid rgba(96,165,250,.40);
+      border:1px solid rgba(96,165,250,.42);
     }
-    .btn.secondary{ background: rgba(45,212,191,.16); border-color: rgba(45,212,191,.40); }
+    .btn.secondary{ background: rgba(45,212,191,.16); border-color: rgba(45,212,191,.42); }
     .btn.ghost{ background: transparent; border-color: rgba(255,255,255,.18); color: var(--muted); }
-    .btn.danger{ background: rgba(251,113,133,.14); border-color: rgba(251,113,133,.45); }
     .btn.warn{ background: rgba(251,191,36,.14); border-color: rgba(251,191,36,.45); }
+    .btn.danger{ background: rgba(251,113,133,.14); border-color: rgba(251,113,133,.45); }
     .btn:active{ transform: translateY(1px); }
 
     .notice{
       margin-top: 14px;
-      border-radius: 14px;
       padding: 10px 12px;
+      border-radius: 14px;
       border: 1px solid rgba(255,255,255,.14);
-      background: rgba(15,22,48,.65);
-      color: rgba(234,240,255,.88);
-      font-size: .9rem;
+      background: rgba(255,255,255,.06);
+      color: rgba(236,242,255,.92);
       line-height: 1.45;
+      font-size:.92rem;
     }
-    .notice strong{ color: var(--c-settings); }
-    .notice.bad{ border-color: rgba(251,113,133,.45); background: rgba(251,113,133,.08); }
-    .notice.warn{ border-color: rgba(251,191,36,.45); background: rgba(251,191,36,.08); }
+    .notice.bad{ border-color: rgba(251,113,133,.45); background: rgba(251,113,133,.10); }
+    .notice.warn{ border-color: rgba(251,191,36,.45); background: rgba(251,191,36,.10); }
+    .notice.ok{ border-color: rgba(52,211,153,.45); background: rgba(52,211,153,.08); }
 
     .section{
       margin-top: 14px;
       border-radius: var(--radius);
       border: 1px solid rgba(255,255,255,.14);
-      background: rgba(15,22,48,.70);
+      background: rgba(255,255,255,.05);
       box-shadow: var(--shadow);
-      overflow: hidden;
+      overflow:hidden;
     }
     .section header{
-      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center;
       padding: 12px 14px;
       border-bottom: 1px solid rgba(255,255,255,.10);
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
     }
-    .section header .hgroup{ display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; }
-    .section header h2{ margin:0; font-size: 1.02rem; font-weight: 900; }
-    .section header .sub{ color: var(--muted); font-size: .85rem; }
-    .badge{
-      padding:6px 10px; border-radius:999px; font-size:.78rem; font-weight: 900;
-      border:1px solid rgba(255,255,255,.16);
-      background: rgba(255,255,255,.06);
-    }
-    .section .content{ padding: 12px 14px; }
+    .section h2{ margin:0; font-size:1.03rem; font-weight: 1000; }
+    .sub{ color: var(--muted); font-size: .86rem; margin-top:3px; }
+    .content{ padding: 12px 14px; }
 
-    /* color strip per section */
-    .strip{ height:4px; }
-    .strip.profile{ background: linear-gradient(90deg, var(--c-profile), transparent); }
-    .strip.settings{ background: linear-gradient(90deg, var(--c-settings), transparent); }
-    .strip.teaching{ background: linear-gradient(90deg, var(--c-teaching), transparent); }
-    .strip.research{ background: linear-gradient(90deg, var(--c-research), transparent); }
-    .strip.admin{ background: linear-gradient(90deg, var(--c-admin), transparent); }
-    .strip.service{ background: linear-gradient(90deg, var(--c-service), transparent); }
-    .strip.pub{ background: linear-gradient(90deg, var(--c-pub), transparent); }
+    .accent{
+      height:5px;
+      background: linear-gradient(90deg, var(--acc), rgba(255,255,255,0));
+    }
+    .profile{ --acc: var(--a-profile); }
+    .settings{ --acc: var(--a-settings); }
+    .teaching{ --acc: var(--a-teaching); }
+    .research{ --acc: var(--a-research); }
+    .admin{ --acc: var(--a-admin); }
+    .service{ --acc: var(--a-service); }
+    .results{ --acc: var(--a-results); }
 
     .grid{
       display:grid;
@@ -147,24 +149,23 @@
       width:100%;
       border-radius: 12px;
       padding: 9px 10px;
-      background: rgba(255,255,255,.06);
+      background: rgba(255,255,255,.08);
       border: 1px solid rgba(255,255,255,.16);
       color: var(--text);
       outline: none;
     }
     textarea{ min-height: 40px; resize: vertical; }
-    input::placeholder, textarea::placeholder{ color: rgba(234,240,255,.45); }
+    input::placeholder, textarea::placeholder{ color: rgba(236,242,255,.45); }
     input:focus, select:focus, textarea:focus{
       border-color: rgba(45,212,191,.55);
-      box-shadow: 0 0 0 2px rgba(45,212,191,.15);
+      box-shadow: 0 0 0 2px rgba(45,212,191,.16);
     }
-    input[readonly], select[disabled], textarea[readonly]{
-      opacity: .85;
-      background: rgba(255,255,255,.04);
-      cursor: not-allowed;
-    }
+
+    .otherWrap{ display:none; margin-top:8px; }
+    .requiredMark::after{ content:" *"; color: var(--warn); font-weight: 1000; }
+
     .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-    .row.right{ justify-content: flex-end; }
+    .row.right{ justify-content:flex-end; }
     .hr{ height:1px; background: rgba(255,255,255,.10); margin: 12px 0; }
 
     table{
@@ -174,24 +175,30 @@
       margin-top: 10px;
       overflow:hidden;
       border-radius: 14px;
-      border:1px solid rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.14);
     }
     thead th{
       text-align:left;
       padding: 9px 10px;
       font-size:.78rem;
-      color: rgba(234,240,255,.92);
+      color: rgba(236,242,255,.95);
       border-bottom: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.06);
+      background: rgba(255,255,255,.08);
     }
     tbody td{
       padding: 8px 10px;
       border-bottom: 1px solid rgba(255,255,255,.08);
-      background: rgba(15,22,48,.35);
+      background: rgba(0,0,0,.10);
       vertical-align: top;
     }
     tbody tr:last-child td{ border-bottom:none; }
-    td .miniinput{ font-size:.85rem; padding: 8px 9px; border-radius: 10px; }
+
+    .miniinput{ font-size:.86rem; padding: 8px 9px; border-radius: 10px; }
+
+    .err{
+      border-color: rgba(251,113,133,.8) !important;
+      box-shadow: 0 0 0 2px rgba(251,113,133,.14) !important;
+    }
 
     .kpi{
       display:grid; grid-template-columns: repeat(5, minmax(0,1fr));
@@ -199,127 +206,129 @@
       margin-top: 10px;
     }
     @media (max-width: 980px){ .kpi{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
-    .kpi .box{
+
+    .box{
       border-radius: 14px;
       border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
+      background: rgba(255,255,255,.08);
       padding: 10px;
     }
-    .kpi .k{ font-size:.78rem; color: var(--muted); }
-    .kpi .v{ font-size: 1.25rem; font-weight: 950; margin-top: 3px; }
-    .kpi .s{ font-size: .78rem; color: rgba(234,240,255,.7); margin-top:2px; }
+    .k{ font-size:.78rem; color: var(--muted); }
+    .v{ font-size: 1.25rem; font-weight: 1000; margin-top: 3px; }
+    .s{ font-size: .78rem; color: rgba(236,242,255,.70); margin-top:2px; }
 
     .zone{
-      display:flex; align-items:center; gap:10px; justify-content: space-between; flex-wrap:wrap;
-      margin-top: 10px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      margin-top:10px;
       padding: 10px 12px;
       border-radius: 14px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.08);
     }
-    .zone .big{
+    .big{
       font-size: 2.2rem;
-      font-weight: 1000;
-      letter-spacing: .4px;
+      font-weight: 1100;
+      letter-spacing:.4px;
     }
-    .zone .tag{
+    .tag{
       display:inline-flex; align-items:center; gap:8px;
-      padding: 7px 10px; border-radius: 999px;
+      padding: 7px 10px;
+      border-radius: 999px;
       border:1px solid rgba(255,255,255,.18);
-      font-weight: 950;
+      font-weight: 1000;
     }
-    .tag.low{ background: rgba(96,165,250,.14); }
-    .tag.normal{ background: rgba(52,211,153,.14); }
-    .tag.high{ background: rgba(251,191,36,.14); }
-    .tag.over{ background: rgba(251,113,133,.14); }
-    .tag .dot{ background: var(--ok); }
+    .tag.low{ background: rgba(96,165,250,.18); }
+    .tag.normal{ background: rgba(52,211,153,.16); }
+    .tag.high{ background: rgba(251,191,36,.18); }
+    .tag.over{ background: rgba(251,113,133,.18); }
     .tag.low .dot{ background: var(--info); }
     .tag.normal .dot{ background: var(--ok); }
     .tag.high .dot{ background: var(--warn); }
     .tag.over .dot{ background: var(--danger); }
 
     .footer{
-      margin: 14px 0 6px;
-      color: rgba(234,240,255,.65);
+      margin: 16px 0 6px;
+      color: rgba(236,242,255,.65);
       font-size: .78rem;
-      text-align: center;
+      text-align:center;
     }
 
-    /* PRINT (PDF) – professional, no colours */
+    /* Print: professional, black/white, ensure no cut */
     @media print{
       body{ background:#fff !important; color:#111 !important; }
-      .topbar, .btn, .modes, .notice, .row, .strip{ display:none !important; }
+      .top, .notice, .row.noPrint, .accent{ display:none !important; }
       .section{ box-shadow:none !important; border:1px solid #ddd !important; background:#fff !important; }
       .section header{ border-bottom:1px solid #ddd !important; }
-      .section header h2, .section header .sub, .badge{ color:#111 !important; }
+      .section header h2, .sub{ color:#111 !important; }
+      label{ color:#333 !important; }
       input, select, textarea{
-        background:#fff !important;
-        color:#111 !important;
+        background:#fff !important; color:#111 !important;
         border: 1px solid #ccc !important;
+        height: auto !important;
+        white-space: pre-wrap !important;
       }
-      table{ border:1px solid #ccc !important; }
+      table{ border:1px solid #ccc !important; page-break-inside:auto !important; }
       thead th{ background:#f3f3f3 !important; color:#111 !important; border-bottom:1px solid #ccc !important; }
       tbody td{ background:#fff !important; color:#111 !important; border-bottom:1px solid #eee !important; }
+      .section, table, tr, td, th{ page-break-inside: avoid !important; }
       canvas{ max-height: 240px !important; }
       .footer{ color:#333 !important; }
-      a{ color:#111 !important; text-decoration:none !important; }
     }
   </style>
 </head>
 
 <body>
   <div class="wrap">
-    <div class="topbar">
+    <div class="top">
       <div class="brand">
-        <div class="logo" title="Put your logo at assets/UMS logo.png">
+        <div class="logo" title="Put logo at assets/UMS logo.png">
+          <!-- If logo not showing: confirm folder assets/ and exact filename 'UMS logo.png' -->
           <img src="assets/UMS%20logo.png" alt="UMS logo" />
         </div>
-        <div class="title">
+        <div class="tbox">
           <h1>FST UMS Staff Busyness Index</h1>
-          <p>Flexible weights • detailed activities • export for dashboard • management (Dean) view</p>
+          <p>One-page • Required fields • Admin-locked settings • Professional Print PDF</p>
         </div>
       </div>
-
-      <div class="modes">
-        <span class="pill" id="pillRole"><span class="dot"></span><span id="roleText">Staff Mode</span></span>
+      <div class="mode">
+        <span class="pill" id="pillRole"><span class="dot" id="roleDot"></span><span id="roleText">Staff Mode</span></span>
         <button class="btn ghost" id="btnToggleMode">Switch to Management View</button>
         <button class="btn warn" id="btnAdminUnlock">Admin Unlock</button>
-        <button class="btn secondary" id="btnCalculate">Calculate</button>
-        <button class="btn" id="btnPrint">Print PDF</button>
       </div>
     </div>
 
-    <div class="notice" id="globalMsg">
-      <strong>Tip:</strong> Staff can fill in activities. Weights/mark scheme are <strong>locked</strong> unless Admin Unlock is activated.
-      Use <strong>Export JSON</strong> for audit trail and Management View import.
+    <div class="notice" id="msgBox">
+      <b>Note:</b> Settings/weights are locked for staff. Admin can unlock (per browser). Calculate & Print are at the bottom.
     </div>
 
-    <!-- STAFF PROFILE -->
-    <section class="section" id="secProfile">
-      <div class="strip profile"></div>
+    <!-- PROFILE -->
+    <section class="section profile" id="secProfile">
+      <div class="accent"></div>
       <header>
-        <div class="hgroup">
+        <div>
           <h2>Staff Profile</h2>
-          <span class="sub">Required for audit trail & dashboard export</span>
+          <div class="sub">All fields are required for audit trail & PDF signing.</div>
         </div>
-        <span class="badge">Section colour: Profile</span>
       </header>
       <div class="content">
         <div class="grid">
           <div>
-            <label>Full Name</label>
+            <label class="requiredMark">Full Name</label>
             <input id="pName" placeholder="e.g., Dr. ..." />
           </div>
+
           <div>
-            <label>Staff ID / Employee No.</label>
-            <input id="pStaffId" placeholder="e.g., UMSxxxx" />
+            <label class="requiredMark">Staff ID (format: 250505-02025)</label>
+            <input id="pStaffId" placeholder="e.g., 250505-02025" />
           </div>
+
           <div>
-            <label>Programme / Department</label>
+            <label class="requiredMark">Programme / Department</label>
             <input id="pDept" placeholder="e.g., Mathematics with Economics" />
           </div>
+
           <div>
-            <label>Grade</label>
+            <label class="requiredMark">Grade</label>
             <select id="pGrade">
               <option value="">Select</option>
               <option>DS45 / Lecturer</option>
@@ -328,44 +337,67 @@
               <option>DS54 / Senior Lecturer</option>
               <option>VK7 / Associate Professor</option>
               <option>VK6 / Professor</option>
-              <option>Other</option>
+              <option value="Other">Other</option>
             </select>
+            <div class="otherWrap" id="pGradeOtherWrap">
+              <label class="requiredMark">Specify Grade (Other)</label>
+              <input id="pGradeOther" placeholder="Type grade..." />
+            </div>
           </div>
+
           <div>
-            <label>Appointment Status</label>
+            <label class="requiredMark">Appointment Status</label>
             <select id="pStatus">
               <option value="">Select</option>
               <option>Permanent</option>
               <option>Contract</option>
               <option>Secondment</option>
               <option>Visiting</option>
-              <option>Others</option>
+              <option value="Other">Other</option>
             </select>
+            <div class="otherWrap" id="pStatusOtherWrap">
+              <label class="requiredMark">Specify Status (Other)</label>
+              <input id="pStatusOther" placeholder="Type status..." />
+            </div>
           </div>
+
           <div>
-            <label>Reporting Period</label>
+            <label class="requiredMark">Reporting Period</label>
             <input id="pPeriod" placeholder="e.g., Semester 1 2025/2026" />
+          </div>
+
+          <div>
+            <label class="requiredMark">Faculty Name</label>
+            <input id="pFaculty" value="Faculty of Science and Technology (FST), UMS" />
+          </div>
+
+          <div>
+            <label class="requiredMark">Dean Name</label>
+            <input id="pDean" placeholder="Type Dean's full name" />
           </div>
         </div>
       </div>
     </section>
 
-    <!-- SETTINGS / WEIGHTS -->
-    <section class="section" id="secSettings">
-      <div class="strip settings"></div>
+    <!-- SETTINGS (Admin only) -->
+    <section class="section settings" id="secSettings">
+      <div class="accent"></div>
       <header>
-        <div class="hgroup">
+        <div>
           <h2>Weights & Mark Scheme (Admin-only)</h2>
-          <span class="sub">Preset rubric by rank + strict validation (weights must sum to 1.00)</span>
+          <div class="sub">Weights must sum to exactly 1.00 (strict). Presets available.</div>
         </div>
-        <span class="badge" id="lockBadge">Locked</span>
+        <div class="row noPrint">
+          <span class="pill" id="lockPill"><span class="dot" id="lockDot"></span><span id="lockText">Locked</span></span>
+        </div>
       </header>
+
       <div class="content">
-        <div class="row" style="gap:12px;">
+        <div class="row noPrint" style="align-items:flex-end;">
           <div style="min-width:260px;flex:1;">
-            <label>Rubric Preset</label>
+            <label>Rubric Preset (admin)</label>
             <select id="preset">
-              <option value="custom">Custom (no changes)</option>
+              <option value="custom">Custom</option>
               <option value="lecturer">Lecturer</option>
               <option value="senior">Senior Lecturer</option>
               <option value="assoc">Associate Professor</option>
@@ -374,7 +406,7 @@
           </div>
 
           <div style="min-width:260px;flex:1;">
-            <label>Admin Password (only needed to unlock)</label>
+            <label>Admin Password (to unlock settings)</label>
             <input id="adminPw" type="password" placeholder="Ask admin for password" />
           </div>
 
@@ -385,137 +417,95 @@
           </div>
         </div>
 
-        <div class="hr"></div>
-
         <div class="notice warn" id="weightWarn" style="display:none;"></div>
+
+        <div class="hr"></div>
+
         <div class="grid">
-          <div>
-            <label>Weight: Teaching (T)</label>
-            <input id="wT" type="number" step="0.01" min="0" value="0.40" />
-          </div>
-          <div>
-            <label>Weight: Research (R)</label>
-            <input id="wR" type="number" step="0.01" min="0" value="0.30" />
-          </div>
-          <div>
-            <label>Weight: Administration (A)</label>
-            <input id="wA" type="number" step="0.01" min="0" value="0.20" />
-          </div>
-          <div>
-            <label>Weight: Service (S)</label>
-            <input id="wS" type="number" step="0.01" min="0" value="0.10" />
-          </div>
+          <div><label class="requiredMark">Weight: Teaching (T)</label><input id="wT" type="number" step="0.01" min="0" value="0.40" /></div>
+          <div><label class="requiredMark">Weight: Research (R)</label><input id="wR" type="number" step="0.01" min="0" value="0.30" /></div>
+          <div><label class="requiredMark">Weight: Administration (A)</label><input id="wA" type="number" step="0.01" min="0" value="0.20" /></div>
+          <div><label class="requiredMark">Weight: Service (S)</label><input id="wS" type="number" step="0.01" min="0" value="0.10" /></div>
         </div>
 
         <div class="hr"></div>
 
         <div class="grid">
-          <div>
-            <label>Teaching: points per credit</label>
-            <input id="tCreditW" type="number" step="0.1" min="0" value="5" />
-          </div>
-          <div>
-            <label>Teaching: points per student</label>
-            <input id="tStudentW" type="number" step="0.01" min="0" value="0.10" />
-          </div>
-          <div>
-            <label>Teaching: points per contact hour</label>
-            <input id="tHourW" type="number" step="0.1" min="0" value="1.0" />
-          </div>
-          <div>
-            <label>Multiplier for PG course</label>
-            <input id="tPgMult" type="number" step="0.05" min="0" value="1.20" />
-          </div>
-
-          <div>
-            <label>Research: PI base</label>
-            <input id="rPI" type="number" step="1" min="0" value="25" />
-          </div>
-          <div>
-            <label>Research: Co-I base</label>
-            <input id="rCo" type="number" step="1" min="0" value="12" />
-          </div>
-          <div>
-            <label>Research: Member base</label>
-            <input id="rMem" type="number" step="1" min="0" value="6" />
-          </div>
-          <div>
-            <label>Research: points per publication</label>
-            <input id="rPubW" type="number" step="0.5" min="0" value="4" />
-          </div>
-
-          <div>
-            <label>Admin: Official (base)</label>
-            <input id="aOfficial" type="number" step="1" min="0" value="25" />
-          </div>
-          <div>
-            <label>Admin: Ad-hoc (base)</label>
-            <input id="aAdhoc" type="number" step="1" min="0" value="10" />
-          </div>
-          <div>
-            <label>Admin: points per month</label>
-            <input id="aMonthW" type="number" step="0.5" min="0" value="0.5" />
-          </div>
-          <div>
-            <label>Admin: intensity multiplier cap</label>
-            <input id="aIntCap" type="number" step="0.1" min="1" value="1.8" />
-          </div>
-
-          <div>
-            <label>Service: points per hour</label>
-            <input id="sHourW" type="number" step="0.1" min="0" value="1.0" />
-          </div>
-          <div>
-            <label>Service: points per 10 participants</label>
-            <input id="sPaxW" type="number" step="0.1" min="0" value="0.8" />
-          </div>
-          <div>
-            <label>Service: Lead bonus</label>
-            <input id="sLead" type="number" step="0.5" min="0" value="4" />
-          </div>
-          <div>
-            <label>Service: Member bonus</label>
-            <input id="sMember" type="number" step="0.5" min="0" value="1.5" />
-          </div>
+          <div><label>Teaching: points per credit</label><input id="tCreditW" type="number" step="0.1" min="0" value="5" /></div>
+          <div><label>Teaching: points per student</label><input id="tStudentW" type="number" step="0.01" min="0" value="0.10" /></div>
+          <div><label>Teaching: points per contact hour</label><input id="tHourW" type="number" step="0.1" min="0" value="1.0" /></div>
+          <div><label>Multiplier for PG course</label><input id="tPgMult" type="number" step="0.05" min="0" value="1.20" /></div>
         </div>
 
-        <div class="notice" style="margin-top:12px">
-          <strong>Admin-only control:</strong> This site is static (GitHub Pages). The “lock” here is a practical UI lock, not a secure authentication system.
-          For strict security (real admin/staff accounts), it requires a backend/login system.
+        <div class="hr"></div>
+
+        <div class="grid">
+          <div><label>Research: PI base</label><input id="rPI" type="number" step="1" min="0" value="25" /></div>
+          <div><label>Research: Co-I base</label><input id="rCo" type="number" step="1" min="0" value="12" /></div>
+          <div><label>Research: Member base</label><input id="rMem" type="number" step="1" min="0" value="6" /></div>
+          <div><label>Research Effort: points per supervision/review hour</label><input id="rEffortW" type="number" step="0.1" min="0" value="1.0" /></div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="grid">
+          <div><label>Admin: points per level (Programme)</label><input id="aProg" type="number" step="0.5" min="0" value="3" /></div>
+          <div><label>Admin: points per level (Faculty)</label><input id="aFac" type="number" step="0.5" min="0" value="5" /></div>
+          <div><label>Admin: points per level (University)</label><input id="aUni" type="number" step="0.5" min="0" value="7" /></div>
+          <div><label>Admin: points per level (State)</label><input id="aState" type="number" step="0.5" min="0" value="8" /></div>
+
+          <div><label>Admin: points per level (National)</label><input id="aNat" type="number" step="0.5" min="0" value="10" /></div>
+          <div><label>Admin: points per level (International)</label><input id="aInt" type="number" step="0.5" min="0" value="12" /></div>
+          <div><label>Admin: points per level (Industry)</label><input id="aInd" type="number" step="0.5" min="0" value="9" /></div>
+          <div><label>Admin: points per meeting</label><input id="aMeetW" type="number" step="0.1" min="0" value="1.5" /></div>
+
+          <div><label>Admin: points per preparation hour</label><input id="aPrepW" type="number" step="0.1" min="0" value="1.0" /></div>
+          <div><label>Admin: points per month (duration)</label><input id="aMonthW" type="number" step="0.1" min="0" value="0.3" /></div>
+          <div><label>Admin: appointment type bonus (Official)</label><input id="aOfficialB" type="number" step="0.5" min="0" value="3" /></div>
+          <div><label>Admin: appointment type bonus (Conference Committee)</label><input id="aConfB" type="number" step="0.5" min="0" value="4" /></div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="grid">
+          <div><label>Service: points per hour</label><input id="sHourW" type="number" step="0.1" min="0" value="1.0" /></div>
+          <div><label>Service: points per 10 participants</label><input id="sPaxW" type="number" step="0.1" min="0" value="0.8" /></div>
+          <div><label>Service: Lead bonus</label><input id="sLead" type="number" step="0.5" min="0" value="4" /></div>
+          <div><label>Service: Member bonus</label><input id="sMember" type="number" step="0.5" min="0" value="1.5" /></div>
+        </div>
+
+        <div class="notice">
+          <b>Security note:</b> This is a static GitHub Pages site. Admin lock here is a practical UI lock, not a secure authentication system.
         </div>
       </div>
     </section>
 
     <!-- TEACHING -->
-    <section class="section" id="secTeaching">
-      <div class="strip teaching"></div>
+    <section class="section teaching" id="secTeaching">
+      <div class="accent"></div>
       <header>
-        <div class="hgroup">
-          <h2>Teaching – Course Details</h2>
-          <span class="sub">Credit auto-read + contact hours auto-calc</span>
+        <div>
+          <h2>Teaching – Courses</h2>
+          <div class="sub">Credit auto from last digit of course code (e.g., SJ24102 → 2). Credit is read-only.</div>
         </div>
-        <div class="row">
+        <div class="row noPrint">
           <button class="btn secondary" id="addCourse">+ Add course</button>
           <button class="btn ghost" id="clearCourse">Clear</button>
         </div>
       </header>
       <div class="content">
-        <div class="notice" id="teachHint">
-          Credit is inferred from course code (last digit or (3) pattern). Contact hours = LEC + TUT + LAB + FIELD.
-        </div>
-
         <table id="tblCourse">
           <thead>
             <tr>
               <th style="width:10%">Level</th>
-              <th style="width:14%">Course Code</th>
-              <th>Course Name</th>
-              <th style="width:9%">Credit</th>
-              <th style="width:10%">Students</th>
-              <th style="width:9%">LEC</th>
-              <th style="width:9%">TUT</th>
-              <th style="width:9%">LAB</th>
-              <th style="width:10%">FIELD</th>
+              <th style="width:14%">Course Code *</th>
+              <th>Course Name *</th>
+              <th style="width:8%">Credit</th>
+              <th style="width:10%">Students *</th>
+              <th style="width:8%">LEC *</th>
+              <th style="width:8%">TUT *</th>
+              <th style="width:8%">LAB *</th>
+              <th style="width:9%">FIELD *</th>
               <th style="width:12%">Contact Hours</th>
               <th style="width:8%">Del</th>
             </tr>
@@ -526,14 +516,14 @@
     </section>
 
     <!-- RESEARCH -->
-    <section class="section" id="secResearch">
-      <div class="strip research"></div>
+    <section class="section research" id="secResearch">
+      <div class="accent"></div>
       <header>
-        <div class="hgroup">
-          <h2>Research – Grants & Projects</h2>
-          <span class="sub">Grant level + role + status + amount + duration</span>
+        <div>
+          <h2>Research – Grants + Effort (Top-down busyness)</h2>
+          <div class="sub">Grants are top-down. Research Effort captures supervision/reviewing time (optional, but recommended).</div>
         </div>
-        <div class="row">
+        <div class="row noPrint">
           <button class="btn secondary" id="addGrant">+ Add grant</button>
           <button class="btn ghost" id="clearGrant">Clear</button>
         </div>
@@ -542,63 +532,93 @@
         <table id="tblGrant">
           <thead>
             <tr>
-              <th style="width:14%">Grant Code</th>
-              <th>Title</th>
-              <th style="width:12%">Level</th>
-              <th style="width:12%">Role</th>
-              <th style="width:14%">Status</th>
+              <th style="width:14%">Grant Code *</th>
+              <th>Title *</th>
+              <th style="width:12%">Level *</th>
+              <th style="width:12%">Role *</th>
+              <th style="width:12%">Status *</th>
               <th style="width:12%">Amount (RM)</th>
-              <th style="width:12%">Duration (months)</th>
+              <th style="width:12%">Duration (months) *</th>
               <th style="width:8%">Del</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
-      </div>
-    </section>
 
-    <!-- PUBLICATIONS -->
-    <section class="section" id="secPub">
-      <div class="strip pub"></div>
-      <header>
-        <div class="hgroup">
-          <h2>Publications – Detailed List</h2>
-          <span class="sub">Type, index, quartile, authorship, status</span>
+        <div class="hr"></div>
+
+        <div class="row noPrint" style="justify-content:space-between;gap:12px;">
+          <div>
+            <h3 style="margin:0;font-size:1rem;font-weight:1000;">Research Effort (Supervision / Reviewing / Editorial / Consultancy)</h3>
+            <div class="sub">Use hours to represent effort (more defensible than “publication output”).</div>
+          </div>
+          <div class="row">
+            <button class="btn secondary" id="addEffort">+ Add effort</button>
+            <button class="btn ghost" id="clearEffort">Clear</button>
+          </div>
         </div>
-        <div class="row">
-          <button class="btn secondary" id="addPub">+ Add publication</button>
-          <button class="btn ghost" id="clearPub">Clear</button>
-        </div>
-      </header>
-      <div class="content">
-        <table id="tblPub">
+
+        <table id="tblEffort">
           <thead>
             <tr>
-              <th style="width:14%">Year</th>
-              <th>Title</th>
-              <th style="width:12%">Type</th>
-              <th style="width:12%">Index</th>
-              <th style="width:10%">Quartile</th>
-              <th style="width:14%">Authorship</th>
-              <th style="width:12%">Status</th>
-              <th style="width:8%">Del</th>
+              <th>Activity Type *</th>
+              <th>Description *</th>
+              <th style="width:16%">Hours *</th>
+              <th style="width:10%">Del</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
+
+        <div class="hr"></div>
+
+        <div class="row noPrint" style="justify-content:space-between;gap:12px;">
+          <div>
+            <h3 style="margin:0;font-size:1rem;font-weight:1000;">Publications (Optional)</h3>
+            <div class="sub">Default OFF to avoid “self-create busy”. You may enable if management agrees.</div>
+          </div>
+          <div class="row">
+            <label style="margin:0;color:var(--muted);font-size:.86rem;display:flex;gap:8px;align-items:center;">
+              <input id="pubToggle" type="checkbox" style="width:auto;transform:scale(1.05)" />
+              Include publications in scoring
+            </label>
+          </div>
+        </div>
+
+        <div id="pubWrap" style="display:none;">
+          <div class="row noPrint" style="justify-content:flex-end;">
+            <button class="btn secondary" id="addPub">+ Add publication</button>
+            <button class="btn ghost" id="clearPub">Clear</button>
+          </div>
+
+          <table id="tblPub">
+            <thead>
+              <tr>
+                <th style="width:14%">Year *</th>
+                <th>Title *</th>
+                <th style="width:14%">Index *</th>
+                <th style="width:12%">Quartile</th>
+                <th style="width:16%">Authorship *</th>
+                <th style="width:12%">Status *</th>
+                <th style="width:8%">Del</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </section>
 
-    <!-- ADMIN -->
-    <section class="section" id="secAdmin">
-      <div class="strip admin"></div>
+    <!-- ADMINISTRATION -->
+    <section class="section admin" id="secAdmin">
+      <div class="accent"></div>
       <header>
-        <div class="hgroup">
-          <h2>Administration – Positions & Committees</h2>
-          <span class="sub">Official vs ad-hoc + duration + intensity + evidence URL</span>
+        <div>
+          <h2>Administration – Appointments & Committees</h2>
+          <div class="sub">Level + meetings + preparation hours + duration. Suitable for conference committees (AJK + pre-event work).</div>
         </div>
-        <div class="row">
-          <button class="btn secondary" id="addAdmin">+ Add role</button>
+        <div class="row noPrint">
+          <button class="btn secondary" id="addAdmin">+ Add appointment</button>
           <button class="btn ghost" id="clearAdmin">Clear</button>
         </div>
       </header>
@@ -606,11 +626,12 @@
         <table id="tblAdmin">
           <thead>
             <tr>
-              <th>Position/Role</th>
-              <th style="width:14%">Category</th>
-              <th style="width:12%">Intensity</th>
-              <th style="width:12%">Duration (months)</th>
-              <th style="width:22%">Evidence URL</th>
+              <th>Appointment / Role *</th>
+              <th style="width:16%">Type *</th>
+              <th style="width:16%">Level *</th>
+              <th style="width:12%">Meetings *</th>
+              <th style="width:14%">Prep Hours *</th>
+              <th style="width:14%">Duration (months) *</th>
               <th style="width:8%">Del</th>
             </tr>
           </thead>
@@ -620,14 +641,14 @@
     </section>
 
     <!-- SERVICE -->
-    <section class="section" id="secService">
-      <div class="strip service"></div>
+    <section class="section service" id="secService">
+      <div class="accent"></div>
       <header>
-        <div class="hgroup">
+        <div>
           <h2>Service / Community / Others</h2>
-          <span class="sub">Hours + participants + role</span>
+          <div class="sub">Hours + participants + role.</div>
         </div>
-        <div class="row">
+        <div class="row noPrint">
           <button class="btn secondary" id="addService">+ Add activity</button>
           <button class="btn ghost" id="clearService">Clear</button>
         </div>
@@ -636,10 +657,10 @@
         <table id="tblService">
           <thead>
             <tr>
-              <th>Activity</th>
-              <th style="width:14%">Role</th>
-              <th style="width:12%">Hours</th>
-              <th style="width:14%">Participants</th>
+              <th>Activity *</th>
+              <th style="width:14%">Role *</th>
+              <th style="width:12%">Hours *</th>
+              <th style="width:14%">Participants *</th>
               <th style="width:8%">Del</th>
             </tr>
           </thead>
@@ -648,60 +669,46 @@
       </div>
     </section>
 
-    <!-- RESULTS / DASHBOARD -->
-    <section class="section" id="secResults">
-      <div class="strip settings"></div>
+    <!-- RESULTS -->
+    <section class="section results" id="secResults">
+      <div class="accent"></div>
       <header>
-        <div class="hgroup">
-          <h2>Results & Mini Dashboard</h2>
-          <span class="sub">Audit trail + exports + management view import</span>
+        <div>
+          <h2>Results & Export</h2>
+          <div class="sub">Calculate at bottom • Print PDF includes signatures • Export for dashboard</div>
         </div>
-        <span class="badge" id="auditStamp">Not calculated yet</span>
+        <span class="pill" id="auditPill"><span class="dot" style="background:var(--info)"></span><span id="auditStamp">Not calculated yet</span></span>
       </header>
+
       <div class="content">
         <div class="kpi">
-          <div class="box">
-            <div class="k">Teaching Score (T)</div>
-            <div class="v" id="outT">0.0</div>
-            <div class="s" id="sT">Courses & contact hours</div>
-          </div>
-          <div class="box">
-            <div class="k">Research Score (R)</div>
-            <div class="v" id="outR">0.0</div>
-            <div class="s" id="sR">Grants & publications</div>
-          </div>
-          <div class="box">
-            <div class="k">Administration Score (A)</div>
-            <div class="v" id="outA">0.0</div>
-            <div class="s" id="sA">Roles, duration, intensity</div>
-          </div>
-          <div class="box">
-            <div class="k">Service Score (S)</div>
-            <div class="v" id="outS">0.0</div>
-            <div class="s" id="sS">Hours, participants, role</div>
-          </div>
-          <div class="box">
-            <div class="k">Overall Index</div>
-            <div class="v" id="outIndex">0.0</div>
-            <div class="s">Scale 0–100</div>
-          </div>
+          <div class="box"><div class="k">Teaching (T)</div><div class="v" id="outT">0.0</div><div class="s">Courses + contact hours</div></div>
+          <div class="box"><div class="k">Research (R)</div><div class="v" id="outR">0.0</div><div class="s">Grants + effort (+ optional pubs)</div></div>
+          <div class="box"><div class="k">Administration (A)</div><div class="v" id="outA">0.0</div><div class="s">Level + meetings + prep + duration</div></div>
+          <div class="box"><div class="k">Service (S)</div><div class="v" id="outS">0.0</div><div class="s">Hours + participants</div></div>
+          <div class="box"><div class="k">Overall Index</div><div class="v" id="outIndex">0.0</div><div class="s">Scale 0–100</div></div>
         </div>
 
         <div class="zone">
           <div>
             <div class="k" style="color:var(--muted);font-size:.86rem">Busyness Index</div>
-            <div class="big"><span id="bigIndex">0.0</span> <span style="font-size:.9rem;color:rgba(234,240,255,.75)">/100</span></div>
+            <div class="big"><span id="bigIndex">0.0</span> <span style="font-size:.92rem;color:rgba(236,242,255,.75)">/100</span></div>
           </div>
-          <div class="tag normal" id="zoneTag">
-            <span class="dot"></span><span id="zoneText">Normal</span>
-          </div>
+          <div class="tag normal" id="zoneTag"><span class="dot"></span><span id="zoneText">Normal</span></div>
         </div>
-
         <p id="zoneDesc" style="color:var(--muted);margin:10px 0 0;line-height:1.45"></p>
 
         <div class="hr"></div>
 
-        <div class="row" style="justify-content:space-between;gap:12px">
+        <div class="notice" id="chartNote">
+          Chart uses section colours. If not visible, CDN may be blocked; scores/exports still work.
+        </div>
+        <canvas id="chart" height="140"></canvas>
+
+        <div class="hr"></div>
+
+        <!-- Management View import -->
+        <div class="row noPrint" style="justify-content:space-between;gap:12px;">
           <div style="min-width:260px;flex:1">
             <label>Management View – Import staff JSON (read-only)</label>
             <input type="file" id="jsonImport" accept=".json" />
@@ -715,10 +722,74 @@
 
         <div class="hr"></div>
 
-        <div class="notice" id="chartNote">
-          If chart does not appear, your network may block CDN. Scores and exports will still work.
+        <!-- Calculate & Print at bottom -->
+        <div class="row noPrint" style="justify-content:flex-end;">
+          <button class="btn secondary" id="btnCalculate">Calculate</button>
+          <button class="btn" id="btnPrint">Print PDF</button>
         </div>
-        <canvas id="chart" height="140"></canvas>
+
+        <!-- Signature block (print) -->
+        <div class="hr"></div>
+        <div class="section" style="box-shadow:none;border:1px dashed rgba(255,255,255,.18);background:rgba(255,255,255,.03);">
+          <header style="border-bottom:none">
+            <div>
+              <h2 style="font-size:1rem;margin:0">Signatures (for PDF)</h2>
+              <div class="sub">Printed output includes staff & dean signature lines and dates.</div>
+            </div>
+          </header>
+          <div class="content">
+            <div class="grid">
+              <div>
+                <label>Printed Date</label>
+                <input id="printDate" readonly />
+              </div>
+              <div>
+                <label>Staff Name</label>
+                <input id="sigStaffName" readonly />
+              </div>
+              <div>
+                <label>Staff ID</label>
+                <input id="sigStaffId" readonly />
+              </div>
+              <div>
+                <label>Faculty</label>
+                <input id="sigFaculty" readonly />
+              </div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="grid">
+              <div style="grid-column: span 2;">
+                <label>Staff Signature</label>
+                <input placeholder="Signature (manual/digital)" />
+              </div>
+              <div>
+                <label>Staff Signature Date</label>
+                <input placeholder="DD/MM/YYYY" />
+              </div>
+              <div style="grid-column: span 1;">
+                <label>Dean Name</label>
+                <input id="sigDean" readonly />
+              </div>
+
+              <div style="grid-column: span 2;">
+                <label>Dean Signature</label>
+                <input placeholder="Signature (manual/digital)" />
+              </div>
+              <div>
+                <label>Dean Signature Date</label>
+                <input placeholder="DD/MM/YYYY" />
+              </div>
+              <div>
+                <label>Dean Office / Faculty</label>
+                <input id="sigDeanOffice" readonly />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -726,89 +797,88 @@
   </div>
 
 <script>
-/* =====================
-   CORE STATE
-===================== */
-const LS_KEY = "fst_ums_busyness_v2";
+/* ======================
+   CONFIG
+====================== */
+const LS_KEY = "fst_ums_busyness_v3";
+const ADMIN_PASSWORD = "FST-ADMIN"; // CHANGE THIS (Dato' boleh tukar)
+const STAFF_ID_REGEX = /^\d{6}-\d{5}$/;
+
+/* ======================
+   STATE
+====================== */
 let isAdminUnlocked = false;
 let isManagementView = false;
 let lastCalculatedISO = "";
 
 const state = {
-  profile: { name:"", staffId:"", dept:"", grade:"", status:"", period:"" },
+  profile: {
+    name:"", staffId:"", dept:"", grade:"", gradeOther:"",
+    status:"", statusOther:"",
+    period:"", faculty:"Faculty of Science and Technology (FST), UMS",
+    dean:""
+  },
   settings: {
     weights: { T:0.40, R:0.30, A:0.20, S:0.10 },
     teaching: { creditW:5, studentW:0.10, hourW:1.0, pgMult:1.20 },
-    research: { PI:25, CO:12, MEM:6, pubW:4 },
-    admin: { official:25, adhoc:10, monthW:0.5, intCap:1.8 },
+    research: { PI:25, CO:12, MEM:6, effortW:1.0, pubW:4 }, // pubW used only when toggle ON
+    admin: {
+      levelW: { Programme:3, Faculty:5, University:7, State:8, National:10, International:12, Industry:9 },
+      perMeeting:1.5, perPrepHour:1.0, perMonth:0.3,
+      bonus: { Official:3, "Conference Committee":4, "Ad-hoc":1.5 }
+    },
     service: { hourW:1.0, paxW:0.8, lead:4, member:1.5 }
   },
-  data: {
-    courses: [],
-    grants: [],
-    pubs: [],
-    adminRoles: [],
-    service: []
-  }
+  toggles: { includePubs:false },
+  data: { courses:[], grants:[], effort:[], pubs:[], adminRoles:[], service:[] }
 };
 
 function n(v){ const x = parseFloat(v); return Number.isFinite(x) ? x : 0; }
 function clamp(x, lo, hi){ return Math.max(lo, Math.min(hi, x)); }
 function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
-
 function $(id){ return document.getElementById(id); }
 
-/* =====================
-   CREDIT & CONTACT HOURS
-   Robust parsing:
-   - last digit in code (SBM1233 -> 3)
-   - or (3) pattern
-   - or trailing " - 3" pattern
-===================== */
+/* ======================
+   UI helpers: Other fields
+====================== */
+function bindOther(selectId, wrapId, inputId){
+  const sel = $(selectId), wrap = $(wrapId), inp = $(inputId);
+  const update = ()=>{
+    const isOther = sel.value === "Other";
+    wrap.style.display = isOther ? "block" : "none";
+    if(!isOther) inp.value = "";
+    autosave();
+  };
+  sel.addEventListener("change", update);
+  inp.addEventListener("input", ()=>autosave());
+  update();
+}
+
+/* ======================
+   CREDIT parsing (SJ24102 -> 2)
+====================== */
 function inferCredit(code){
   if(!code) return 0;
   const s = String(code).trim();
-
-  // (3) pattern
-  const mParen = s.match(/\((\d)\)/);
-  if(mParen) return n(mParen[1]);
-
-  // last digit in entire string
   const mLastDigit = s.match(/(\d)(?!.*\d)/);
-  if(mLastDigit) return n(mLastDigit[1]);
-
-  // fallback
-  return 0;
+  return mLastDigit ? n(mLastDigit[1]) : 0;
 }
+function contactHours(c){ return n(c.lec)+n(c.tut)+n(c.lab)+n(c.field); }
 
-function contactHours(row){
-  return n(row.lec) + n(row.tut) + n(row.lab) + n(row.field);
-}
-
-/* =====================
-   TABLE ROW TEMPLATES
-===================== */
+/* ======================
+   Seed rows (one each)
+====================== */
 function ensureSeed(){
-  if(state.data.courses.length===0){
-    state.data.courses.push({ id:uid(), level:"UG", code:"", name:"", credit:0, students:0, lec:0, tut:0, lab:0, field:0 });
-  }
-  if(state.data.grants.length===0){
-    state.data.grants.push({ id:uid(), code:"", title:"", level:"University", role:"PI", status:"Active", amount:0, months:0 });
-  }
-  if(state.data.pubs.length===0){
-    state.data.pubs.push({ id:uid(), year:"", title:"", type:"Journal", index:"Scopus", quartile:"Q1", authorship:"First/Corresponding", status:"Published" });
-  }
-  if(state.data.adminRoles.length===0){
-    state.data.adminRoles.push({ id:uid(), role:"", category:"Official", intensity:1.0, months:0, evidence:"" });
-  }
-  if(state.data.service.length===0){
-    state.data.service.push({ id:uid(), activity:"", role:"Lead", hours:0, pax:0 });
-  }
+  if(state.data.courses.length===0) state.data.courses.push({ id:uid(), level:"UG", code:"", name:"", credit:0, students:0, lec:0, tut:0, lab:0, field:0 });
+  if(state.data.grants.length===0) state.data.grants.push({ id:uid(), code:"", title:"", level:"University", role:"PI", status:"Active", amount:0, months:0 });
+  if(state.data.effort.length===0) state.data.effort.push({ id:uid(), type:"Supervision", desc:"", hours:0 });
+  if(state.data.adminRoles.length===0) state.data.adminRoles.push({ id:uid(), role:"", type:"Official", level:"Programme", meetings:0, prep:0, months:0 });
+  if(state.data.service.length===0) state.data.service.push({ id:uid(), activity:"", role:"Lead", hours:0, pax:0 });
 }
 
-/* =====================
-   RENDER TABLES
-===================== */
+/* ======================
+   Render tables
+====================== */
 function renderCourses(){
   const tb = $("tblCourse").querySelector("tbody");
   tb.innerHTML = "";
@@ -816,13 +886,10 @@ function renderCourses(){
     const tr = document.createElement("tr");
     tr.dataset.id = r.id;
     tr.innerHTML = `
-      <td><select class="miniinput" data-k="level">
-        <option value="UG">UG</option>
-        <option value="PG">PG</option>
-      </select></td>
-      <td><input class="miniinput" data-k="code" placeholder="e.g., SBM1233" /></td>
+      <td><select class="miniinput" data-k="level"><option>UG</option><option>PG</option></select></td>
+      <td><input class="miniinput" data-k="code" placeholder="e.g., SJ24102" /></td>
       <td><input class="miniinput" data-k="name" placeholder="Course name" /></td>
-      <td><input class="miniinput" data-k="credit" type="number" min="0" step="1" /></td>
+      <td><input class="miniinput" data-k="credit" type="number" readonly /></td>
       <td><input class="miniinput" data-k="students" type="number" min="0" step="1" /></td>
       <td><input class="miniinput" data-k="lec" type="number" min="0" step="1" /></td>
       <td><input class="miniinput" data-k="tut" type="number" min="0" step="1" /></td>
@@ -844,24 +911,19 @@ function renderCourses(){
     tr.querySelector('[data-k="field"]').value = r.field;
     tr.querySelector('[data-k="ch"]').value = contactHours(r);
 
-    tr.addEventListener("input", (e)=>{
+    tr.addEventListener("input",(e)=>{
       const k = e.target.getAttribute("data-k");
       if(!k) return;
       const obj = state.data.courses.find(x=>x.id===tr.dataset.id);
       if(!obj) return;
 
       if(k==="code"){
-        obj.code = e.target.value;
-        const inferred = inferCredit(obj.code);
-        const creditInput = tr.querySelector('[data-k="credit"]');
-        const current = n(creditInput.value);
-        if(current===0 && inferred>0){
-          obj.credit = inferred;
-          creditInput.value = inferred;
-        }
+        obj.code = e.target.value.trim();
+        obj.credit = inferCredit(obj.code);
+        tr.querySelector('[data-k="credit"]').value = obj.credit;
       } else if(k==="level" || k==="name"){
         obj[k] = e.target.value;
-      } else if(k==="credit" || k==="students" || k==="lec" || k==="tut" || k==="lab" || k==="field"){
+      } else if(["students","lec","tut","lab","field"].includes(k)){
         obj[k] = Math.max(0, n(e.target.value));
         e.target.value = obj[k];
       }
@@ -873,7 +935,7 @@ function renderCourses(){
     tr.addEventListener("click",(e)=>{
       if(e.target?.getAttribute("data-act")==="del"){
         state.data.courses = state.data.courses.filter(x=>x.id!==tr.dataset.id);
-        renderCourses(); autosave();
+        ensureSeed(); renderCourses(); autosave();
       }
     });
   });
@@ -888,15 +950,9 @@ function renderGrants(){
     tr.innerHTML = `
       <td><input class="miniinput" data-k="code" placeholder="e.g., FRGS/..." /></td>
       <td><input class="miniinput" data-k="title" placeholder="Grant title" /></td>
-      <td><select class="miniinput" data-k="level">
-        <option>University</option><option>National</option><option>International</option>
-      </select></td>
-      <td><select class="miniinput" data-k="role">
-        <option>PI</option><option>Co-I</option><option>Member</option>
-      </select></td>
-      <td><select class="miniinput" data-k="status">
-        <option>Active</option><option>Applied</option><option>Ended</option>
-      </select></td>
+      <td><select class="miniinput" data-k="level"><option>University</option><option>National</option><option>International</option></select></td>
+      <td><select class="miniinput" data-k="role"><option>PI</option><option>Co-I</option><option>Member</option></select></td>
+      <td><select class="miniinput" data-k="status"><option>Active</option><option>Applied</option><option>Ended</option></select></td>
       <td><input class="miniinput" data-k="amount" type="number" min="0" step="1000" /></td>
       <td><input class="miniinput" data-k="months" type="number" min="0" step="1" /></td>
       <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
@@ -929,7 +985,57 @@ function renderGrants(){
     tr.addEventListener("click",(e)=>{
       if(e.target?.getAttribute("data-act")==="del"){
         state.data.grants = state.data.grants.filter(x=>x.id!==tr.dataset.id);
-        renderGrants(); autosave();
+        ensureSeed(); renderGrants(); autosave();
+      }
+    });
+  });
+}
+
+function renderEffort(){
+  const tb = $("tblEffort").querySelector("tbody");
+  tb.innerHTML = "";
+  state.data.effort.forEach(r=>{
+    const tr = document.createElement("tr");
+    tr.dataset.id = r.id;
+    tr.innerHTML = `
+      <td>
+        <select class="miniinput" data-k="type">
+          <option>Supervision</option>
+          <option>Peer Review</option>
+          <option>Editorial</option>
+          <option>Consultancy</option>
+          <option>Other</option>
+        </select>
+      </td>
+      <td><input class="miniinput" data-k="desc" placeholder="Describe briefly" /></td>
+      <td><input class="miniinput" data-k="hours" type="number" min="0" step="0.5" /></td>
+      <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
+    `;
+    tb.appendChild(tr);
+
+    tr.querySelector('[data-k="type"]').value = r.type;
+    tr.querySelector('[data-k="desc"]').value = r.desc;
+    tr.querySelector('[data-k="hours"]').value = r.hours;
+
+    tr.addEventListener("input",(e)=>{
+      const k = e.target.getAttribute("data-k");
+      if(!k) return;
+      const obj = state.data.effort.find(x=>x.id===tr.dataset.id);
+      if(!obj) return;
+
+      if(k==="hours"){
+        obj.hours = Math.max(0, n(e.target.value));
+        e.target.value = obj.hours;
+      } else {
+        obj[k] = e.target.value;
+      }
+      autosave();
+    });
+
+    tr.addEventListener("click",(e)=>{
+      if(e.target?.getAttribute("data-act")==="del"){
+        state.data.effort = state.data.effort.filter(x=>x.id!==tr.dataset.id);
+        ensureSeed(); renderEffort(); autosave();
       }
     });
   });
@@ -944,28 +1050,32 @@ function renderPubs(){
     tr.innerHTML = `
       <td><input class="miniinput" data-k="year" placeholder="e.g., 2025" /></td>
       <td><input class="miniinput" data-k="title" placeholder="Publication title" /></td>
-      <td><select class="miniinput" data-k="type">
-        <option>Journal</option><option>Conference</option><option>Book Chapter</option><option>Book</option><option>Other</option>
-      </select></td>
-      <td><select class="miniinput" data-k="index">
-        <option>Scopus</option><option>WoS</option><option>MyCite</option><option>Non-indexed</option>
-      </select></td>
-      <td><select class="miniinput" data-k="quartile">
-        <option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option><option>N/A</option>
-      </select></td>
-      <td><select class="miniinput" data-k="authorship">
-        <option>First/Corresponding</option><option>Co-author</option><option>Single author</option>
-      </select></td>
-      <td><select class="miniinput" data-k="status">
-        <option>Published</option><option>Accepted</option><option>Submitted</option><option>In preparation</option>
-      </select></td>
+      <td>
+        <select class="miniinput" data-k="index">
+          <option>Scopus</option><option>WoS</option><option>MyCite</option><option>Non-indexed</option>
+        </select>
+      </td>
+      <td>
+        <select class="miniinput" data-k="quartile">
+          <option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option><option>N/A</option>
+        </select>
+      </td>
+      <td>
+        <select class="miniinput" data-k="authorship">
+          <option>First/Corresponding</option><option>Co-author</option><option>Single author</option>
+        </select>
+      </td>
+      <td>
+        <select class="miniinput" data-k="status">
+          <option>Published</option><option>Accepted</option><option>Submitted</option><option>In preparation</option>
+        </select>
+      </td>
       <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
     `;
     tb.appendChild(tr);
 
     tr.querySelector('[data-k="year"]').value = r.year;
     tr.querySelector('[data-k="title"]').value = r.title;
-    tr.querySelector('[data-k="type"]').value = r.type;
     tr.querySelector('[data-k="index"]').value = r.index;
     tr.querySelector('[data-k="quartile"]').value = r.quartile;
     tr.querySelector('[data-k="authorship"]').value = r.authorship;
@@ -996,22 +1106,31 @@ function renderAdmin(){
     const tr = document.createElement("tr");
     tr.dataset.id = r.id;
     tr.innerHTML = `
-      <td><input class="miniinput" data-k="role" placeholder="e.g., Programme Head" /></td>
-      <td><select class="miniinput" data-k="category">
-        <option>Official</option><option>Ad-hoc</option>
-      </select></td>
-      <td><input class="miniinput" data-k="intensity" type="number" step="0.1" min="1" /></td>
-      <td><input class="miniinput" data-k="months" type="number" step="1" min="0" /></td>
-      <td><input class="miniinput" data-k="evidence" placeholder="URL / meeting minutes reference" /></td>
+      <td><input class="miniinput" data-k="role" placeholder="e.g., AJK Conference / Programme Head" /></td>
+      <td>
+        <select class="miniinput" data-k="type">
+          <option>Official</option><option>Ad-hoc</option><option>Conference Committee</option>
+        </select>
+      </td>
+      <td>
+        <select class="miniinput" data-k="level">
+          <option>Programme</option><option>Faculty</option><option>University</option>
+          <option>State</option><option>National</option><option>International</option><option>Industry</option>
+        </select>
+      </td>
+      <td><input class="miniinput" data-k="meetings" type="number" min="0" step="1" /></td>
+      <td><input class="miniinput" data-k="prep" type="number" min="0" step="0.5" /></td>
+      <td><input class="miniinput" data-k="months" type="number" min="0" step="1" /></td>
       <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
     `;
     tb.appendChild(tr);
 
     tr.querySelector('[data-k="role"]').value = r.role;
-    tr.querySelector('[data-k="category"]').value = r.category;
-    tr.querySelector('[data-k="intensity"]').value = r.intensity;
+    tr.querySelector('[data-k="type"]').value = r.type;
+    tr.querySelector('[data-k="level"]').value = r.level;
+    tr.querySelector('[data-k="meetings"]').value = r.meetings;
+    tr.querySelector('[data-k="prep"]').value = r.prep;
     tr.querySelector('[data-k="months"]').value = r.months;
-    tr.querySelector('[data-k="evidence"]').value = r.evidence;
 
     tr.addEventListener("input",(e)=>{
       const k = e.target.getAttribute("data-k");
@@ -1019,13 +1138,9 @@ function renderAdmin(){
       const obj = state.data.adminRoles.find(x=>x.id===tr.dataset.id);
       if(!obj) return;
 
-      if(k==="intensity"){
-        const cap = n($("aIntCap").value) || 1.8;
-        obj.intensity = clamp(Math.max(1, n(e.target.value)), 1, cap);
-        e.target.value = obj.intensity;
-      } else if(k==="months"){
-        obj.months = Math.max(0, n(e.target.value));
-        e.target.value = obj.months;
+      if(["meetings","prep","months"].includes(k)){
+        obj[k] = Math.max(0, n(e.target.value));
+        e.target.value = obj[k];
       } else {
         obj[k] = e.target.value;
       }
@@ -1035,7 +1150,7 @@ function renderAdmin(){
     tr.addEventListener("click",(e)=>{
       if(e.target?.getAttribute("data-act")==="del"){
         state.data.adminRoles = state.data.adminRoles.filter(x=>x.id!==tr.dataset.id);
-        renderAdmin(); autosave();
+        ensureSeed(); renderAdmin(); autosave();
       }
     });
   });
@@ -1050,8 +1165,8 @@ function renderService(){
     tr.innerHTML = `
       <td><input class="miniinput" data-k="activity" placeholder="e.g., Community workshop" /></td>
       <td><select class="miniinput" data-k="role"><option>Lead</option><option>Member</option></select></td>
-      <td><input class="miniinput" data-k="hours" type="number" step="0.5" min="0" /></td>
-      <td><input class="miniinput" data-k="pax" type="number" step="1" min="0" /></td>
+      <td><input class="miniinput" data-k="hours" type="number" min="0" step="0.5" /></td>
+      <td><input class="miniinput" data-k="pax" type="number" min="0" step="1" /></td>
       <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
     `;
     tb.appendChild(tr);
@@ -1079,15 +1194,24 @@ function renderService(){
     tr.addEventListener("click",(e)=>{
       if(e.target?.getAttribute("data-act")==="del"){
         state.data.service = state.data.service.filter(x=>x.id!==tr.dataset.id);
-        renderService(); autosave();
+        ensureSeed(); renderService(); autosave();
       }
     });
   });
 }
 
-/* =====================
-   SETTINGS BINDING
-===================== */
+function renderAll(){
+  renderCourses();
+  renderGrants();
+  renderEffort();
+  if(state.toggles.includePubs) renderPubs();
+  renderAdmin();
+  renderService();
+}
+
+/* ======================
+   Settings sync
+====================== */
 function syncSettingsFromUI(){
   state.settings.weights.T = n($("wT").value);
   state.settings.weights.R = n($("wR").value);
@@ -1102,12 +1226,20 @@ function syncSettingsFromUI(){
   state.settings.research.PI = n($("rPI").value);
   state.settings.research.CO = n($("rCo").value);
   state.settings.research.MEM = n($("rMem").value);
-  state.settings.research.pubW = n($("rPubW").value);
+  state.settings.research.effortW = n($("rEffortW").value);
 
-  state.settings.admin.official = n($("aOfficial").value);
-  state.settings.admin.adhoc = n($("aAdhoc").value);
-  state.settings.admin.monthW = n($("aMonthW").value);
-  state.settings.admin.intCap = n($("aIntCap").value);
+  state.settings.admin.levelW.Programme = n($("aProg").value);
+  state.settings.admin.levelW.Faculty = n($("aFac").value);
+  state.settings.admin.levelW.University = n($("aUni").value);
+  state.settings.admin.levelW.State = n($("aState").value);
+  state.settings.admin.levelW.National = n($("aNat").value);
+  state.settings.admin.levelW.International = n($("aInt").value);
+  state.settings.admin.levelW.Industry = n($("aInd").value);
+  state.settings.admin.perMeeting = n($("aMeetW").value);
+  state.settings.admin.perPrepHour = n($("aPrepW").value);
+  state.settings.admin.perMonth = n($("aMonthW").value);
+  state.settings.admin.bonus.Official = n($("aOfficialB").value);
+  state.settings.admin.bonus["Conference Committee"] = n($("aConfB").value);
 
   state.settings.service.hourW = n($("sHourW").value);
   state.settings.service.paxW = n($("sPaxW").value);
@@ -1129,12 +1261,20 @@ function syncUIFromSettings(){
   $("rPI").value = state.settings.research.PI;
   $("rCo").value = state.settings.research.CO;
   $("rMem").value = state.settings.research.MEM;
-  $("rPubW").value = state.settings.research.pubW;
+  $("rEffortW").value = state.settings.research.effortW;
 
-  $("aOfficial").value = state.settings.admin.official;
-  $("aAdhoc").value = state.settings.admin.adhoc;
-  $("aMonthW").value = state.settings.admin.monthW;
-  $("aIntCap").value = state.settings.admin.intCap;
+  $("aProg").value = state.settings.admin.levelW.Programme;
+  $("aFac").value = state.settings.admin.levelW.Faculty;
+  $("aUni").value = state.settings.admin.levelW.University;
+  $("aState").value = state.settings.admin.levelW.State;
+  $("aNat").value = state.settings.admin.levelW.National;
+  $("aInt").value = state.settings.admin.levelW.International;
+  $("aInd").value = state.settings.admin.levelW.Industry;
+  $("aMeetW").value = state.settings.admin.perMeeting;
+  $("aPrepW").value = state.settings.admin.perPrepHour;
+  $("aMonthW").value = state.settings.admin.perMonth;
+  $("aOfficialB").value = state.settings.admin.bonus.Official;
+  $("aConfB").value = state.settings.admin.bonus["Conference Committee"];
 
   $("sHourW").value = state.settings.service.hourW;
   $("sPaxW").value = state.settings.service.paxW;
@@ -1142,140 +1282,258 @@ function syncUIFromSettings(){
   $("sMember").value = state.settings.service.member;
 }
 
+/* ======================
+   Profile sync (including Other)
+====================== */
 function syncProfileFromUI(){
   state.profile.name = $("pName").value.trim();
   state.profile.staffId = $("pStaffId").value.trim();
   state.profile.dept = $("pDept").value.trim();
   state.profile.grade = $("pGrade").value;
+  state.profile.gradeOther = $("pGradeOther").value.trim();
   state.profile.status = $("pStatus").value;
+  state.profile.statusOther = $("pStatusOther").value.trim();
   state.profile.period = $("pPeriod").value.trim();
+  state.profile.faculty = $("pFaculty").value.trim();
+  state.profile.dean = $("pDean").value.trim();
 }
-
 function syncUIFromProfile(){
   $("pName").value = state.profile.name;
   $("pStaffId").value = state.profile.staffId;
   $("pDept").value = state.profile.dept;
   $("pGrade").value = state.profile.grade;
+  $("pGradeOther").value = state.profile.gradeOther;
   $("pStatus").value = state.profile.status;
+  $("pStatusOther").value = state.profile.statusOther;
   $("pPeriod").value = state.profile.period;
+  $("pFaculty").value = state.profile.faculty;
+  $("pDean").value = state.profile.dean;
 }
 
-/* =====================
-   VALIDATION
-===================== */
+/* ======================
+   Strict validation (required fields)
+====================== */
+function clearErrors(){
+  document.querySelectorAll(".err").forEach(e=>e.classList.remove("err"));
+}
+
+function markErr(elId){
+  const e = $(elId);
+  if(e) e.classList.add("err");
+}
+
+function showMsg(type, html){
+  const box = $("msgBox");
+  box.className = "notice " + (type || "");
+  box.innerHTML = html;
+}
+
 function validateWeightsStrict(){
   syncSettingsFromUI();
-
   const w = state.settings.weights;
   const sum = w.T + w.R + w.A + w.S;
 
-  // prevent negatives
-  const anyNeg = Object.values(w).some(v => v < 0);
-  if(anyNeg){
-    showWeightWarn("Weights cannot be negative.", "bad");
-    return { ok:false, reason:"negative" };
+  if(Object.values(w).some(v=>v<0)){
+    $("weightWarn").style.display="block";
+    $("weightWarn").textContent="Weights cannot be negative.";
+    return false;
   }
-
-  const tol = 0.001;
-  if(Math.abs(sum - 1.0) > tol){
-    showWeightWarn(`Weight sum must be exactly 1.00. Current sum = ${sum.toFixed(3)}. Please adjust.`, "warn");
-    return { ok:false, reason:"sum" };
+  if(Math.abs(sum - 1.0) > 0.001){
+    $("weightWarn").style.display="block";
+    $("weightWarn").textContent=`Weight sum must be exactly 1.00. Current sum = ${sum.toFixed(3)}.`;
+    return false;
   }
-
-  showWeightWarn("", "ok");
-  return { ok:true, reason:"ok" };
+  $("weightWarn").style.display="none";
+  $("weightWarn").textContent="";
+  return true;
 }
 
-function showWeightWarn(msg, type){
-  const box = $("weightWarn");
-  if(!msg){
-    box.style.display = "none";
-    box.textContent = "";
-    return;
-  }
-  box.style.display = "block";
-  box.textContent = msg;
-  box.className = "notice " + (type==="bad" ? "bad" : "warn");
+function validateProfileRequired(){
+  syncProfileFromUI();
+
+  let ok = true;
+
+  if(!state.profile.name){ markErr("pName"); ok=false; }
+  if(!state.profile.staffId || !STAFF_ID_REGEX.test(state.profile.staffId)){ markErr("pStaffId"); ok=false; }
+
+  if(!state.profile.dept){ markErr("pDept"); ok=false; }
+
+  if(!state.profile.grade){ markErr("pGrade"); ok=false; }
+  if(state.profile.grade==="Other" && !state.profile.gradeOther){ markErr("pGradeOther"); ok=false; }
+
+  if(!state.profile.status){ markErr("pStatus"); ok=false; }
+  if(state.profile.status==="Other" && !state.profile.statusOther){ markErr("pStatusOther"); ok=false; }
+
+  if(!state.profile.period){ markErr("pPeriod"); ok=false; }
+  if(!state.profile.faculty){ markErr("pFaculty"); ok=false; }
+  if(!state.profile.dean){ markErr("pDean"); ok=false; }
+
+  return ok;
 }
 
-/* =====================
-   SCORING
-===================== */
+function validateTableRows(){
+  // if a row exists, require its mandatory fields
+  let ok = true;
+
+  // Courses
+  state.data.courses.forEach((c, i)=>{
+    const tr = $("tblCourse").querySelectorAll("tbody tr")[i];
+    if(!tr) return;
+
+    const code = (c.code||"").trim();
+    const name = (c.name||"").trim();
+
+    // require all fields in existing row
+    if(!code){ tr.querySelector('[data-k="code"]').classList.add("err"); ok=false; }
+    if(!name){ tr.querySelector('[data-k="name"]').classList.add("err"); ok=false; }
+    if(n(c.students) <= 0){ tr.querySelector('[data-k="students"]').classList.add("err"); ok=false; }
+    if(n(c.lec) < 0 || n(c.tut) < 0 || n(c.lab) < 0 || n(c.field) < 0){ ok=false; }
+    // require at least 1 contact hour
+    if(contactHours(c) <= 0){
+      tr.querySelector('[data-k="lec"]').classList.add("err");
+      tr.querySelector('[data-k="tut"]').classList.add("err");
+      tr.querySelector('[data-k="lab"]').classList.add("err");
+      tr.querySelector('[data-k="field"]').classList.add("err");
+      ok=false;
+    }
+    // auto-credit must be >0
+    if(n(c.credit) <= 0){ tr.querySelector('[data-k="code"]').classList.add("err"); ok=false; }
+  });
+
+  // Grants
+  state.data.grants.forEach((g, i)=>{
+    const tr = $("tblGrant").querySelectorAll("tbody tr")[i];
+    if(!tr) return;
+    if(!(g.code||"").trim()){ tr.querySelector('[data-k="code"]').classList.add("err"); ok=false; }
+    if(!(g.title||"").trim()){ tr.querySelector('[data-k="title"]').classList.add("err"); ok=false; }
+    if(!(g.level||"").trim()){ tr.querySelector('[data-k="level"]').classList.add("err"); ok=false; }
+    if(!(g.role||"").trim()){ tr.querySelector('[data-k="role"]').classList.add("err"); ok=false; }
+    if(!(g.status||"").trim()){ tr.querySelector('[data-k="status"]').classList.add("err"); ok=false; }
+    if(n(g.months) <= 0){ tr.querySelector('[data-k="months"]').classList.add("err"); ok=false; }
+  });
+
+  // Effort
+  state.data.effort.forEach((e, i)=>{
+    const tr = $("tblEffort").querySelectorAll("tbody tr")[i];
+    if(!tr) return;
+    if(!(e.type||"").trim()){ tr.querySelector('[data-k="type"]').classList.add("err"); ok=false; }
+    if(!(e.desc||"").trim()){ tr.querySelector('[data-k="desc"]').classList.add("err"); ok=false; }
+    if(n(e.hours) <= 0){ tr.querySelector('[data-k="hours"]').classList.add("err"); ok=false; }
+  });
+
+  // Publications (only if enabled)
+  if(state.toggles.includePubs){
+    state.data.pubs.forEach((p, i)=>{
+      const tr = $("tblPub").querySelectorAll("tbody tr")[i];
+      if(!tr) return;
+      if(!(p.year||"").trim()){ tr.querySelector('[data-k="year"]').classList.add("err"); ok=false; }
+      if(!(p.title||"").trim()){ tr.querySelector('[data-k="title"]').classList.add("err"); ok=false; }
+      if(!(p.index||"").trim()){ tr.querySelector('[data-k="index"]').classList.add("err"); ok=false; }
+      if(!(p.authorship||"").trim()){ tr.querySelector('[data-k="authorship"]').classList.add("err"); ok=false; }
+      if(!(p.status||"").trim()){ tr.querySelector('[data-k="status"]').classList.add("err"); ok=false; }
+    });
+  }
+
+  // Admin
+  state.data.adminRoles.forEach((a, i)=>{
+    const tr = $("tblAdmin").querySelectorAll("tbody tr")[i];
+    if(!tr) return;
+    if(!(a.role||"").trim()){ tr.querySelector('[data-k="role"]').classList.add("err"); ok=false; }
+    if(!(a.type||"").trim()){ tr.querySelector('[data-k="type"]').classList.add("err"); ok=false; }
+    if(!(a.level||"").trim()){ tr.querySelector('[data-k="level"]').classList.add("err"); ok=false; }
+    if(n(a.meetings) < 0){ tr.querySelector('[data-k="meetings"]').classList.add("err"); ok=false; }
+    if(n(a.prep) < 0){ tr.querySelector('[data-k="prep"]').classList.add("err"); ok=false; }
+    if(n(a.months) <= 0){ tr.querySelector('[data-k="months"]').classList.add("err"); ok=false; }
+  });
+
+  // Service
+  state.data.service.forEach((s, i)=>{
+    const tr = $("tblService").querySelectorAll("tbody tr")[i];
+    if(!tr) return;
+    if(!(s.activity||"").trim()){ tr.querySelector('[data-k="activity"]').classList.add("err"); ok=false; }
+    if(!(s.role||"").trim()){ tr.querySelector('[data-k="role"]').classList.add("err"); ok=false; }
+    if(n(s.hours) <= 0){ tr.querySelector('[data-k="hours"]').classList.add("err"); ok=false; }
+    if(n(s.pax) < 0){ tr.querySelector('[data-k="pax"]').classList.add("err"); ok=false; }
+  });
+
+  return ok;
+}
+
+/* ======================
+   Scoring
+====================== */
 function scoreTeaching(){
   const s = state.settings.teaching;
   let total = 0;
-
   state.data.courses.forEach(c=>{
     const credit = n(c.credit);
     const students = n(c.students);
     const ch = contactHours(c);
 
     let base = (credit * s.creditW) + (students * s.studentW) + (ch * s.hourW);
-    if((c.level || "UG") === "PG") base *= (s.pgMult || 1);
-
+    if((c.level||"UG")==="PG") base *= (s.pgMult || 1);
     total += base;
   });
-
   return total;
 }
 
 function scoreResearch(){
-  const gW = state.settings.research;
+  const r = state.settings.research;
   let total = 0;
 
-  // grants
+  // Grants
   state.data.grants.forEach(g=>{
     let base = 0;
-    const role = (g.role || "").toUpperCase();
-    if(role === "PI") base += gW.PI;
-    else if(role === "CO-I") base += gW.CO;
-    else base += gW.MEM;
+    const role = (g.role||"").toUpperCase();
+    if(role==="PI") base += r.PI;
+    else if(role==="CO-I") base += r.CO;
+    else base += r.MEM;
 
-    // level bonus
-    const lvl = (g.level || "").toLowerCase();
-    if(lvl === "national") base += 3;
-    if(lvl === "international") base += 6;
+    const lvl = (g.level||"").toLowerCase();
+    if(lvl==="national") base += 3;
+    if(lvl==="international") base += 6;
 
-    // status bonus/penalty
-    const st = (g.status || "").toLowerCase();
-    if(st === "active") base += 5;
-    if(st === "applied") base += 2;
-    if(st === "ended") base += 0;
+    const st = (g.status||"").toLowerCase();
+    if(st==="active") base += 5;
+    if(st==="applied") base += 2;
 
-    // duration minor contribution
-    base += (n(g.months) * 0.15);
-
-    // amount minor contribution (scaled)
-    base += (n(g.amount) / 100000) * 2; // RM100k -> +2
-
+    base += n(g.months) * 0.15;
+    base += (n(g.amount)/100000) * 2; // RM100k -> +2
     total += base;
   });
 
-  // publications
-  state.data.pubs.forEach(p=>{
-    let base = gW.pubW;
-
-    const idx = (p.index || "").toLowerCase();
-    if(idx === "wos") base += 2;
-    if(idx === "scopus") base += 1;
-    if(idx === "mycite") base += 0.5;
-
-    const q = (p.quartile || "").toUpperCase();
-    if(q === "Q1") base += 3;
-    else if(q === "Q2") base += 2;
-    else if(q === "Q3") base += 1;
-    else if(q === "Q4") base += 0.5;
-
-    const auth = (p.authorship || "").toLowerCase();
-    if(auth.includes("first") || auth.includes("single")) base += 2;
-
-    const st = (p.status || "").toLowerCase();
-    if(st === "published") base += 2;
-    else if(st === "accepted") base += 1;
-    else if(st === "submitted") base += 0.5;
-
-    total += base;
+  // Effort (top-down busyness)
+  state.data.effort.forEach(e=>{
+    total += Math.max(0, n(e.hours)) * (r.effortW || 1);
   });
+
+  // Publications (optional)
+  if(state.toggles.includePubs){
+    state.data.pubs.forEach(p=>{
+      let base = r.pubW || 0;
+
+      const idx = (p.index||"").toLowerCase();
+      if(idx==="wos") base += 2;
+      if(idx==="scopus") base += 1;
+      if(idx==="mycite") base += 0.5;
+
+      const q = (p.quartile||"").toUpperCase();
+      if(q==="Q1") base += 3;
+      else if(q==="Q2") base += 2;
+      else if(q==="Q3") base += 1;
+      else if(q==="Q4") base += 0.5;
+
+      const auth = (p.authorship||"").toLowerCase();
+      if(auth.includes("first") || auth.includes("single")) base += 2;
+
+      const st = (p.status||"").toLowerCase();
+      if(st==="published") base += 2;
+      else if(st==="accepted") base += 1;
+      else if(st==="submitted") base += 0.5;
+
+      total += base;
+    });
+  }
 
   return total;
 }
@@ -1284,15 +1542,21 @@ function scoreAdmin(){
   const a = state.settings.admin;
   let total = 0;
 
-  state.data.adminRoles.forEach(r=>{
-    const cat = (r.category || "").toLowerCase();
-    let base = cat === "official" ? a.official : a.adhoc;
+  state.data.adminRoles.forEach(x=>{
+    const level = x.level || "Programme";
+    const lvlScore = n(a.levelW[level] ?? 0);
 
-    const intensity = clamp(Math.max(1, n(r.intensity)), 1, (a.intCap || 1.8));
-    const months = Math.max(0, n(r.months));
+    const perMeeting = n(a.perMeeting);
+    const perPrep = n(a.perPrepHour);
+    const perMonth = n(a.perMonth);
 
-    base = base * intensity + (months * a.monthW);
-    total += base;
+    const meetings = Math.max(0, n(x.meetings));
+    const prep = Math.max(0, n(x.prep));
+    const months = Math.max(0, n(x.months));
+
+    const bonus = n(a.bonus[x.type] ?? 0);
+
+    total += lvlScore + (meetings*perMeeting) + (prep*perPrep) + (months*perMonth) + bonus;
   });
 
   return total;
@@ -1301,73 +1565,74 @@ function scoreAdmin(){
 function scoreService(){
   const s = state.settings.service;
   let total = 0;
-
   state.data.service.forEach(x=>{
-    let base = (Math.max(0, n(x.hours)) * s.hourW) + ((Math.max(0, n(x.pax))/10) * s.paxW);
-    if((x.role || "").toLowerCase() === "lead") base += s.lead;
-    else base += s.member;
+    const hours = Math.max(0, n(x.hours));
+    const pax = Math.max(0, n(x.pax));
+    let base = (hours*s.hourW) + ((pax/10)*s.paxW);
+    base += (String(x.role).toLowerCase()==="lead") ? s.lead : s.member;
     total += base;
   });
-
   return total;
 }
 
 function classify(index){
-  if(index < 40) return { key:"low", label:"Low", desc:"Lower workload range. May take additional assignments if appropriate." };
-  if(index < 70) return { key:"normal", label:"Normal", desc:"Balanced workload. Overall busyness is within normal range." };
-  if(index < 90) return { key:"high", label:"High", desc:"High busyness. Be cautious when assigning new tasks." };
-  return { key:"over", label:"Overload", desc:"Very high busyness. Consider workload redistribution or additional support." };
+  if(index < 40) return { key:"low", label:"Low", desc:"Lower workload range." };
+  if(index < 70) return { key:"normal", label:"Normal", desc:"Balanced workload range." };
+  if(index < 90) return { key:"high", label:"High", desc:"High busyness. Be cautious with new assignments." };
+  return { key:"over", label:"Overload", desc:"Very high. Consider workload redistribution/support." };
 }
 
-/* =====================
-   CHART
-===================== */
+/* ======================
+   Chart
+====================== */
 let chartObj = null;
 function drawChart(T,R,A,S,index){
   const ctx = $("chart").getContext("2d");
   if(chartObj) chartObj.destroy();
 
-  // colourful bars by section colour
+  const css = getComputedStyle(document.documentElement);
   const colors = [
-    getComputedStyle(document.documentElement).getPropertyValue("--c-teaching").trim(),
-    getComputedStyle(document.documentElement).getPropertyValue("--c-research").trim(),
-    getComputedStyle(document.documentElement).getPropertyValue("--c-admin").trim(),
-    getComputedStyle(document.documentElement).getPropertyValue("--c-service").trim(),
-    getComputedStyle(document.documentElement).getPropertyValue("--c-settings").trim()
+    css.getPropertyValue("--a-teaching").trim(),
+    css.getPropertyValue("--a-research").trim(),
+    css.getPropertyValue("--a-admin").trim(),
+    css.getPropertyValue("--a-service").trim(),
+    css.getPropertyValue("--a-results").trim()
   ];
 
   chartObj = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: ["Teaching (T)","Research (R)","Admin (A)","Service (S)","Overall"],
-      datasets: [{
-        label: "Score",
-        data: [T,R,A,S,index],
-        backgroundColor: colors
-      }]
+    type:"bar",
+    data:{
+      labels:["Teaching (T)","Research (R)","Administration (A)","Service (S)","Overall"],
+      datasets:[{ data:[T,R,A,S,index], backgroundColor: colors }]
     },
-    options: {
-      responsive: true,
-      plugins: { legend: { display:false } },
-      scales: { y: { beginAtZero:true } }
+    options:{
+      responsive:true,
+      plugins:{ legend:{ display:false } },
+      scales:{ y:{ beginAtZero:true } }
     }
   });
 }
 
-/* =====================
-   CALCULATE + OUTPUTS
-===================== */
+/* ======================
+   Calculate & outputs
+====================== */
 function calculate(){
-  // If management view: do not recalc based on locked inputs (but still show if data loaded)
+  clearErrors();
   syncProfileFromUI();
-  const v = validateWeightsStrict();
-  if(!v.ok){
-    $("globalMsg").className = "notice warn";
-    $("globalMsg").innerHTML = `<strong>Action required:</strong> ${$("weightWarn").textContent}`;
+
+  if(!validateWeightsStrict()){
+    showMsg("warn", "<b>Action required:</b> Fix weights (sum must be exactly 1.00) before calculation.");
+    return;
+  }
+  if(!validateProfileRequired()){
+    showMsg("bad", "<b>Missing required profile fields.</b> Please complete all compulsory fields (including valid Staff ID format).");
+    return;
+  }
+  if(!validateTableRows()){
+    showMsg("bad", "<b>Missing required activity fields.</b> Please complete all compulsory cells highlighted in red.");
     return;
   }
 
-  // compute component scores
   const T = scoreTeaching();
   const R = scoreResearch();
   const A = scoreAdmin();
@@ -1376,11 +1641,9 @@ function calculate(){
   const w = state.settings.weights;
   const index = clamp((T*w.T) + (R*w.R) + (A*w.A) + (S*w.S), 0, 100);
 
-  // update stamps
   lastCalculatedISO = new Date().toISOString();
-  $("auditStamp").textContent = "Calculated at: " + lastCalculatedISO;
+  $("auditStamp").textContent = "Calculated: " + lastCalculatedISO;
 
-  // outputs
   $("outT").textContent = T.toFixed(1);
   $("outR").textContent = R.toFixed(1);
   $("outA").textContent = A.toFixed(1);
@@ -1389,27 +1652,28 @@ function calculate(){
   $("bigIndex").textContent = index.toFixed(1);
 
   const cls = classify(index);
-  const tag = $("zoneTag");
-  tag.className = "tag " + cls.key;
+  $("zoneTag").className = "tag " + cls.key;
   $("zoneText").textContent = cls.label;
   $("zoneDesc").textContent = cls.desc;
 
-  // chart (optional)
-  try{
-    drawChart(T,R,A,S,index);
-  }catch(e){
-    console.warn("Chart not available (CDN blocked).", e);
-  }
+  try{ drawChart(T,R,A,S,index); }catch(e){ console.warn(e); }
 
-  $("globalMsg").className = "notice";
-  $("globalMsg").innerHTML = `<strong>OK:</strong> Index updated. Use Export JSON for audit trail.`;
+  // signature block auto-fill
+  const d = new Date();
+  $("printDate").value = d.toLocaleDateString("en-GB");
+  $("sigStaffName").value = state.profile.name;
+  $("sigStaffId").value = state.profile.staffId;
+  $("sigFaculty").value = state.profile.faculty;
+  $("sigDean").value = state.profile.dean;
+  $("sigDeanOffice").value = state.profile.faculty;
 
+  showMsg("ok", "<b>OK:</b> Index updated. You may Export or Print PDF.");
   autosave();
 }
 
-/* =====================
-   EXPORTS
-===================== */
+/* ======================
+   Exports
+====================== */
 function downloadText(filename, text, mime="text/plain;charset=utf-8"){
   const blob = new Blob([text], {type:mime});
   const url = URL.createObjectURL(blob);
@@ -1418,99 +1682,103 @@ function downloadText(filename, text, mime="text/plain;charset=utf-8"){
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url), 500);
 }
-
+function quote(x){
+  const s = String(x ?? "");
+  if(s.includes(",") || s.includes('"') || s.includes("\n")){
+    return '"' + s.replaceAll('"','""') + '"';
+  }
+  return s;
+}
 function exportSummaryCSV(){
-  // ensure latest compute
   calculate();
-
-  const profile = state.profile;
-  const T = n($("outT").textContent);
-  const R = n($("outR").textContent);
-  const A = n($("outA").textContent);
-  const S = n($("outS").textContent);
+  const T = n($("outT").textContent), R = n($("outR").textContent), A = n($("outA").textContent), S = n($("outS").textContent);
   const index = n($("outIndex").textContent);
   const zone = $("zoneText").textContent;
 
+  const gradeFinal = (state.profile.grade==="Other") ? state.profile.gradeOther : state.profile.grade;
+  const statusFinal = (state.profile.status==="Other") ? state.profile.statusOther : state.profile.status;
+
   const header = [
-    "timestamp","period","name","staff_id","programme_dept","grade","appointment_status",
+    "timestamp","period","name","staff_id","programme_dept","grade","appointment_status","faculty","dean",
     "score_T","score_R","score_A","score_S","index_total","zone",
-    "count_courses","count_grants","count_publications","count_admin_roles","count_service"
-  ];
+    "count_courses","count_grants","count_effort","count_pubs_included","count_admin","count_service"
+  ].join(",");
 
   const row = [
-    lastCalculatedISO || new Date().toISOString(),
-    quote(profile.period),
-    quote(profile.name),
-    quote(profile.staffId),
-    quote(profile.dept),
-    quote(profile.grade),
-    quote(profile.status),
-    T.toFixed(1), R.toFixed(1), A.toFixed(1), S.toFixed(1), index.toFixed(1), quote(zone),
-    state.data.courses.length,
-    state.data.grants.length,
-    state.data.pubs.length,
-    state.data.adminRoles.length,
-    state.data.service.length
-  ];
-
-  downloadText("fst_ums_busyness_summary.csv", header.join(",") + "\n" + row.join(","), "text/csv;charset=utf-8");
-}
-
-function exportDetailedCSV(){
-  // multi-block CSV (sections separated) – still one file
-  const blocks = [];
-
-  blocks.push("==PROFILE==");
-  blocks.push(["timestamp","period","name","staff_id","programme_dept","grade","appointment_status"].join(","));
-  blocks.push([
     lastCalculatedISO || new Date().toISOString(),
     quote(state.profile.period),
     quote(state.profile.name),
     quote(state.profile.staffId),
     quote(state.profile.dept),
-    quote(state.profile.grade),
-    quote(state.profile.status)
+    quote(gradeFinal),
+    quote(statusFinal),
+    quote(state.profile.faculty),
+    quote(state.profile.dean),
+    T.toFixed(1), R.toFixed(1), A.toFixed(1), S.toFixed(1), index.toFixed(1), quote(zone),
+    state.data.courses.length,
+    state.data.grants.length,
+    state.data.effort.length,
+    state.toggles.includePubs ? state.data.pubs.length : 0,
+    state.data.adminRoles.length,
+    state.data.service.length
+  ].join(",");
+
+  downloadText("fst_ums_busyness_summary.csv", header + "\n" + row, "text/csv;charset=utf-8");
+}
+
+function exportDetailedCSV(){
+  calculate();
+  const blocks = [];
+
+  const gradeFinal = (state.profile.grade==="Other") ? state.profile.gradeOther : state.profile.grade;
+  const statusFinal = (state.profile.status==="Other") ? state.profile.statusOther : state.profile.status;
+
+  blocks.push("==PROFILE==");
+  blocks.push(["timestamp","period","name","staff_id","programme_dept","grade","appointment_status","faculty","dean"].join(","));
+  blocks.push([
+    lastCalculatedISO || new Date().toISOString(),
+    quote(state.profile.period), quote(state.profile.name), quote(state.profile.staffId), quote(state.profile.dept),
+    quote(gradeFinal), quote(statusFinal), quote(state.profile.faculty), quote(state.profile.dean)
   ].join(","));
 
   blocks.push("\n==COURSES==");
   blocks.push(["level","code","name","credit","students","lec","tut","lab","field","contact_hours"].join(","));
   state.data.courses.forEach(c=>{
     blocks.push([
-      quote(c.level), quote(c.code), quote(c.name),
-      n(c.credit), n(c.students), n(c.lec), n(c.tut), n(c.lab), n(c.field),
-      contactHours(c)
+      quote(c.level), quote(c.code), quote(c.name), n(c.credit), n(c.students), n(c.lec), n(c.tut), n(c.lab), n(c.field), contactHours(c)
     ].join(","));
   });
 
   blocks.push("\n==GRANTS==");
   blocks.push(["code","title","level","role","status","amount_rm","duration_months"].join(","));
   state.data.grants.forEach(g=>{
-    blocks.push([
-      quote(g.code), quote(g.title), quote(g.level), quote(g.role), quote(g.status),
-      n(g.amount), n(g.months)
-    ].join(","));
+    blocks.push([quote(g.code),quote(g.title),quote(g.level),quote(g.role),quote(g.status),n(g.amount),n(g.months)].join(","));
   });
 
-  blocks.push("\n==PUBLICATIONS==");
-  blocks.push(["year","title","type","index","quartile","authorship","status"].join(","));
-  state.data.pubs.forEach(p=>{
-    blocks.push([
-      quote(p.year), quote(p.title), quote(p.type), quote(p.index), quote(p.quartile), quote(p.authorship), quote(p.status)
-    ].join(","));
+  blocks.push("\n==RESEARCH_EFFORT==");
+  blocks.push(["type","description","hours"].join(","));
+  state.data.effort.forEach(e=>{
+    blocks.push([quote(e.type),quote(e.desc),n(e.hours)].join(","));
   });
 
-  blocks.push("\n==ADMIN_ROLES==");
-  blocks.push(["role","category","intensity","duration_months","evidence_url"].join(","));
+  if(state.toggles.includePubs){
+    blocks.push("\n==PUBLICATIONS==");
+    blocks.push(["year","title","index","quartile","authorship","status"].join(","));
+    state.data.pubs.forEach(p=>{
+      blocks.push([quote(p.year),quote(p.title),quote(p.index),quote(p.quartile),quote(p.authorship),quote(p.status)].join(","));
+    });
+  }
+
+  blocks.push("\n==ADMIN_APPOINTMENTS==");
+  blocks.push(["role","type","level","meetings","prep_hours","duration_months"].join(","));
   state.data.adminRoles.forEach(a=>{
-    blocks.push([
-      quote(a.role), quote(a.category), n(a.intensity), n(a.months), quote(a.evidence)
-    ].join(","));
+    blocks.push([quote(a.role),quote(a.type),quote(a.level),n(a.meetings),n(a.prep),n(a.months)].join(","));
   });
 
   blocks.push("\n==SERVICE==");
   blocks.push(["activity","role","hours","participants"].join(","));
   state.data.service.forEach(s=>{
-    blocks.push([ quote(s.activity), quote(s.role), n(s.hours), n(s.pax) ].join(","));
+    blocks.push([quote(s.activity),quote(s.role),n(s.hours),n(s.pax)].join(","));
   });
 
   downloadText("fst_ums_busyness_detailed.csv", blocks.join("\n"), "text/csv;charset=utf-8");
@@ -1518,14 +1786,13 @@ function exportDetailedCSV(){
 
 function exportJSON(){
   calculate();
+  const gradeFinal = (state.profile.grade==="Other") ? state.profile.gradeOther : state.profile.grade;
+  const statusFinal = (state.profile.status==="Other") ? state.profile.statusOther : state.profile.status;
+
   const payload = {
-    metadata: {
-      exported_at: new Date().toISOString(),
-      calculated_at: lastCalculatedISO || null,
-      system: "FST UMS Staff Busyness Index",
-      version: "v2"
-    },
-    profile: state.profile,
+    metadata: { exported_at: new Date().toISOString(), calculated_at: lastCalculatedISO || null, version:"v3", system:"FST UMS Staff Busyness Index" },
+    profile: { ...state.profile, grade_final: gradeFinal, status_final: statusFinal },
+    toggles: state.toggles,
     settings: state.settings,
     data: state.data,
     results: {
@@ -1540,139 +1807,79 @@ function exportJSON(){
   downloadText("fst_ums_busyness_full.json", JSON.stringify(payload, null, 2), "application/json;charset=utf-8");
 }
 
-function quote(x){
-  const s = String(x ?? "");
-  if(s.includes(",") || s.includes('"') || s.includes("\n")){
-    return '"' + s.replaceAll('"','""') + '"';
-  }
-  return s;
-}
-
-/* =====================
-   ADMIN LOCK + MODES
-===================== */
-function setSettingsLockedUI(locked){
-  // lock all settings inputs
-  const settingsInputs = [
-    "wT","wR","wA","wS",
-    "tCreditW","tStudentW","tHourW","tPgMult",
-    "rPI","rCo","rMem","rPubW",
-    "aOfficial","aAdhoc","aMonthW","aIntCap",
-    "sHourW","sPaxW","sLead","sMember",
-    "preset"
+/* ======================
+   Admin lock + mode
+====================== */
+function setSettingsLocked(locked){
+  const ids = [
+    "preset","wT","wR","wA","wS","tCreditW","tStudentW","tHourW","tPgMult",
+    "rPI","rCo","rMem","rEffortW",
+    "aProg","aFac","aUni","aState","aNat","aInt","aInd","aMeetW","aPrepW","aMonthW","aOfficialB","aConfB",
+    "sHourW","sPaxW","sLead","sMember"
   ];
-  settingsInputs.forEach(id=>{
+  ids.forEach(id=>{
     const e = $(id);
     if(!e) return;
-    // preset select always enabled, but only applies if admin
-    if(id === "preset"){
-      e.disabled = locked;
-    } else {
-      e.readOnly = locked;
-      e.disabled = locked; // for select (none currently besides preset)
-    }
+    if(id==="preset") e.disabled = locked;
+    else e.readOnly = locked;
+    if(e.tagName==="SELECT") e.disabled = locked;
   });
 
-  $("lockBadge").textContent = locked ? "Locked" : "Unlocked (Admin)";
-  $("lockBadge").style.background = locked ? "rgba(255,255,255,.06)" : "rgba(45,212,191,.16)";
-  $("lockBadge").style.borderColor = locked ? "rgba(255,255,255,.16)" : "rgba(45,212,191,.40)";
+  $("lockText").textContent = locked ? "Locked" : "Unlocked (Admin)";
+  $("lockDot").style.background = locked ? "var(--warn)" : "var(--ok)";
 }
 
-function applyPreset(p){
-  if(!isAdminUnlocked) return;
-
-  // Presets are examples; refine later with FST policy
-  if(p==="lecturer"){
-    state.settings.weights = { T:0.55, R:0.20, A:0.15, S:0.10 };
-    state.settings.teaching = { creditW:6, studentW:0.12, hourW:1.2, pgMult:1.15 };
-    state.settings.research = { PI:20, CO:10, MEM:5, pubW:3 };
-    state.settings.admin = { official:20, adhoc:8, monthW:0.4, intCap:1.6 };
-    state.settings.service = { hourW:1.0, paxW:0.7, lead:3, member:1.2 };
-  } else if(p==="senior"){
-    state.settings.weights = { T:0.45, R:0.30, A:0.15, S:0.10 };
-    state.settings.teaching = { creditW:5, studentW:0.10, hourW:1.1, pgMult:1.20 };
-    state.settings.research = { PI:25, CO:12, MEM:6, pubW:4 };
-    state.settings.admin = { official:25, adhoc:10, monthW:0.5, intCap:1.8 };
-    state.settings.service = { hourW:1.0, paxW:0.8, lead:4, member:1.5 };
-  } else if(p==="assoc"){
-    state.settings.weights = { T:0.35, R:0.40, A:0.15, S:0.10 };
-    state.settings.teaching = { creditW:4.5, studentW:0.09, hourW:1.0, pgMult:1.25 };
-    state.settings.research = { PI:30, CO:14, MEM:7, pubW:5 };
-    state.settings.admin = { official:28, adhoc:12, monthW:0.6, intCap:2.0 };
-    state.settings.service = { hourW:1.0, paxW:0.9, lead:4.5, member:1.7 };
-  } else if(p==="prof"){
-    state.settings.weights = { T:0.25, R:0.50, A:0.15, S:0.10 };
-    state.settings.teaching = { creditW:4.0, studentW:0.08, hourW:0.9, pgMult:1.30 };
-    state.settings.research = { PI:35, CO:16, MEM:8, pubW:6 };
-    state.settings.admin = { official:30, adhoc:12, monthW:0.6, intCap:2.0 };
-    state.settings.service = { hourW:1.0, paxW:1.0, lead:5, member:2 };
+function adminUnlock(){
+  const pw = $("adminPw").value || "";
+  if(pw === ADMIN_PASSWORD){
+    isAdminUnlocked = true;
+    setSettingsLocked(false);
+    showMsg("ok", "<b>Admin unlocked:</b> Settings can now be edited on this browser.");
+    autosave();
   } else {
-    // custom: do nothing
+    showMsg("bad", "<b>Admin unlock failed:</b> Incorrect password.");
   }
-
-  syncUIFromSettings();
-  autosave();
-  $("globalMsg").className = "notice";
-  $("globalMsg").innerHTML = `<strong>Preset applied:</strong> ${$("preset").value}.`;
 }
 
 function toggleMode(){
   isManagementView = !isManagementView;
-
   $("roleText").textContent = isManagementView ? "Management View" : "Staff Mode";
-  $("pillRole").querySelector(".dot").style.background = isManagementView ? "var(--warn)" : "var(--ok)";
+  $("roleDot").style.background = isManagementView ? "var(--warn)" : "var(--ok)";
   $("btnToggleMode").textContent = isManagementView ? "Switch to Staff Mode" : "Switch to Management View";
 
-  // Management view: hide editing controls for activities? We'll keep tables visible but disable inputs.
-  setReadOnlyAll(isManagementView);
-
-  // Settings section always hidden in management view
+  // hide settings for management
   $("secSettings").style.display = isManagementView ? "none" : "block";
 
-  // In management view, keep export buttons but discourage changes
-  $("globalMsg").className = "notice";
-  $("globalMsg").innerHTML = isManagementView
-    ? "<strong>Management View:</strong> Settings are hidden. Import staff JSON to review. No editing."
-    : "<strong>Staff Mode:</strong> Fill activities and click Calculate. Settings are locked unless admin unlock.";
-}
-
-function setReadOnlyAll(readonly){
-  // disable all inputs in activity tables + profile in management view
-  const ids = ["pName","pStaffId","pDept","pGrade","pStatus","pPeriod"];
-  ids.forEach(id=>{
-    const e = $(id);
-    if(!e) return;
-    if(e.tagName === "SELECT") e.disabled = readonly;
-    else e.readOnly = readonly;
+  // read-only for management view (profile + activities)
+  const ro = isManagementView;
+  ["pName","pStaffId","pDept","pGrade","pStatus","pPeriod","pFaculty","pDean","pGradeOther","pStatusOther"].forEach(id=>{
+    const e = $(id); if(!e) return;
+    if(e.tagName==="SELECT") e.disabled = ro;
+    else e.readOnly = ro;
   });
-
-  document.querySelectorAll("#secTeaching input, #secTeaching select, #secResearch input, #secResearch select, #secPub input, #secPub select, #secAdmin input, #secAdmin select, #secService input, #secService select")
-    .forEach(e=>{
-      if(e.tagName === "SELECT") e.disabled = readonly;
-      else e.readOnly = readonly;
-    });
+  document.querySelectorAll("#secTeaching input, #secTeaching select, #secResearch input, #secResearch select, #secAdmin input, #secAdmin select, #secService input, #secService select")
+    .forEach(e=>{ if(e.tagName==="SELECT") e.disabled = ro; else e.readOnly = ro; });
 
   // hide add/clear buttons in management view
-  const buttons = ["addCourse","clearCourse","addGrant","clearGrant","addPub","clearPub","addAdmin","clearAdmin","addService","clearService"];
-  buttons.forEach(id=>{
-    const b = $(id);
-    if(b) b.style.display = readonly ? "none" : "inline-flex";
+  ["addCourse","clearCourse","addGrant","clearGrant","addEffort","clearEffort","addAdmin","clearAdmin","addService","clearService","addPub","clearPub"].forEach(id=>{
+    const b=$(id); if(b) b.style.display = ro ? "none" : "inline-flex";
   });
 
-  // Admin unlock button irrelevant in management view
-  $("btnAdminUnlock").style.display = readonly ? "none" : "inline-flex";
+  $("btnAdminUnlock").style.display = ro ? "none" : "inline-flex";
+  showMsg("ok", ro
+    ? "<b>Management View:</b> Settings hidden. Import JSON to review staff record (read-only)."
+    : "<b>Staff Mode:</b> Fill activities, then Calculate at the bottom."
+  );
 }
 
-/* =====================
-   SAVE/LOAD
-===================== */
+/* ======================
+   Save/Load/Import
+====================== */
 function autosave(){
-  // Keep current UI -> state profile & settings
   syncProfileFromUI();
-  syncSettingsFromUI();
+  if(isAdminUnlocked) syncSettingsFromUI();
   localStorage.setItem(LS_KEY, JSON.stringify({ state, lastCalculatedISO, isAdminUnlocked }));
 }
-
 function loadLocal(){
   const raw = localStorage.getItem(LS_KEY);
   if(!raw) return false;
@@ -1681,138 +1888,108 @@ function loadLocal(){
     if(obj?.state){
       Object.assign(state.profile, obj.state.profile || {});
       Object.assign(state.settings, obj.state.settings || {});
+      Object.assign(state.toggles, obj.state.toggles || {});
       Object.assign(state.data, obj.state.data || {});
       lastCalculatedISO = obj.lastCalculatedISO || "";
       isAdminUnlocked = !!obj.isAdminUnlocked;
-
       syncUIFromProfile();
       syncUIFromSettings();
-
+      $("pubToggle").checked = !!state.toggles.includePubs;
+      updatePubToggleUI();
       renderAll();
-      setSettingsLockedUI(!isAdminUnlocked);
-      $("globalMsg").className = "notice";
-      $("globalMsg").innerHTML = "<strong>Loaded:</strong> Local saved data loaded.";
+      setSettingsLocked(!isAdminUnlocked);
       return true;
     }
   }catch{}
   return false;
 }
-
 function resetAll(){
   if(!confirm("Reset all data and settings?")) return;
-
-  // reset
-  state.profile = { name:"", staffId:"", dept:"", grade:"", status:"", period:"" };
-  state.settings = {
-    weights: { T:0.40, R:0.30, A:0.20, S:0.10 },
-    teaching: { creditW:5, studentW:0.10, hourW:1.0, pgMult:1.20 },
-    research: { PI:25, CO:12, MEM:6, pubW:4 },
-    admin: { official:25, adhoc:10, monthW:0.5, intCap:1.8 },
-    service: { hourW:1.0, paxW:0.8, lead:4, member:1.5 }
-  };
-  state.data = { courses:[], grants:[], pubs:[], adminRoles:[], service:[] };
-  isAdminUnlocked = false;
-  lastCalculatedISO = "";
-
-  ensureSeed();
-  syncUIFromProfile();
-  syncUIFromSettings();
-  setSettingsLockedUI(true);
-  renderAll();
-
   localStorage.removeItem(LS_KEY);
-
-  $("globalMsg").className = "notice";
-  $("globalMsg").innerHTML = "<strong>Reset:</strong> Everything cleared.";
+  location.reload();
 }
-
 function importJSONFile(file){
   const reader = new FileReader();
   reader.onload = ()=>{
     try{
       const obj = JSON.parse(reader.result);
-      // accept our export shape
-      const payload = obj.state ? obj : null;
-
-      if(payload?.state){
-        Object.assign(state.profile, payload.state.profile || {});
-        Object.assign(state.settings, payload.state.settings || {});
-        Object.assign(state.data, payload.state.data || {});
-        lastCalculatedISO = payload.lastCalculatedISO || payload?.results?.calculated_at || "";
-      } else if(obj?.profile && obj?.settings && obj?.data){
-        // accept "exportJSON()" payload
+      if(obj?.profile && obj?.settings && obj?.data){
         Object.assign(state.profile, obj.profile || {});
         Object.assign(state.settings, obj.settings || {});
+        Object.assign(state.toggles, obj.toggles || {});
         Object.assign(state.data, obj.data || {});
         lastCalculatedISO = obj.metadata?.calculated_at || "";
       } else {
-        throw new Error("Invalid JSON format");
+        throw new Error("Invalid format");
       }
 
       syncUIFromProfile();
       syncUIFromSettings();
+      $("pubToggle").checked = !!state.toggles.includePubs;
+      updatePubToggleUI();
       renderAll();
 
-      // force management view read-only
       if(!isManagementView) toggleMode();
       calculate();
-
-      $("globalMsg").className = "notice";
-      $("globalMsg").innerHTML = "<strong>Imported:</strong> Staff JSON loaded for review (Management View).";
-    }catch(e){
-      $("globalMsg").className = "notice bad";
-      $("globalMsg").innerHTML = "<strong>Error:</strong> Cannot import JSON. Please use JSON exported from this system.";
+      showMsg("ok", "<b>Imported:</b> Staff JSON loaded (Management View).");
+    } catch(e){
       console.error(e);
+      showMsg("bad", "<b>Error:</b> Unable to import JSON. Please import JSON exported from this system.");
     }
   };
   reader.readAsText(file);
 }
 
-/* =====================
-   ADMIN UNLOCK
-   Practical UI lock only (static site limitation).
-   Default password: FST-ADMIN
-   (Change it below before production.)
-===================== */
-function adminUnlock(){
-  const input = $("adminPw").value || "";
-  const expected = "FST-ADMIN"; // CHANGE THIS PASSWORD
-  if(input === expected){
-    isAdminUnlocked = true;
-    setSettingsLockedUI(false);
-    $("globalMsg").className = "notice";
-    $("globalMsg").innerHTML = "<strong>Admin unlocked:</strong> Settings can now be edited on this browser.";
-    autosave();
-  } else {
-    $("globalMsg").className = "notice bad";
-    $("globalMsg").innerHTML = "<strong>Admin unlock failed:</strong> Incorrect password.";
+/* ======================
+   Pub toggle
+====================== */
+function updatePubToggleUI(){
+  state.toggles.includePubs = $("pubToggle").checked;
+  $("pubWrap").style.display = state.toggles.includePubs ? "block" : "none";
+  if(state.toggles.includePubs && state.data.pubs.length===0){
+    state.data.pubs.push({ id:uid(), year:"", title:"", index:"Scopus", quartile:"Q1", authorship:"First/Corresponding", status:"Published" });
   }
+  renderAll();
+  autosave();
 }
 
-/* =====================
-   EVENT WIRING
-===================== */
-function renderAll(){
-  renderCourses();
-  renderGrants();
-  renderPubs();
-  renderAdmin();
-  renderService();
+/* ======================
+   Presets (Admin only)
+====================== */
+function applyPreset(p){
+  if(!isAdminUnlocked) return;
+
+  if(p==="lecturer"){
+    state.settings.weights = { T:0.55, R:0.20, A:0.15, S:0.10 };
+  } else if(p==="senior"){
+    state.settings.weights = { T:0.45, R:0.30, A:0.15, S:0.10 };
+  } else if(p==="assoc"){
+    state.settings.weights = { T:0.35, R:0.40, A:0.15, S:0.10 };
+  } else if(p==="prof"){
+    state.settings.weights = { T:0.25, R:0.50, A:0.15, S:0.10 };
+  }
+  syncUIFromSettings();
+  autosave();
+  showMsg("ok", `<b>Preset applied:</b> ${p}.`);
 }
 
+/* ======================
+   Buttons
+====================== */
 function addRow(kind){
   if(kind==="course") state.data.courses.push({ id:uid(), level:"UG", code:"", name:"", credit:0, students:0, lec:0, tut:0, lab:0, field:0 });
   if(kind==="grant") state.data.grants.push({ id:uid(), code:"", title:"", level:"University", role:"PI", status:"Active", amount:0, months:0 });
-  if(kind==="pub") state.data.pubs.push({ id:uid(), year:"", title:"", type:"Journal", index:"Scopus", quartile:"Q1", authorship:"First/Corresponding", status:"Published" });
-  if(kind==="admin") state.data.adminRoles.push({ id:uid(), role:"", category:"Official", intensity:1.0, months:0, evidence:"" });
+  if(kind==="effort") state.data.effort.push({ id:uid(), type:"Supervision", desc:"", hours:0 });
+  if(kind==="pub") state.data.pubs.push({ id:uid(), year:"", title:"", index:"Scopus", quartile:"Q1", authorship:"First/Corresponding", status:"Published" });
+  if(kind==="admin") state.data.adminRoles.push({ id:uid(), role:"", type:"Official", level:"Programme", meetings:0, prep:0, months:0 });
   if(kind==="service") state.data.service.push({ id:uid(), activity:"", role:"Lead", hours:0, pax:0 });
   renderAll(); autosave();
 }
-
 function clearKind(kind){
   if(!confirm("Clear this section?")) return;
   if(kind==="course") state.data.courses = [];
   if(kind==="grant") state.data.grants = [];
+  if(kind==="effort") state.data.effort = [];
   if(kind==="pub") state.data.pubs = [];
   if(kind==="admin") state.data.adminRoles = [];
   if(kind==="service") state.data.service = [];
@@ -1820,30 +1997,51 @@ function clearKind(kind){
   renderAll(); autosave();
 }
 
-function bind(){
-  // profile inputs autosave
-  ["pName","pStaffId","pDept","pGrade","pStatus","pPeriod"].forEach(id=>{
-    $(id).addEventListener("input", ()=>autosave());
-  });
+/* ======================
+   Scaffolding / init
+====================== */
+function init(){
+  $("yearNow").textContent = String(new Date().getFullYear());
 
-  // settings inputs only autosave if admin unlocked
+  ensureSeed();
+  renderAll();
+
+  // other fields
+  bindOther("pGrade","pGradeOtherWrap","pGradeOther");
+  bindOther("pStatus","pStatusOtherWrap","pStatusOther");
+
+  // pub toggle
+  $("pubToggle").addEventListener("change", updatePubToggleUI);
+  updatePubToggleUI();
+
+  // load local
+  loadLocal();
+
+  // lock settings by default
+  setSettingsLocked(!isAdminUnlocked);
+  $("lockDot").style.background = !isAdminUnlocked ? "var(--warn)" : "var(--ok)";
+  $("lockText").textContent = !isAdminUnlocked ? "Locked" : "Unlocked (Admin)";
+
+  // settings change (admin only)
   document.querySelectorAll("#secSettings input, #secSettings select").forEach(e=>{
     e.addEventListener("input", ()=>{
       if(!isAdminUnlocked) return;
-      if(e.id === "preset") applyPreset(e.value);
-      autosave();
+      if(e.id==="preset") applyPreset(e.value);
+      else autosave();
     });
   });
 
-  $("btnCalculate").addEventListener("click", (e)=>{ e.preventDefault(); calculate(); });
-  $("btnPrint").addEventListener("click", (e)=>{ e.preventDefault(); window.print(); });
+  // profile autosave
+  ["pName","pStaffId","pDept","pPeriod","pFaculty","pDean","pGrade","pStatus","pGradeOther","pStatusOther"].forEach(id=>{
+    $(id).addEventListener("input", ()=>autosave());
+  });
 
+  // buttons
   $("btnAdminUnlock").addEventListener("click",(e)=>{ e.preventDefault(); adminUnlock(); });
-
   $("btnToggleMode").addEventListener("click",(e)=>{ e.preventDefault(); toggleMode(); });
 
-  $("btnSaveLocal").addEventListener("click",(e)=>{ e.preventDefault(); autosave(); $("globalMsg").className="notice"; $("globalMsg").innerHTML="<strong>Saved:</strong> Stored locally in this browser."; });
-  $("btnLoadLocal").addEventListener("click",(e)=>{ e.preventDefault(); if(!loadLocal()){$("globalMsg").className="notice warn"; $("globalMsg").innerHTML="<strong>No saved data:</strong> Nothing found in local storage."; }});
+  $("btnSaveLocal").addEventListener("click",(e)=>{ e.preventDefault(); autosave(); showMsg("ok","<b>Saved:</b> Stored locally in this browser."); });
+  $("btnLoadLocal").addEventListener("click",(e)=>{ e.preventDefault(); if(loadLocal()) showMsg("ok","<b>Loaded:</b> Local saved data loaded."); else showMsg("warn","<b>No saved data</b> found."); });
   $("btnResetAll").addEventListener("click",(e)=>{ e.preventDefault(); resetAll(); });
 
   $("addCourse").addEventListener("click",(e)=>{ e.preventDefault(); addRow("course"); });
@@ -1852,14 +2050,21 @@ function bind(){
   $("addGrant").addEventListener("click",(e)=>{ e.preventDefault(); addRow("grant"); });
   $("clearGrant").addEventListener("click",(e)=>{ e.preventDefault(); clearKind("grant"); });
 
-  $("addPub").addEventListener("click",(e)=>{ e.preventDefault(); addRow("pub"); });
-  $("clearPub").addEventListener("click",(e)=>{ e.preventDefault(); clearKind("pub"); });
+  $("addEffort").addEventListener("click",(e)=>{ e.preventDefault(); addRow("effort"); });
+  $("clearEffort").addEventListener("click",(e)=>{ e.preventDefault(); clearKind("effort"); });
+
+  const addPubBtn = $("addPub"); const clearPubBtn = $("clearPub");
+  if(addPubBtn) addPubBtn.addEventListener("click",(e)=>{ e.preventDefault(); addRow("pub"); });
+  if(clearPubBtn) clearPubBtn.addEventListener("click",(e)=>{ e.preventDefault(); clearKind("pub"); });
 
   $("addAdmin").addEventListener("click",(e)=>{ e.preventDefault(); addRow("admin"); });
   $("clearAdmin").addEventListener("click",(e)=>{ e.preventDefault(); clearKind("admin"); });
 
   $("addService").addEventListener("click",(e)=>{ e.preventDefault(); addRow("service"); });
   $("clearService").addEventListener("click",(e)=>{ e.preventDefault(); clearKind("service"); });
+
+  $("btnCalculate").addEventListener("click",(e)=>{ e.preventDefault(); calculate(); });
+  $("btnPrint").addEventListener("click",(e)=>{ e.preventDefault(); calculate(); window.print(); });
 
   $("btnExportSummaryCSV").addEventListener("click",(e)=>{ e.preventDefault(); exportSummaryCSV(); });
   $("btnExportDetailedCSV").addEventListener("click",(e)=>{ e.preventDefault(); exportDetailedCSV(); });
@@ -1870,31 +2075,10 @@ function bind(){
     if(f) importJSONFile(f);
     e.target.value = "";
   });
+
+  // initial signature fields
+  $("printDate").value = new Date().toLocaleDateString("en-GB");
 }
-
-/* =====================
-   INIT
-===================== */
-function init(){
-  $("yearNow").textContent = String(new Date().getFullYear());
-
-  ensureSeed();
-  renderAll();
-
-  // try load local
-  loadLocal();
-  syncUIFromProfile();
-  syncUIFromSettings();
-
-  // lock settings by default
-  setSettingsLockedUI(!isAdminUnlocked);
-
-  // initial compute
-  calculate();
-
-  bind();
-}
-
 init();
 </script>
 </body>
