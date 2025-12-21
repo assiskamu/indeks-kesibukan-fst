@@ -3094,7 +3094,133 @@ function init(){
   hideMsg();
 }
 init();
+<script>
+/* =========================================================
+   SAFE HELPERS (ELAK CRASH BILA ELEMENT TAK WUJUD)
+========================================================= */
+const $ = (id)=>document.getElementById(id);
+
+function onClick(id, fn){
+  const el = $(id);
+  if(!el){ console.warn("Missing button:", id); return; }
+  el.onclick = (e)=>{ e.preventDefault(); fn(e); };
+}
+
+function onChange(id, fn){
+  const el = $(id);
+  if(!el){ console.warn("Missing input:", id); return; }
+  el.addEventListener("change", fn);
+}
+
+/* =========================================================
+   PRINT PDF (BLACK / WHITE / GRAY ONLY)
+========================================================= */
+function syncPrintFields(){
+  if($("printName")) $("printName").textContent = $("pName")?.value || "";
+  if($("printId")) $("printId").textContent = $("pStaffId")?.value || "";
+  if($("printDate")) $("printDate").textContent = new Date().toLocaleString();
+}
+
+function printPDF(){
+  syncPrintFields();
+  window.print();
+}
+
+/* =========================================================
+   MANUAL PDF (GUARDED – TAK CRASH)
+========================================================= */
+function manualPDF(){
+  if(!window.jspdf || !window.jspdf.jsPDF){
+    alert("Manual PDF library (jsPDF) not loaded. Sila pastikan internet/CDN tersedia.");
+    return;
+  }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:"pt", format:"a4"});
+
+  const W = doc.internal.pageSize.getWidth();
+  const m = 48;
+  let y = 56;
+
+  const write = (t, size=11, bold=false)=>{
+    doc.setFont("helvetica", bold?"bold":"normal");
+    doc.setFontSize(size);
+    const lines = doc.splitTextToSize(t, W-m*2);
+    lines.forEach(line=>{
+      if(y>780){ doc.addPage(); y=56; }
+      doc.text(line, m, y);
+      y += size + 6;
+    });
+  };
+
+  // Header (gray style)
+  doc.setFillColor(230,230,230);
+  doc.rect(0,0,W,48,"F");
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(15);
+  doc.setTextColor(0,0,0);
+  doc.text("FST UMS Staff Busyness Index – Manual", m, 30);
+
+  y = 80;
+  write("Purpose", 13, true);
+  write(
+    "This manual explains how workload (busyness) is calculated. "
+    + "It measures workload intensity and NOT performance or quality outcomes.",
+    11
+  );
+
+  write("Key Formula", 13, true);
+  write(
+    "Overall Busyness Index (points per month) = Σ (Section Points per Month × Normalized Weight).",
+    11
+  );
+
+  write("Note", 11, true);
+  write(
+    "All long text is automatically wrapped. No content is hidden or truncated in print.",
+    11
+  );
+
+  doc.save("FST_UMS_Busyness_Index_Manual.pdf");
+}
+
+/* =========================================================
+   INIT – SAFE BINDING (INI KUNCI UTAMA)
+========================================================= */
+function initSafe(){
+  // Buttons
+  onClick("btnCalc", ()=>{ if(typeof calculate==="function") calculate(); });
+  onClick("btnPrint", ()=>printPDF());
+  onClick("btnManual", ()=>manualPDF());
+
+  onClick("btnSaveLocal", ()=>{ if(typeof saveNow==="function") saveNow(); });
+  onClick("btnReset", ()=>{ if(typeof resetAll==="function") resetAll(); });
+
+  onClick("btnExportSummaryCSV", ()=>{ if(typeof exportSummaryCSV==="function") exportSummaryCSV(); });
+  onClick("btnExportDetailedCSV", ()=>{ if(typeof exportDetailedCSV==="function") exportDetailedCSV(); });
+  onClick("btnExportJSON", ()=>{ if(typeof exportJSON==="function") exportJSON(); });
+
+  // Admin lock
+  onClick("btnAdminUnlock", ()=>{ if(typeof unlockAdmin==="function") unlockAdmin(); });
+  onClick("btnAdminLock", ()=>{ if(typeof lockAdmin==="function") lockAdmin(); });
+
+  // Toggles (selamat walaupun ada yang belum wujud)
+  [
+    "enTeaching","enSupervision","enResearch","enPublication",
+    "enAdministration","enServices","enLabOps","enProSch"
+  ].forEach(id=>{
+    onChange(id, ()=>{
+      if(typeof syncEnabledFromUI==="function") syncEnabledFromUI();
+      if(typeof applySectionVisibility==="function") applySectionVisibility();
+      if(typeof autosave==="function") autosave();
+    });
+  });
+
+  console.log("✅ Safe init completed. Print & Manual PDF ready.");
+}
+
+document.addEventListener("DOMContentLoaded", initSafe);
 </script>
 
 </body>
 </html>
+
