@@ -1,3 +1,8 @@
+<!-- =========================
+     PART 1 / 5
+     HTML <head> + CSS (Mobile-friendly + Print B/W + Auto-wrap + One font)
+     Copy-paste this as the TOP of your index.html
+========================= -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -21,6 +26,7 @@
 
   <style>
     :root{
+      /* Web theme (unchanged look & feel). Print will override to B/W + gray. */
       --bg:#0b1220;
       --text:#eaf0ff;
       --muted:#b8c3e6;
@@ -41,8 +47,8 @@
       --l:#22c55e;
       --set:#60a5fa;
 
-      /* One consistent font everywhere */
-      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      /* ONE font family everywhere (web + print + manual). */
+      --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Noto Sans", "Liberation Sans", sans-serif;
     }
 
     *{box-sizing:border-box}
@@ -56,12 +62,17 @@
         radial-gradient(900px 650px at 70% 80%, rgba(45,212,191,.12), transparent 55%),
         linear-gradient(180deg, #070b15, #0b1220 45%, #070b15);
       color:var(--text);
+      -webkit-text-size-adjust: 100%;
+      text-rendering: optimizeLegibility;
     }
 
     .wrap{max-width:1180px;margin:0 auto;padding:22px 18px 80px}
 
+    /* =========================
+       Top bar (mobile-friendly)
+    ========================= */
     .topbar{
-      display:flex;align-items:center;justify-content:space-between;gap:16px;
+      display:flex;align-items:center;justify-content:space-between;gap:14px;
       padding:14px 16px;border:1px solid var(--line);
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       border-radius: var(--radius);
@@ -69,23 +80,31 @@
       position:sticky;top:10px;z-index:20;
       backdrop-filter: blur(10px);
     }
-    .brand{display:flex;align-items:center;gap:14px}
+    .brand{display:flex;align-items:center;gap:14px;min-width:0}
     .logoBox{
-      width:120px;height:72px;               /* bigger logo */
+      width:120px;height:72px;
       border-radius:14px;
-      background:#ffffff;                    /* white background */
+      background:#ffffff;
       overflow:hidden;
       display:flex;align-items:center;justify-content:center;
-      border:none;                           /* no border */
-      box-shadow:none;                       /* no border feel */
+      border:none;
+      box-shadow:none;
       padding:8px;
-      flex:0 0 auto;
+      flex: 0 0 auto;
     }
     .logoBox img{width:100%;height:100%;object-fit:contain}
 
     .title{display:flex;flex-direction:column;gap:2px;min-width:0}
-    .title h1{font-size:16px;margin:0;letter-spacing:.2px}
-    .title .sub{font-size:12px;color:var(--muted)}
+    .title h1{
+      font-size:16px;margin:0;letter-spacing:.2px;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      max-width: 520px;
+    }
+    .title .sub{
+      font-size:12px;color:var(--muted);
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      max-width: 520px;
+    }
 
     .top-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
 
@@ -127,6 +146,9 @@
     .dot{width:9px;height:9px;border-radius:99px;background:var(--ok);box-shadow:0 0 0 4px rgba(45,212,191,.15)}
     .dot.lock{background:var(--warn);box-shadow:0 0 0 4px rgba(255,176,32,.15)}
 
+    /* =========================
+       Sections
+    ========================= */
     .section{
       margin-top:16px;
       border:1px solid rgba(255,255,255,.10);
@@ -139,11 +161,11 @@
       padding:16px 18px;
       border-bottom:1px solid rgba(255,255,255,.10);
     }
-    .section h2{margin:0;font-size:15px;letter-spacing:.2px}
-    .section .sub{margin-top:4px;color:var(--muted);font-size:12px;max-width:920px}
+    .section h2{margin:0;font-size:15px;letter-spacing:.2px;font-family:var(--font)}
+    .section .sub{margin-top:4px;color:var(--muted);font-size:12px;max-width:920px;font-family:var(--font)}
     .content{padding:16px 18px}
 
-    /* Strong section backgrounds */
+    /* Strong section backgrounds (web only) */
     .profile{
       background:
         radial-gradient(900px 520px at 18% 10%, rgba(96,165,250,.46) 0%, rgba(96,165,250,0) 58%),
@@ -199,17 +221,23 @@
         radial-gradient(900px 520px at 18% 10%, rgba(45,212,191,.48) 0%, rgba(45,212,191,0) 60%),
         linear-gradient(180deg, rgba(45,212,191,.18), rgba(255,255,255,.03));
     }
+    .prosch{
+      background:
+        radial-gradient(900px 520px at 18% 10%, rgba(160,160,160,.34) 0%, rgba(160,160,160,0) 60%),
+        linear-gradient(180deg, rgba(180,180,180,.12), rgba(255,255,255,.03));
+    }
 
+    /* =========================
+       Layout grids
+    ========================= */
     .grid{display:grid;gap:12px}
     .grid.two{grid-template-columns:repeat(2, minmax(0,1fr))}
     .grid.three{grid-template-columns:repeat(3, minmax(0,1fr))}
-    @media(max-width:980px){
-      .grid.two,.grid.three{grid-template-columns:1fr}
-      .topbar{position:relative;top:auto}
-      .logoBox{width:110px;height:66px}
-    }
 
-    label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+    /* =========================
+       Form controls
+    ========================= */
+    label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;font-family:var(--font)}
     input,select,textarea{
       width:100%;
       background:rgba(7,11,21,.55);
@@ -219,36 +247,49 @@
       padding:10px 10px;
       outline:none;
       font-family: var(--font);
-      line-height:1.25;
+      font-size: 14px;
+      line-height: 1.25;
     }
-    textarea{min-height:42px;resize:vertical}
-    textarea.autoGrow{
-      resize:none;
-      overflow:hidden;
-      min-height:42px;
+    textarea{
+      min-height:70px;
+      resize:vertical;
+      overflow:hidden; /* enables auto-grow without scrollbars */
     }
     input.err, select.err, textarea.err{border-color: rgba(255,91,110,.85) !important; box-shadow: 0 0 0 3px rgba(255,91,110,.18)}
-    .hint{font-size:12px;color:var(--muted);margin-top:6px}
+    .hint{font-size:12px;color:var(--muted);margin-top:6px;font-family:var(--font)}
     .requiredMark::after{content:" *"; color: var(--warn); font-weight:800}
 
+    /* =========================
+       Tables: mobile-friendly (horizontal scroll)
+    ========================= */
     .tableWrap{
       width:100%;
       overflow-x:auto;
-      -webkit-overflow-scrolling:touch;
-      border-radius:12px;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 14px;
     }
     table{width:100%;border-collapse:collapse;min-width:980px}
-    th,td{border-bottom:1px solid rgba(255,255,255,.10);padding:10px 8px;vertical-align:top}
-    th{font-size:12px;color:var(--muted);text-align:left;white-space:nowrap}
+    th,td{border-bottom:1px solid rgba(255,255,255,.10);padding:10px 8px;vertical-align:top;font-family:var(--font)}
+    th{font-size:12px;color:var(--muted);text-align:left}
     td input, td select, td textarea{padding:8px 8px;border-radius:10px}
-    td textarea{min-height:38px}
+
+    /* allow long text inside table cells */
+    td .cellText{
+      white-space:pre-wrap;
+      word-break:break-word;
+      overflow-wrap:anywhere;
+    }
 
     .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .row.right{justify-content:flex-end}
 
     .notice{
       padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.06);color:var(--muted);font-size:12px
+      background:rgba(255,255,255,.06);color:var(--muted);font-size:12px;
+      font-family:var(--font);
+      white-space: normal;
+      overflow-wrap:anywhere;
+      word-break:break-word;
     }
     .notice.bad{border-color: rgba(255,91,110,.55); background: rgba(255,91,110,.10); color:#ffd9de}
     .notice.warn{border-color: rgba(255,176,32,.55); background: rgba(255,176,32,.10); color:#ffe9c2}
@@ -258,24 +299,21 @@
       display:grid;gap:10px;
       grid-template-columns:repeat(4, minmax(0,1fr));
     }
-    @media(max-width:900px){ .kpi{grid-template-columns:repeat(2, minmax(0,1fr))} }
     .box{
       border:1px solid rgba(255,255,255,.12);
       background:rgba(7,11,21,.40);
       border-radius:14px;
       padding:12px;
+      font-family:var(--font);
+      min-width: 0;
     }
     .box .k{font-size:12px;color:var(--muted)}
     .box .v{font-size:20px;font-weight:900;margin-top:4px}
     .box .s{font-size:12px;color:var(--muted);margin-top:4px}
 
+    /* Narrative / summary boxes: ensure wrap (web + print) */
     .wrapText{
-      white-space:normal;
-      overflow-wrap:anywhere;
-      word-break:break-word;
-    }
-    .wrapPre{
-      white-space:pre-wrap;
+      white-space: pre-wrap;
       overflow-wrap:anywhere;
       word-break:break-word;
     }
@@ -283,29 +321,12 @@
     .footer{
       margin-top:18px;
       color:rgba(255,255,255,.55);
-      font-size:12px;text-align:center
+      font-size:12px;text-align:center;
+      font-family:var(--font)
     }
-
     .spacer{height:10px}
 
-    /* Print rules: hide settings/toggles/admin; show signatures only in print */
-    .printOnly{display:none}
-    @media print{
-      body{background:#fff;color:#000}
-      .topbar,.noPrint,#secSettings,#secToggles{display:none !important}
-      .wrap{max-width:900px;padding:0}
-      .section{box-shadow:none;border:1px solid #ddd}
-      .section header{background:#f7f7f7;color:#000}
-      .content, input, select, textarea{color:#000}
-      input,select,textarea{background:#fff;border:1px solid #bbb}
-      .box{border:1px solid #ddd;background:#fff;break-inside:avoid}
-      .printOnly{display:block !important}
-      canvas{max-width:100% !important}
-      .wrapText,.wrapPre{color:#000 !important}
-      .tableWrap{overflow:visible !important}
-      table{min-width:0 !important}
-    }
-
+    /* Admin panel */
     .adminPanel{
       display:flex;gap:8px;align-items:center;flex-wrap:wrap;
     }
@@ -313,26 +334,128 @@
       width:220px;
       background:rgba(7,11,21,.65);
     }
-    .small{font-size:12px;color:var(--muted)}
+    .small{font-size:12px;color:var(--muted);font-family:var(--font)}
 
-    /* Mobile-first improvements */
-    @media(max-width:720px){
-      .wrap{padding:14px 12px 60px}
-      .topbar{flex-direction:column;align-items:stretch}
+    /* =========================
+       RESPONSIVE (Phone/Tablet)
+       - one column layout
+       - topbar un-sticky
+       - buttons bigger
+       - tables scroll horizontally
+    ========================= */
+    @media(max-width:980px){
+      .wrap{padding:14px 12px 70px}
+      .topbar{position:relative;top:auto;flex-direction:column;align-items:stretch;gap:12px}
       .brand{width:100%}
-      .title h1{font-size:15px}
-      .top-actions{width:100%;justify-content:flex-start}
-      .pill,.badge{flex:0 0 auto}
+      .logoBox{width:110px;height:66px}
+      .title h1,.title .sub{max-width: 100%}
+      .top-actions{justify-content:flex-start}
+      .grid.two,.grid.three{grid-template-columns:1fr}
+      .kpi{grid-template-columns:repeat(2, minmax(0,1fr))}
+      .btn{padding:12px 12px}
+      table{min-width:920px} /* still scroll */
+    }
+    @media(max-width:520px){
+      .kpi{grid-template-columns:1fr}
+      .logoBox{width:104px;height:62px}
+      .btn{width:100%}
       .adminPanel{width:100%}
-      .adminPanel input{flex:1 1 auto; width:auto; min-width:180px}
-      .btn{flex:1 1 auto}
-      .btn.primary,.btn.warn,.btn.danger,.btn.ghost{min-width:120px}
-      .row.right{justify-content:flex-start}
-      table{min-width:980px} /* allow horizontal swipe */
+      .adminPanel input{width:100%}
+      .pill,.badge{width:100%;justify-content:center}
+    }
+
+    /* =========================
+       PRINT (Professional B/W + Gray)
+       - no colorful web gradients
+       - form-like borders
+       - wrap all long text
+    ========================= */
+    .printOnly{display:none}
+    @media print{
+      @page { margin: 14mm; }
+
+      body{
+        background:#fff !important;
+        color:#000 !important;
+        font-family: var(--font) !important;
+      }
+
+      /* Hide web controls */
+      .topbar,.noPrint,#secSettings,#secToggles{display:none !important}
+
+      .wrap{max-width: 100% !important; padding:0 !important}
+
+      /* Sections look like official forms */
+      .section{
+        box-shadow:none !important;
+        border:1px solid #444 !important;
+        border-radius: 8px !important;
+        margin-top: 10px !important;
+        background:#fff !important;
+      }
+      .section header{
+        background:#e9e9e9 !important;
+        color:#000 !important;
+        border-bottom:1px solid #444 !important;
+        padding:10px 12px !important;
+      }
+      .section h2{font-size: 12pt !important}
+      .section .sub{color:#111 !important; font-size: 10pt !important}
+
+      .content{padding:10px 12px !important}
+
+      /* Inputs appear like form fields */
+      input,select,textarea{
+        color:#000 !important;
+        background:#fff !important;
+        border:1px solid #000 !important;
+        border-radius: 6px !important;
+      }
+
+      /* KPI boxes */
+      .box{
+        border:1px solid #000 !important;
+        background:#fff !important;
+        border-radius: 8px !important;
+      }
+      .box .k,.box .s{color:#111 !important}
+      .box .v{color:#000 !important}
+
+      /* Tables: B/W */
+      .tableWrap{overflow:visible !important}
+      table{min-width: 0 !important; width:100% !important}
+      th,td{
+        border-bottom:1px solid #000 !important;
+        color:#000 !important;
+      }
+      th{
+        background:#efefef !important;
+        border-top:1px solid #000 !important;
+      }
+
+      /* Force wrapping everywhere important */
+      .wrapText, .notice, .hint, .sub, td, th, div, span{
+        white-space: normal !important;
+        overflow-wrap:anywhere !important;
+        word-break:break-word !important;
+      }
+
+      /* Ensure Narrative Summary stays inside a bordered box (we'll render it as a box in HTML) */
+      .printOnly{display:block !important}
+
+      /* Charts print cleanly */
+      canvas{max-width:100% !important; height:auto !important}
     }
   </style>
 </head>
-
+<!-- =========================
+     END PART 1 / 5
+========================= -->
+<!-- =========================
+     PART 2 / 5
+     HTML <body> (ALL SECTIONS)
+     Paste this IMMEDIATELY AFTER Part 1
+========================= -->
 <body>
 <div class="wrap">
 
@@ -344,7 +467,7 @@
       </div>
       <div class="title">
         <h1>FST UMS – Staff Busyness Index Calculator</h1>
-        <div class="sub">Single-file tool (GitHub Pages). Admin can lock weights and scoring scheme; staff only enter activities.</div>
+        <div class="sub">Single-file tool (GitHub Pages). Admin can lock weights/mark scheme; staff only enter workload activities.</div>
       </div>
     </div>
 
@@ -385,7 +508,7 @@
           <label class="requiredMark">Staff Category</label>
           <select id="pCategory">
             <option value="">Select</option>
-            <option value="Academic">Academic Staff</option>
+            <option value="Academic">Academic</option>
             <option value="Administrative">Administrative Staff</option>
             <option value="Laboratory">Laboratory Staff</option>
           </select>
@@ -394,7 +517,7 @@
 
         <div>
           <label class="requiredMark">Programme/Unit</label>
-          <textarea id="pUnit" class="autoGrow" rows="1" placeholder="e.g., Mathematics with Economics / Finance Unit / Chemistry Lab"></textarea>
+          <input id="pUnit" placeholder="e.g., Mathematics with Economics / Finance Unit / Chemistry Lab"/>
         </div>
 
         <div>
@@ -440,6 +563,7 @@
             <option value="Semester">Semester</option>
             <option value="Annual">Annual</option>
           </select>
+          <div class="hint">All scores will be normalized into <b>points per month</b> for fair comparisons.</div>
         </div>
       </div>
 
@@ -454,8 +578,8 @@
       <div>
         <h2>Section Applicability (ON/OFF)</h2>
         <div class="sub">
-          Turn ON only relevant sections. The calculator will automatically re-normalize weights using ON sections only.
-          (This supports Academic Staff, Administrative Staff, and Laboratory Staff fairly.)
+          Turn ON only relevant sections. The calculator will <b>auto re-normalize weights</b> using ON sections only.
+          (This supports Academic, Administrative, and Laboratory roles fairly.)
         </div>
       </div>
       <div class="row right noPrint">
@@ -466,11 +590,12 @@
       <div class="grid three">
         <div><label><input type="checkbox" id="enTeaching" checked> Teaching</label></div>
         <div><label><input type="checkbox" id="enSupervision" checked> Supervision</label></div>
-        <div><label><input type="checkbox" id="enResearch" checked> Research</label></div>
+        <div><label><input type="checkbox" id="enResearch" checked> Research (Grants / Projects)</label></div>
         <div><label><input type="checkbox" id="enPublication" checked> Publication</label></div>
         <div><label><input type="checkbox" id="enAdministration" checked> Administration</label></div>
         <div><label><input type="checkbox" id="enServices" checked> Services</label></div>
         <div><label><input type="checkbox" id="enLabOps"> Laboratory Operations</label></div>
+        <div><label><input type="checkbox" id="enProSch" checked> Professional & Scholarly Service (Reviewer / Editor / Examiner / Committee)</label></div>
       </div>
       <div class="spacer"></div>
       <div id="toggleWarn" class="notice warn" style="display:none;"></div>
@@ -481,7 +606,7 @@
   <section class="section settings" id="secSettings">
     <header>
       <div>
-        <h2>Settings (Weights & Scoring Scheme) – Admin Only</h2>
+        <h2>Settings (Weights, Scoring Scheme & Benchmarks) – Admin Only</h2>
         <div class="sub">
           Locked by default. Admin must unlock using password to edit.
           <span class="small">Baseline weights must sum to 1.00.</span>
@@ -491,32 +616,59 @@
     <div class="content">
       <div id="msgSettings" class="notice warn" style="display:none;"></div>
 
+      <div class="notice">
+        <b>Important:</b> This tool measures <b>busyness (workload)</b>, not performance.
+        Scoring emphasizes workload indicators (time, volume, meetings, duration, responsibility) and excludes quality/outcome metrics (e.g., journal quartiles, impact factors).
+      </div>
+
+      <div class="spacer"></div>
+
       <div class="grid three">
-        <div><label class="requiredMark">Weight: Teaching</label><input class="adminOnly" id="wT" type="number" step="0.01" min="0" value="0.30"/></div>
-        <div><label class="requiredMark">Weight: Supervision</label><input class="adminOnly" id="wSV" type="number" step="0.01" min="0" value="0.15"/></div>
-        <div><label class="requiredMark">Weight: Research</label><input class="adminOnly" id="wR" type="number" step="0.01" min="0" value="0.20"/></div>
-        <div><label class="requiredMark">Weight: Publication</label><input class="adminOnly" id="wP" type="number" step="0.01" min="0" value="0.10"/></div>
-        <div><label class="requiredMark">Weight: Administration</label><input class="adminOnly" id="wA" type="number" step="0.01" min="0" value="0.15"/></div>
-        <div><label class="requiredMark">Weight: Services</label><input class="adminOnly" id="wS" type="number" step="0.01" min="0" value="0.10"/></div>
-        <div><label class="requiredMark">Weight: Laboratory Operations</label><input class="adminOnly" id="wL" type="number" step="0.01" min="0" value="0.00"/></div>
+        <div><label class="requiredMark">Weight: Teaching</label><input class="adminOnly" id="wTeaching" type="number" step="0.01" min="0" value="0.30"/></div>
+        <div><label class="requiredMark">Weight: Supervision</label><input class="adminOnly" id="wSupervision" type="number" step="0.01" min="0" value="0.15"/></div>
+        <div><label class="requiredMark">Weight: Research</label><input class="adminOnly" id="wResearch" type="number" step="0.01" min="0" value="0.20"/></div>
+        <div><label class="requiredMark">Weight: Publication</label><input class="adminOnly" id="wPublication" type="number" step="0.01" min="0" value="0.10"/></div>
+        <div><label class="requiredMark">Weight: Administration</label><input class="adminOnly" id="wAdministration" type="number" step="0.01" min="0" value="0.15"/></div>
+        <div><label class="requiredMark">Weight: Services</label><input class="adminOnly" id="wServices" type="number" step="0.01" min="0" value="0.10"/></div>
+        <div><label class="requiredMark">Weight: Laboratory Operations</label><input class="adminOnly" id="wLabOps" type="number" step="0.01" min="0" value="0.00"/></div>
+        <div><label class="requiredMark">Weight: Professional & Scholarly Service</label><input class="adminOnly" id="wProSch" type="number" step="0.01" min="0" value="0.00"/></div>
       </div>
 
       <div class="spacer"></div>
       <div class="row noPrint">
-        <button class="btn adminOnly" id="btnPresetAcademic">Preset: Academic Staff</button>
-        <button class="btn adminOnly" id="btnPresetAdmin">Preset: Administrative Staff</button>
-        <button class="btn adminOnly" id="btnPresetLab">Preset: Laboratory Staff</button>
+        <button class="btn adminOnly" id="btnPresetAcademic">Preset: Academic</button>
+        <button class="btn adminOnly" id="btnPresetAdmin">Preset: Administrative</button>
+        <button class="btn adminOnly" id="btnPresetLab">Preset: Laboratory</button>
       </div>
 
       <div class="spacer"></div>
       <div class="notice">
-        <b>Important:</b> During calculation, the system uses only ON sections and re-normalizes weights automatically.
-        Baseline weights (admin) must still sum to <b>1.00</b>.
+        <b>Weight logic:</b> Baseline weights (admin) must sum to <b>1.00</b>.
+        During calculation, the tool uses only ON sections and re-normalizes weights automatically.
       </div>
 
       <div class="spacer"></div>
       <hr style="border:0;border-top:1px solid rgba(255,255,255,.10);margin:16px 0">
 
+      <!-- Benchmarks (Admin input: A) -->
+      <div class="notice">
+        <b>Institutional Benchmarks (Admin input):</b>
+        These values are used for interpretation only (e.g., below/around/above faculty average; percentile band).
+        They do not change the score calculation.
+      </div>
+
+      <div class="spacer"></div>
+      <div class="grid three">
+        <div><label>Faculty average index (points per month)</label><input class="adminOnly" id="bmAvg" type="number" step="0.1" min="0" value="45.0"/></div>
+        <div><label>Percentile cut-off: 25th percentile (P25)</label><input class="adminOnly" id="bmP25" type="number" step="0.1" min="0" value="30.0"/></div>
+        <div><label>Percentile cut-off: 50th percentile (P50 / median)</label><input class="adminOnly" id="bmP50" type="number" step="0.1" min="0" value="45.0"/></div>
+        <div><label>Percentile cut-off: 75th percentile (P75)</label><input class="adminOnly" id="bmP75" type="number" step="0.1" min="0" value="60.0"/></div>
+      </div>
+
+      <div class="spacer"></div>
+      <hr style="border:0;border-top:1px solid rgba(255,255,255,.10);margin:16px 0">
+
+      <!-- Scoring parameters -->
       <div class="grid three">
         <div><label>Teaching – points per contact hour</label><input class="adminOnly" id="tHourW" type="number" step="0.1" min="0" value="1.0"/></div>
         <div><label>Teaching – points per student (scaled /100)</label><input class="adminOnly" id="tStudW" type="number" step="0.1" min="0" value="0.6"/></div>
@@ -527,25 +679,31 @@
         <div><label>Supervision – PhD (per student)</label><input class="adminOnly" id="svPHD" type="number" step="0.1" min="0" value="4.5"/></div>
 
         <div><label>Research – base points per grant</label><input class="adminOnly" id="rBase" type="number" step="0.1" min="0" value="6"/></div>
-        <div><label>Research – level multipliers (University, National, International)</label><input class="adminOnly" id="rUniNatIntl" type="text" value="1.0,1.4,1.8"/></div>
-        <div><label>Research – role multipliers (Principal Investigator, Co-Investigator, Member)</label><input class="adminOnly" id="rRole" type="text" value="1.6,1.2,1.0"/></div>
+        <div><label>Research – level multipliers (University,National,International)</label><input class="adminOnly" id="rUniNatIntl" type="text" value="1.0,1.4,1.8"/></div>
+        <div><label>Research – role multipliers (PI,Co-I,Member)</label><input class="adminOnly" id="rRole" type="text" value="1.6,1.2,1.0"/></div>
 
         <div><label>Publication – base points per item</label><input class="adminOnly" id="pBase" type="number" step="0.1" min="0" value="4"/></div>
-        <div><label>Publication – type multipliers (Journal, Book/Chapter, Proceeding, Other)</label><input class="adminOnly" id="pType" type="text" value="1.5,1.8,1.0,0.8"/></div>
-        <div><label>Publication – indexed multipliers (Yes, No)</label><input class="adminOnly" id="pIdx" type="text" value="1.4,1.0"/></div>
+        <div><label>Publication – type multipliers (Journal,Book/Chapter,Proceeding,Other)</label><input class="adminOnly" id="pType" type="text" value="1.5,1.8,1.0,0.8"/></div>
+        <div><label>Publication – indexed multipliers (Yes,No)</label><input class="adminOnly" id="pIdx" type="text" value="1.4,1.0"/></div>
 
-        <div><label>Administration – base points by level (Programme, Faculty, University, State, National, International, Industry)</label><input class="adminOnly" id="aLevel" type="text" value="3,5,7,8,10,12,9"/></div>
-        <div><label>Administration – per meeting points</label><input class="adminOnly" id="aMeetW" type="number" step="0.1" min="0" value="1.5"/></div>
-        <div><label>Administration – per month points</label><input class="adminOnly" id="aMonthW" type="number" step="0.1" min="0" value="0.3"/></div>
+        <div><label>Administration – base points by level (Programme,Faculty,University,State,National,International,Industry)</label><input class="adminOnly" id="aLevel" type="text" value="3,5,7,8,10,12,9"/></div>
+        <div><label>Administration – points per meeting</label><input class="adminOnly" id="aMeetW" type="number" step="0.1" min="0" value="1.5"/></div>
+        <div><label>Administration – points per month in role</label><input class="adminOnly" id="aMonthW" type="number" step="0.1" min="0" value="0.3"/></div>
 
         <div><label>Services – points per hour</label><input class="adminOnly" id="sHourW" type="number" step="0.1" min="0" value="1.0"/></div>
         <div><label>Services – points per participants (scaled /10)</label><input class="adminOnly" id="sPaxW" type="number" step="0.1" min="0" value="0.8"/></div>
-        <div><label>Services – role bonus (Lead, Member)</label><input class="adminOnly" id="sRoleBonus" type="text" value="4,1.5"/></div>
+        <div><label>Services – role bonus (Lead,Member)</label><input class="adminOnly" id="sRoleBonus" type="text" value="4,1.5"/></div>
 
         <div><label>Laboratory Operations – points per volume</label><input class="adminOnly" id="lVolW" type="number" step="0.1" min="0" value="1.0"/></div>
         <div><label>Laboratory Operations – points per hour</label><input class="adminOnly" id="lHourW" type="number" step="0.1" min="0" value="1.0"/></div>
-        <div><label>Laboratory Operations – multipliers (Complexity Low, Medium, High)</label><input class="adminOnly" id="lCx" type="text" value="1.0,1.3,1.6"/></div>
-        <div><label>Laboratory Operations – multipliers (Urgency Normal, Tight, Critical)</label><input class="adminOnly" id="lUr" type="text" value="1.0,1.25,1.5"/></div>
+        <div><label>Laboratory Operations – multipliers (Complexity Low,Medium,High)</label><input class="adminOnly" id="lCx" type="text" value="1.0,1.3,1.6"/></div>
+        <div><label>Laboratory Operations – multipliers (Urgency Normal,Tight,Critical)</label><input class="adminOnly" id="lUr" type="text" value="1.0,1.25,1.5"/></div>
+
+        <!-- Professional & Scholarly Service parameters (busyness-based) -->
+        <div><label>Professional & Scholarly Service – base points per item</label><input class="adminOnly" id="psBase" type="number" step="0.1" min="0" value="3.0"/></div>
+        <div><label>Professional & Scholarly Service – role multipliers (Lead,Member)</label><input class="adminOnly" id="psRole" type="text" value="1.3,1.0"/></div>
+        <div><label>Professional & Scholarly Service – multipliers (Complexity Low,Medium,High)</label><input class="adminOnly" id="psCx" type="text" value="1.0,1.3,1.6"/></div>
+        <div><label>Professional & Scholarly Service – multipliers (Urgency Normal,Tight,Critical)</label><input class="adminOnly" id="psUr" type="text" value="1.0,1.25,1.5"/></div>
       </div>
 
       <div class="spacer"></div>
@@ -578,10 +736,10 @@
               <th style="width:10%">Students *</th>
               <th style="width:10%">Lecture *</th>
               <th style="width:10%">Tutorial *</th>
-              <th style="width:10%">Laboratory *</th>
+              <th style="width:10%">Lab *</th>
               <th style="width:10%">Field *</th>
               <th style="width:10%">Contact hours</th>
-              <th style="width:6%">Delete</th>
+              <th style="width:6%">Del</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -613,7 +771,7 @@
               <th style="width:12%">Status *</th>
               <th style="width:12%">Start *</th>
               <th style="width:12%">End *</th>
-              <th style="width:8%">Delete</th>
+              <th style="width:8%">Del</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -647,7 +805,7 @@
               <th style="width:12%">Amount (RM) *</th>
               <th style="width:10%">Start *</th>
               <th style="width:10%">End *</th>
-              <th style="width:6%">Delete</th>
+              <th style="width:6%">Del</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -661,7 +819,7 @@
     <header>
       <div>
         <h2>Publication</h2>
-        <div class="sub">If ON, record publication output for the reporting period.</div>
+        <div class="sub">If ON, record publication output for the reporting period. This captures workload (count/handling), not quality metrics.</div>
       </div>
       <div class="row right noPrint">
         <button class="btn" id="addPub">+ Add publication</button>
@@ -680,7 +838,7 @@
               <th style="width:14%">Role *</th>
               <th style="width:12%">Start *</th>
               <th style="width:12%">End *</th>
-              <th style="width:6%">Delete</th>
+              <th style="width:6%">Del</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -694,10 +852,10 @@
     <header>
       <div>
         <h2>Administration</h2>
-        <div class="sub">Include appointments (official/ad-hoc), level, duration (months) and meeting workload.</div>
+        <div class="sub">Include appointments, level, duration (months) and meeting workload. Notes should describe workload clearly.</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn" id="addAdmin">+ Add administration role</button>
+        <button class="btn" id="addAdmin">+ Add admin role</button>
         <button class="btn ghost" id="clearAdmin">Clear</button>
       </div>
     </header>
@@ -711,17 +869,17 @@
               <th style="width:18%">Level *</th>
               <th style="width:10%">Months *</th>
               <th style="width:10%">Meetings *</th>
-              <th>Notes *</th>
+              <th>Workload Notes *</th>
               <th style="width:10%">Start *</th>
               <th style="width:10%">End *</th>
-              <th style="width:6%">Delete</th>
+              <th style="width:6%">Del</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
       <div class="spacer"></div>
-      <div class="notice">Tip: For conference committee work, use Position = “Conference Committee” and describe preparation tasks in Notes.</div>
+      <div class="notice">Tip: For conference committee work (AJK), record it under <b>Professional & Scholarly Service</b> (recommended) or under Administration if it is an official appointment. Describe workload in Notes.</div>
     </div>
   </section>
 
@@ -749,7 +907,7 @@
               <th style="width:10%">Participants *</th>
               <th style="width:12%">Start *</th>
               <th style="width:12%">End *</th>
-              <th style="width:6%">Delete</th>
+              <th style="width:6%">Del</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -758,15 +916,15 @@
     </div>
   </section>
 
-  <!-- LABORATORY OPERATIONS -->
+  <!-- LAB OPERATIONS -->
   <section class="section labops" id="secLabOps" style="display:none;">
     <header>
       <div>
         <h2>Laboratory Operations</h2>
-        <div class="sub">For laboratory staff or lab-support work. Scored using (volume + hours) × complexity × urgency.</div>
+        <div class="sub">For lab staff or lab-support work. Scored using (volume + hours) × complexity × urgency.</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn" id="addLab">+ Add laboratory activity</button>
+        <button class="btn" id="addLab">+ Add lab activity</button>
         <button class="btn ghost" id="clearLab">Clear</button>
       </div>
     </header>
@@ -783,11 +941,55 @@
               <th style="width:10%">Hours *</th>
               <th style="width:12%">Start *</th>
               <th style="width:12%">End *</th>
-              <th style="width:6%">Delete</th>
+              <th style="width:6%">Del</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROFESSIONAL & SCHOLARLY SERVICE (NEW) -->
+  <section class="section prosch" id="secProSch">
+    <header>
+      <div>
+        <h2>Professional & Scholarly Service</h2>
+        <div class="sub">
+          This section captures <b>workload</b> such as journal reviewing, editorial handling, external examining, and conference committee work.
+          It does not capture quality metrics (e.g., journal ranking). Use volume, rounds, complexity, urgency and time indicators.
+        </div>
+      </div>
+      <div class="row right noPrint">
+        <button class="btn" id="addProSch">+ Add item</button>
+        <button class="btn ghost" id="clearProSch">Clear</button>
+      </div>
+    </header>
+    <div class="content">
+      <div class="tableWrap">
+        <table id="tblProSch">
+          <thead>
+            <tr>
+              <th style="width:18%">Activity Type *</th>
+              <th>Description / Notes *</th>
+              <th style="width:12%">Role *</th>
+              <th style="width:10%">Quantity *</th>
+              <th style="width:10%">Rounds *</th>
+              <th style="width:12%">Complexity *</th>
+              <th style="width:12%">Urgency *</th>
+              <th style="width:10%">Hours *</th>
+              <th style="width:10%">Start *</th>
+              <th style="width:10%">End *</th>
+              <th style="width:6%">Del</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="spacer"></div>
+      <div class="notice">
+        Example: Reviewer (Quantity=3 manuscripts, Rounds=2, Complexity=High, Urgency=Tight, Hours=10).
+        Conference committee can be recorded as “Conference Committee / Secretariat / Chair”.
       </div>
     </div>
   </section>
@@ -797,45 +999,58 @@
     <header>
       <div>
         <h2>Results</h2>
-        <div class="sub">Calculate index, view section contributions, export for dashboard, and print clean PDF (no settings/weights shown).</div>
+        <div class="sub">
+          Calculate monthly-normalized busyness index, view contributions, export for dashboard, and print a professional black-and-white form (no settings shown).
+        </div>
       </div>
     </header>
     <div class="content">
       <div id="msgGlobal" class="notice warn" style="display:none;"></div>
 
+      <!-- KPIs (FULL NAMES, no abbreviations) -->
       <div class="kpi">
-        <div class="box"><div class="k">Teaching</div><div class="v" id="outT">0.0</div><div class="s">Contact hours + student load + credit load</div></div>
-        <div class="box"><div class="k">Supervision</div><div class="v" id="outSV">0.0</div><div class="s">Undergraduate + Master + PhD supervision load</div></div>
-        <div class="box"><div class="k">Research</div><div class="v" id="outR">0.0</div><div class="s">Grants and projects by level, role, and status</div></div>
-        <div class="box"><div class="k">Publication</div><div class="v" id="outP">0.0</div><div class="s">Publication type, indexing, and role</div></div>
+        <div class="box"><div class="k">Teaching</div><div class="v" id="outTeaching">0.0</div><div class="s">Monthly-normalized workload points</div></div>
+        <div class="box"><div class="k">Supervision</div><div class="v" id="outSupervision">0.0</div><div class="s">Monthly-normalized workload points</div></div>
+        <div class="box"><div class="k">Research (Grants / Projects)</div><div class="v" id="outResearch">0.0</div><div class="s">Monthly-normalized workload points</div></div>
+        <div class="box"><div class="k">Publication</div><div class="v" id="outPublication">0.0</div><div class="s">Monthly-normalized workload points</div></div>
 
-        <div class="box"><div class="k">Administration</div><div class="v" id="outA">0.0</div><div class="s">Appointment level + meetings + months</div></div>
-        <div class="box"><div class="k">Services</div><div class="v" id="outS">0.0</div><div class="s">Hours + participants + role</div></div>
-        <div class="box"><div class="k">Laboratory Operations</div><div class="v" id="outL">0.0</div><div class="s">Volume + hours multiplied by complexity and urgency</div></div>
+        <div class="box"><div class="k">Administration</div><div class="v" id="outAdministration">0.0</div><div class="s">Monthly-normalized workload points</div></div>
+        <div class="box"><div class="k">Services</div><div class="v" id="outServices">0.0</div><div class="s">Monthly-normalized workload points</div></div>
+        <div class="box"><div class="k">Laboratory Operations</div><div class="v" id="outLabOps">0.0</div><div class="s">Monthly-normalized workload points</div></div>
+        <div class="box"><div class="k">Professional & Scholarly Service</div><div class="v" id="outProSch">0.0</div><div class="s">Monthly-normalized workload points</div></div>
+
         <div class="box">
-          <div class="k">Overall Busyness Index</div>
+          <div class="k">Overall Busyness Index (Points per month)</div>
           <div class="v" id="outIndex">0.0</div>
           <div class="s" id="outBand">—</div>
+        </div>
+
+        <div class="box">
+          <div class="k">Benchmark Interpretation (Admin input)</div>
+          <div class="s wrapText" id="outBenchmark">—</div>
         </div>
       </div>
 
       <div class="spacer"></div>
 
-      <div class="box">
-        <div class="row" style="justify-content:space-between;align-items:flex-start">
-          <div style="min-width:280px;flex:1 1 auto">
-            <div class="k">Dean View Summary (read-only)</div>
-            <div class="hint wrapPre" id="outDean">—</div>
-            <div class="spacer"></div>
-            <div class="k">Narrative Summary</div>
-            <div class="hint wrapPre" id="outNarr">—</div>
-          </div>
-          <div class="row noPrint" style="align-items:flex-start">
-            <button class="btn primary" id="btnCalc">Calculate</button>
-            <button class="btn" id="btnPrint">Print PDF</button>
-            <button class="btn warn" id="btnManual">Download Manual (PDF)</button>
-          </div>
+      <!-- Summaries (ensure wrap inside boxes, including print) -->
+      <div class="grid two">
+        <div class="box">
+          <div class="k">Dean View Summary (read-only)</div>
+          <div class="hint wrapText" id="outDean">—</div>
         </div>
+        <div class="box">
+          <div class="k">Narrative Summary (workload drivers)</div>
+          <div class="hint wrapText" id="outNarr">—</div>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+
+      <div class="row noPrint" style="justify-content:flex-end">
+        <button class="btn primary" id="btnCalc">Calculate</button>
+        <button class="btn" id="btnPrint">Print PDF</button>
+        <button class="btn warn" id="btnManual">Download Manual (PDF)</button>
       </div>
 
       <div class="spacer"></div>
@@ -848,24 +1063,24 @@
 
       <!-- PRINT-ONLY SIGNATURES -->
       <div class="printOnly" style="margin-top:16px">
-        <hr style="border:0;border-top:1px solid #ddd;margin:16px 0">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+        <hr style="border:0;border-top:1px solid #000;margin:12px 0">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
           <div>
             <div style="font-weight:800;margin-bottom:8px">Staff Declaration</div>
-            <div>Full Name: <span id="printName"></span></div>
+            <div>Full name: <span id="printName"></span></div>
             <div>Staff ID: <span id="printId"></span></div>
             <div>Date printed: <span id="printDate"></span></div>
-            <div style="height:110px;border:1px solid #bbb;margin-top:10px;padding:10px">Staff Signature:</div>
+            <div style="height:110px;border:1px solid #000;margin-top:10px;padding:10px">Staff Signature:</div>
           </div>
           <div>
             <div style="font-weight:800;margin-bottom:8px">Dean Approval</div>
             <div>Faculty: Faculty of Science and Technology</div>
             <div>Dean: Prof. P.Geol. Ts. Dr. Rodeano Roslee</div>
             <div>Date: _______________________</div>
-            <div style="height:110px;border:1px solid #bbb;margin-top:10px;padding:10px">Dean Signature:</div>
+            <div style="height:110px;border:1px solid #000;margin-top:10px;padding:10px">Dean Signature:</div>
           </div>
         </div>
-        <div style="margin-top:10px;font-size:11px;color:#555">© FST UMS</div>
+        <div style="margin-top:10px;font-size:11px;color:#000">© FST UMS</div>
       </div>
 
       <div class="spacer"></div>
@@ -880,22 +1095,23 @@
   <div class="footer">© FST UMS</div>
 </div>
 
+<!-- PART 3 will start here with: <script> ... -->
+<!-- =========================
+     END PART 2 / 5
+========================= -->
+<!-- =========================
+     PART 3 / 5
+     JavaScript (Core State + Admin + Sync + Normalization + Diminishing Returns + Scoring)
+     Paste this IMMEDIATELY AFTER Part 2
+========================= -->
 <script>
-/* ========================= Helpers ========================= */
+/* =========================================================
+   Helpers
+========================================================= */
 const $ = (id)=>document.getElementById(id);
 const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
 const n = (v)=>{ const x=parseFloat(v); return isNaN(x)?0:x; };
 const uid = ()=>Math.random().toString(16).slice(2)+Date.now().toString(16);
-
-const SECTION_LABELS = {
-  T: "Teaching",
-  SV: "Supervision",
-  R: "Research",
-  P: "Publication",
-  A: "Administration",
-  S: "Services",
-  L: "Laboratory Operations"
-};
 
 function showMsg(kind, html){
   const el = $("msgGlobal");
@@ -905,19 +1121,34 @@ function showMsg(kind, html){
 }
 function hideMsg(){ $("msgGlobal").style.display="none"; }
 
-function autoGrowTextarea(el){
-  if(!el) return;
-  el.style.height = "auto";
-  el.style.height = (el.scrollHeight) + "px";
-}
-function bindAutoGrow(root=document){
-  root.querySelectorAll("textarea.autoGrow").forEach(t=>{
-    autoGrowTextarea(t);
-    t.addEventListener("input", ()=>autoGrowTextarea(t));
-  });
+/* =========================================================
+   Period normalization (points per month)
+========================================================= */
+function periodMonths(period){
+  if(period==="Monthly") return 1;
+  if(period==="Quarterly") return 3;
+  if(period==="Semester") return 6;
+  if(period==="Annual") return 12;
+  return 1; // safe fallback
 }
 
-/* ========================= State ========================= */
+/* =========================================================
+   Soft caps / diminishing returns
+   Goal: measure busyness (workload), but avoid runaway scores.
+   Logic: up to cap = 100% credit; beyond cap = reduced marginal credit.
+========================================================= */
+function applySoftCap(score, cap, marginalRateAfterCap){
+  const c = Math.max(0, n(cap));
+  const r = clamp(n(marginalRateAfterCap), 0, 1);
+  const s = Math.max(0, n(score));
+  if(c<=0) return s;
+  if(s<=c) return s;
+  return c + (s-c)*r;  // diminishing returns after cap
+}
+
+/* =========================================================
+   State
+========================================================= */
 let isAdmin = false;
 
 const state = {
@@ -927,8 +1158,31 @@ const state = {
     status:"", statusOther:"",
     period:""
   },
-  enabled:{ T:true, SV:true, R:true, P:true, A:true, S:true, L:false },
-  weights:{ T:0.30, SV:0.15, R:0.20, P:0.10, A:0.15, S:0.10, L:0.00 },
+
+  enabled:{
+    Teaching:true,
+    Supervision:true,
+    Research:true,
+    Publication:true,
+    Administration:true,
+    Services:true,
+    LabOps:false,
+    ProSch:true
+  },
+
+  // Baseline weights must sum to 1.00
+  weights:{
+    Teaching:0.30,
+    Supervision:0.15,
+    Research:0.20,
+    Publication:0.10,
+    Administration:0.15,
+    Services:0.10,
+    LabOps:0.00,
+    ProSch:0.00
+  },
+
+  // Admin scoring scheme + caps (defaults are sensible placeholders)
   scheme:{
     teaching:{ hourW:1.0, studW:0.6, creditW:0.4 },
     supervision:{ ug:1.5, m:3.0, phd:4.5 },
@@ -936,8 +1190,32 @@ const state = {
     publication:{ base:4, type:[1.5,1.8,1.0,0.8], idx:[1.4,1.0] },
     admin:{ lvl:[3,5,7,8,10,12,9], meetW:1.5, monthW:0.3 },
     service:{ hourW:1.0, paxW:0.8, bonus:[4,1.5] },
-    lab:{ volW:1.0, hourW:1.0, cx:[1.0,1.3,1.6], ur:[1.0,1.25,1.5] }
+    lab:{ volW:1.0, hourW:1.0, cx:[1.0,1.3,1.6], ur:[1.0,1.25,1.5] },
+
+    // Professional & Scholarly Service (reviewer/editor/examiner/committee)
+    prosch:{
+      base:3.0,
+      role:[1.3,1.0],          // Lead, Member
+      cx:[1.0,1.3,1.6],        // Low, Medium, High
+      ur:[1.0,1.25,1.5]        // Normal, Tight, Critical
+    },
+
+    // Soft caps (applied AFTER period-normalization)
+    caps:{
+      Teaching:{ cap:35, rate:0.40 },
+      Supervision:{ cap:25, rate:0.45 },
+      Research:{ cap:30, rate:0.45 },
+      Publication:{ cap:20, rate:0.50 },
+      Administration:{ cap:35, rate:0.45 },
+      Services:{ cap:25, rate:0.50 },
+      LabOps:{ cap:35, rate:0.45 },
+      ProSch:{ cap:25, rate:0.50 }
+    }
   },
+
+  // Benchmarks (interpretation only)
+  benchmarks:{ avg:45.0, p25:30.0, p50:45.0, p75:60.0 },
+
   data:{
     teaching:[],
     supervision:[],
@@ -945,12 +1223,16 @@ const state = {
     publication:[],
     admin:[],
     service:[],
-    lab:[]
+    lab:[],
+    prosch:[]
   },
+
   audit:{ last_saved_at:null, last_calc_at:null }
 };
 
-/* ========================= Admin lock ========================= */
+/* =========================================================
+   Admin lock
+========================================================= */
 function setAdminUI(){
   $("modeText").textContent = isAdmin ? "Admin" : "Staff";
   $("btnAdminLock").style.display = isAdmin ? "inline-block" : "none";
@@ -967,7 +1249,7 @@ function unlockAdmin(){
   if(pw === ADMIN_PASSWORD){
     isAdmin = true;
     setAdminUI();
-    showMsg("ok","<b>Admin unlocked:</b> You can now edit weights and scoring scheme.");
+    showMsg("ok","<b>Admin unlocked:</b> You can now edit weights, scoring scheme, and benchmarks.");
   }else{
     isAdmin = false;
     setAdminUI();
@@ -981,31 +1263,55 @@ function lockAdmin(){
   showMsg("warn","<b>Locked:</b> Settings are now read-only.");
 }
 
-/* ========================= Parsing helpers ========================= */
+/* =========================================================
+   Parsing helper
+========================================================= */
 function parseCSVNums(str, expected){
   const arr = (str||"").split(",").map(s=>n(s.trim()));
   if(arr.length!==expected) return null;
   return arr;
 }
 
-/* ========================= Category templates ========================= */
+/* =========================================================
+   Category templates (weights + section ON/OFF)
+========================================================= */
 function applyTemplateByCategory(cat){
   if(cat==="Academic"){
-    state.enabled = { T:true, SV:true, R:true, P:true, A:true, S:true, L:false };
-    state.weights = { T:0.30, SV:0.15, R:0.20, P:0.10, A:0.15, S:0.10, L:0.00 };
+    state.enabled = {
+      Teaching:true, Supervision:true, Research:true, Publication:true,
+      Administration:true, Services:true, LabOps:false, ProSch:true
+    };
+    state.weights = {
+      Teaching:0.28, Supervision:0.14, Research:0.20, Publication:0.10,
+      Administration:0.12, Services:0.08, LabOps:0.00, ProSch:0.08
+    };
   } else if(cat==="Administrative"){
-    state.enabled = { T:false, SV:false, R:false, P:false, A:true, S:true, L:false };
-    state.weights = { T:0.00, SV:0.00, R:0.00, P:0.00, A:0.60, S:0.40, L:0.00 };
+    state.enabled = {
+      Teaching:false, Supervision:false, Research:false, Publication:false,
+      Administration:true, Services:true, LabOps:false, ProSch:true
+    };
+    state.weights = {
+      Teaching:0.00, Supervision:0.00, Research:0.00, Publication:0.00,
+      Administration:0.55, Services:0.30, LabOps:0.00, ProSch:0.15
+    };
   } else if(cat==="Laboratory"){
-    state.enabled = { T:false, SV:false, R:false, P:false, A:true, S:true, L:true };
-    state.weights = { T:0.00, SV:0.00, R:0.00, P:0.00, A:0.45, S:0.25, L:0.30 };
+    state.enabled = {
+      Teaching:false, Supervision:false, Research:false, Publication:false,
+      Administration:true, Services:true, LabOps:true, ProSch:true
+    };
+    state.weights = {
+      Teaching:0.00, Supervision:0.00, Research:0.00, Publication:0.00,
+      Administration:0.40, Services:0.20, LabOps:0.30, ProSch:0.10
+    };
   }
   syncUIFromState();
   applySectionVisibility();
   autosave();
 }
 
-/* ========================= Sync UI <-> State ========================= */
+/* =========================================================
+   Sync UI <-> State
+========================================================= */
 function syncProfileFromUI(){
   state.profile.name = $("pName").value.trim();
   state.profile.staffId = $("pStaffId").value.trim();
@@ -1019,26 +1325,36 @@ function syncProfileFromUI(){
 }
 
 function syncEnabledFromUI(){
-  state.enabled.T = $("enTeaching").checked;
-  state.enabled.SV = $("enSupervision").checked;
-  state.enabled.R = $("enResearch").checked;
-  state.enabled.P = $("enPublication").checked;
-  state.enabled.A = $("enAdministration").checked;
-  state.enabled.S = $("enServices").checked;
-  state.enabled.L = $("enLabOps").checked;
+  state.enabled.Teaching = $("enTeaching").checked;
+  state.enabled.Supervision = $("enSupervision").checked;
+  state.enabled.Research = $("enResearch").checked;
+  state.enabled.Publication = $("enPublication").checked;
+  state.enabled.Administration = $("enAdministration").checked;
+  state.enabled.Services = $("enServices").checked;
+  state.enabled.LabOps = $("enLabOps").checked;
+  state.enabled.ProSch = $("enProSch").checked;
 }
 
 function syncSettingsFromUI_ifAdmin(){
   if(!isAdmin) return;
 
-  state.weights.T = n($("wT").value);
-  state.weights.SV = n($("wSV").value);
-  state.weights.R = n($("wR").value);
-  state.weights.P = n($("wP").value);
-  state.weights.A = n($("wA").value);
-  state.weights.S = n($("wS").value);
-  state.weights.L = n($("wL").value);
+  // weights
+  state.weights.Teaching = n($("wTeaching").value);
+  state.weights.Supervision = n($("wSupervision").value);
+  state.weights.Research = n($("wResearch").value);
+  state.weights.Publication = n($("wPublication").value);
+  state.weights.Administration = n($("wAdministration").value);
+  state.weights.Services = n($("wServices").value);
+  state.weights.LabOps = n($("wLabOps").value);
+  state.weights.ProSch = n($("wProSch").value);
 
+  // benchmarks
+  state.benchmarks.avg = n($("bmAvg").value);
+  state.benchmarks.p25 = n($("bmP25").value);
+  state.benchmarks.p50 = n($("bmP50").value);
+  state.benchmarks.p75 = n($("bmP75").value);
+
+  // scheme
   state.scheme.teaching.hourW = n($("tHourW").value);
   state.scheme.teaching.studW = n($("tStudW").value);
   state.scheme.teaching.creditW = n($("tCreditW").value);
@@ -1067,9 +1383,16 @@ function syncSettingsFromUI_ifAdmin(){
   state.scheme.lab.hourW = n($("lHourW").value);
   const lCx = parseCSVNums($("lCx").value, 3); if(lCx) state.scheme.lab.cx = lCx;
   const lUr = parseCSVNums($("lUr").value, 3); if(lUr) state.scheme.lab.ur = lUr;
+
+  // prosch
+  state.scheme.prosch.base = n($("psBase").value);
+  const psRole = parseCSVNums($("psRole").value, 2); if(psRole) state.scheme.prosch.role = psRole;
+  const psCx = parseCSVNums($("psCx").value, 3); if(psCx) state.scheme.prosch.cx = psCx;
+  const psUr = parseCSVNums($("psUr").value, 3); if(psUr) state.scheme.prosch.ur = psUr;
 }
 
 function syncUIFromState(){
+  // profile
   $("pName").value = state.profile.name || "";
   $("pStaffId").value = state.profile.staffId || "";
   $("pCategory").value = state.profile.category || "";
@@ -1082,22 +1405,33 @@ function syncUIFromState(){
   $("pGradeOtherWrap").style.display = (state.profile.grade==="Others") ? "block" : "none";
   $("pStatusOtherWrap").style.display = (state.profile.status==="Others") ? "block" : "none";
 
-  $("enTeaching").checked = !!state.enabled.T;
-  $("enSupervision").checked = !!state.enabled.SV;
-  $("enResearch").checked = !!state.enabled.R;
-  $("enPublication").checked = !!state.enabled.P;
-  $("enAdministration").checked = !!state.enabled.A;
-  $("enServices").checked = !!state.enabled.S;
-  $("enLabOps").checked = !!state.enabled.L;
+  // enabled
+  $("enTeaching").checked = !!state.enabled.Teaching;
+  $("enSupervision").checked = !!state.enabled.Supervision;
+  $("enResearch").checked = !!state.enabled.Research;
+  $("enPublication").checked = !!state.enabled.Publication;
+  $("enAdministration").checked = !!state.enabled.Administration;
+  $("enServices").checked = !!state.enabled.Services;
+  $("enLabOps").checked = !!state.enabled.LabOps;
+  $("enProSch").checked = !!state.enabled.ProSch;
 
-  $("wT").value = state.weights.T.toFixed(2);
-  $("wSV").value = state.weights.SV.toFixed(2);
-  $("wR").value = state.weights.R.toFixed(2);
-  $("wP").value = state.weights.P.toFixed(2);
-  $("wA").value = state.weights.A.toFixed(2);
-  $("wS").value = state.weights.S.toFixed(2);
-  $("wL").value = state.weights.L.toFixed(2);
+  // weights
+  $("wTeaching").value = state.weights.Teaching.toFixed(2);
+  $("wSupervision").value = state.weights.Supervision.toFixed(2);
+  $("wResearch").value = state.weights.Research.toFixed(2);
+  $("wPublication").value = state.weights.Publication.toFixed(2);
+  $("wAdministration").value = state.weights.Administration.toFixed(2);
+  $("wServices").value = state.weights.Services.toFixed(2);
+  $("wLabOps").value = state.weights.LabOps.toFixed(2);
+  $("wProSch").value = state.weights.ProSch.toFixed(2);
 
+  // benchmarks
+  $("bmAvg").value = state.benchmarks.avg;
+  $("bmP25").value = state.benchmarks.p25;
+  $("bmP50").value = state.benchmarks.p50;
+  $("bmP75").value = state.benchmarks.p75;
+
+  // scheme
   $("tHourW").value = state.scheme.teaching.hourW;
   $("tStudW").value = state.scheme.teaching.studW;
   $("tCreditW").value = state.scheme.teaching.creditW;
@@ -1127,20 +1461,26 @@ function syncUIFromState(){
   $("lCx").value = state.scheme.lab.cx.join(",");
   $("lUr").value = state.scheme.lab.ur.join(",");
 
-  bindAutoGrow();
+  $("psBase").value = state.scheme.prosch.base;
+  $("psRole").value = state.scheme.prosch.role.join(",");
+  $("psCx").value = state.scheme.prosch.cx.join(",");
+  $("psUr").value = state.scheme.prosch.ur.join(",");
 }
 
 function applySectionVisibility(){
-  $("secTeaching").style.display = state.enabled.T ? "block" : "none";
-  $("secSupervision").style.display = state.enabled.SV ? "block" : "none";
-  $("secResearch").style.display = state.enabled.R ? "block" : "none";
-  $("secPublication").style.display = state.enabled.P ? "block" : "none";
-  $("secAdmin").style.display = state.enabled.A ? "block" : "none";
-  $("secService").style.display = state.enabled.S ? "block" : "none";
-  $("secLabOps").style.display = state.enabled.L ? "block" : "none";
+  $("secTeaching").style.display = state.enabled.Teaching ? "block" : "none";
+  $("secSupervision").style.display = state.enabled.Supervision ? "block" : "none";
+  $("secResearch").style.display = state.enabled.Research ? "block" : "none";
+  $("secPublication").style.display = state.enabled.Publication ? "block" : "none";
+  $("secAdmin").style.display = state.enabled.Administration ? "block" : "none";
+  $("secService").style.display = state.enabled.Services ? "block" : "none";
+  $("secLabOps").style.display = state.enabled.LabOps ? "block" : "none";
+  $("secProSch").style.display = state.enabled.ProSch ? "block" : "none";
 }
 
-/* ========================= Validation ========================= */
+/* =========================================================
+   Validation helpers (profile / toggles / baseline weights)
+========================================================= */
 function validateProfile(){
   const ids = ["pName","pStaffId","pCategory","pUnit","pGrade","pStatus","pPeriod","pGradeOther","pStatusOther"];
   ids.forEach(id=>$(id).classList.remove("err"));
@@ -1172,22 +1512,32 @@ function validateToggles(){
 
 function validateWeightsBaseline_ifAdmin(){
   if(!isAdmin) return true;
-  const sum = state.weights.T+state.weights.SV+state.weights.R+state.weights.P+state.weights.A+state.weights.S+state.weights.L;
+  const sum =
+    state.weights.Teaching +
+    state.weights.Supervision +
+    state.weights.Research +
+    state.weights.Publication +
+    state.weights.Administration +
+    state.weights.Services +
+    state.weights.LabOps +
+    state.weights.ProSch;
+
   const ok = Math.abs(sum-1.00) <= 0.005;
   $("msgSettings").style.display = ok ? "none" : "block";
-  if(!ok) $("msgSettings").innerHTML = `<b>Admin validation:</b> Weight baseline must sum to 1.00. Current sum = <b>${sum.toFixed(2)}</b>.`;
+  if(!ok) $("msgSettings").innerHTML = `<b>Admin validation:</b> Baseline weights must sum to 1.00. Current sum = <b>${sum.toFixed(2)}</b>.`;
   return ok;
 }
 
 function getActiveWeights(){
   const aw = {
-    T: state.enabled.T ? state.weights.T : 0,
-    SV: state.enabled.SV ? state.weights.SV : 0,
-    R: state.enabled.R ? state.weights.R : 0,
-    P: state.enabled.P ? state.weights.P : 0,
-    A: state.enabled.A ? state.weights.A : 0,
-    S: state.enabled.S ? state.weights.S : 0,
-    L: state.enabled.L ? state.weights.L : 0
+    Teaching: state.enabled.Teaching ? state.weights.Teaching : 0,
+    Supervision: state.enabled.Supervision ? state.weights.Supervision : 0,
+    Research: state.enabled.Research ? state.weights.Research : 0,
+    Publication: state.enabled.Publication ? state.weights.Publication : 0,
+    Administration: state.enabled.Administration ? state.weights.Administration : 0,
+    Services: state.enabled.Services ? state.weights.Services : 0,
+    LabOps: state.enabled.LabOps ? state.weights.LabOps : 0,
+    ProSch: state.enabled.ProSch ? state.weights.ProSch : 0
   };
   const sum = Object.values(aw).reduce((a,b)=>a+b,0);
   if(sum<=0) return null;
@@ -1195,113 +1545,240 @@ function getActiveWeights(){
   return aw;
 }
 
-function validateActivityTables(){
-  document.querySelectorAll("input.err,select.err,textarea.err").forEach(el=>el.classList.remove("err"));
-  let ok=true;
-
-  function requireText(el){ if(!el.value.trim()){ el.classList.add("err"); ok=false; } }
-  function requireNonNeg(el, strictPositive=false){
-    const v=n(el.value);
-    if(v<0 || (strictPositive && v<=0)){ el.classList.add("err"); ok=false; }
-  }
-  function requireDate(el){ if(!el.value){ el.classList.add("err"); ok=false; } }
-
-  if(state.enabled.T){
-    $("tblTeach").querySelectorAll("tbody tr").forEach(tr=>{
-      requireText(tr.querySelector('[data-k="code"]'));
-      requireText(tr.querySelector('[data-k="name"]'));
-      requireNonNeg(tr.querySelector('[data-k="students"]'), true);
-      ["lec","tut","lab","field"].forEach(k=>requireNonNeg(tr.querySelector(`[data-k="${k}"]`), false));
-    });
-  }
-  if(state.enabled.SV){
-    $("tblSv").querySelectorAll("tbody tr").forEach(tr=>{
-      requireText(tr.querySelector('[data-k="title"]'));
-      requireDate(tr.querySelector('[data-k="start"]'));
-      requireDate(tr.querySelector('[data-k="end"]'));
-    });
-  }
-  if(state.enabled.R){
-    $("tblRes").querySelectorAll("tbody tr").forEach(tr=>{
-      requireText(tr.querySelector('[data-k="code"]'));
-      requireText(tr.querySelector('[data-k="title"]'));
-      requireNonNeg(tr.querySelector('[data-k="amount"]'), true);
-      requireDate(tr.querySelector('[data-k="start"]'));
-      requireDate(tr.querySelector('[data-k="end"]'));
-    });
-  }
-  if(state.enabled.P){
-    $("tblPub").querySelectorAll("tbody tr").forEach(tr=>{
-      requireNonNeg(tr.querySelector('[data-k="year"]'), true);
-      requireText(tr.querySelector('[data-k="title"]'));
-      requireDate(tr.querySelector('[data-k="start"]'));
-      requireDate(tr.querySelector('[data-k="end"]'));
-    });
-  }
-  if(state.enabled.A){
-    $("tblAdmin").querySelectorAll("tbody tr").forEach(tr=>{
-      requireText(tr.querySelector('[data-k="pos"]'));
-      requireNonNeg(tr.querySelector('[data-k="months"]'), true);
-      requireNonNeg(tr.querySelector('[data-k="meetings"]'), false);
-      requireText(tr.querySelector('[data-k="notes"]'));
-      requireDate(tr.querySelector('[data-k="start"]'));
-      requireDate(tr.querySelector('[data-k="end"]'));
-    });
-  }
-  if(state.enabled.S){
-    $("tblSvc").querySelectorAll("tbody tr").forEach(tr=>{
-      requireText(tr.querySelector('[data-k="activity"]'));
-      requireNonNeg(tr.querySelector('[data-k="hours"]'), true);
-      requireNonNeg(tr.querySelector('[data-k="participants"]'), true);
-      requireDate(tr.querySelector('[data-k="start"]'));
-      requireDate(tr.querySelector('[data-k="end"]'));
-    });
-  }
-  if(state.enabled.L){
-    $("tblLab").querySelectorAll("tbody tr").forEach(tr=>{
-      requireText(tr.querySelector('[data-k="desc"]'));
-      requireNonNeg(tr.querySelector('[data-k="volume"]'), true);
-      requireNonNeg(tr.querySelector('[data-k="hours"]'), true);
-      requireDate(tr.querySelector('[data-k="start"]'));
-      requireDate(tr.querySelector('[data-k="end"]'));
-    });
-  }
-
-  if(!ok) showMsg("warn","<b>Validation:</b> Please fill all required fields (no empty or negative values). Highlighted boxes require attention.");
-  return ok;
-}
-
-/* ========================= Tables ========================= */
+/* =========================================================
+   Activity data seeding (ensure at least one row exists)
+========================================================= */
 function ensureSeed(){
-  if(state.data.teaching.length===0) state.data.teaching.push({id:uid(), code:"", name:"", credit:0, students:0, lec:0, tut:0, lab:0, field:0});
-  if(state.data.supervision.length===0) state.data.supervision.push({id:uid(), level:"Undergraduate", title:"", role:"Main", status:"Active", start:"", end:""});
-  if(state.data.research.length===0) state.data.research.push({id:uid(), code:"", title:"", level:"University", status:"Active", role:"PI", amount:0, start:"", end:""});
-  if(state.data.publication.length===0) state.data.publication.push({id:uid(), year:(new Date()).getFullYear(), title:"", type:"Journal", indexed:"Yes", role:"First/Corresponding", start:"", end:""});
-  if(state.data.admin.length===0) state.data.admin.push({id:uid(), pos:"", type:"Official", level:"Faculty", months:0, meetings:0, notes:"", start:"", end:""});
-  if(state.data.service.length===0) state.data.service.push({id:uid(), type:"Service to University", activity:"", role:"Lead", hours:0, participants:0, start:"", end:""});
-  if(state.data.lab.length===0) state.data.lab.push({id:uid(), type:"Equipment/Maintenance", desc:"", volume:0, cx:"Medium", ur:"Normal", hours:0, start:"", end:""});
+  if(state.data.teaching.length===0)
+    state.data.teaching.push({id:uid(), code:"", name:"", credit:0, students:0, lecture:0, tutorial:0, laboratory:0, field:0});
+  if(state.data.supervision.length===0)
+    state.data.supervision.push({id:uid(), level:"Undergraduate", title:"", role:"Main", status:"Active", start:"", end:""});
+  if(state.data.research.length===0)
+    state.data.research.push({id:uid(), code:"", title:"", level:"University", status:"Active", role:"PI", amount:0, start:"", end:""});
+  if(state.data.publication.length===0)
+    state.data.publication.push({id:uid(), year:(new Date()).getFullYear(), title:"", type:"Journal", indexed:"Yes", role:"First/Corresponding", start:"", end:""});
+  if(state.data.admin.length===0)
+    state.data.admin.push({id:uid(), position:"", type:"Official", level:"Faculty", months:0, meetings:0, notes:"", start:"", end:""});
+  if(state.data.service.length===0)
+    state.data.service.push({id:uid(), type:"Service to University", activity:"", role:"Lead", hours:0, participants:0, start:"", end:""});
+  if(state.data.lab.length===0)
+    state.data.lab.push({id:uid(), type:"Equipment/Maintenance", desc:"", volume:0, complexity:"Medium", urgency:"Normal", hours:0, start:"", end:""});
+  if(state.data.prosch.length===0)
+    state.data.prosch.push({id:uid(), activityType:"Reviewer", desc:"", role:"Member", quantity:1, rounds:1, complexity:"Medium", urgency:"Normal", hours:0, start:"", end:""});
 }
 
+/* =========================================================
+   Teaching helpers
+========================================================= */
 function creditFromCode(code){
   const s = (code||"").trim();
   const m = s.match(/(\d)\s*$/);
   return m ? parseInt(m[1],10) : 0;
 }
 function contactHoursRow(r){
-  return Math.max(0,n(r.lec))+Math.max(0,n(r.tut))+Math.max(0,n(r.lab))+Math.max(0,n(r.field));
+  return Math.max(0,n(r.lecture)) + Math.max(0,n(r.tutorial)) + Math.max(0,n(r.laboratory)) + Math.max(0,n(r.field));
 }
+
+/* =========================================================
+   Scoring (raw -> monthly -> soft caps)
+   NOTE: These scores are workload points, NOT performance.
+========================================================= */
+function scoreTeaching_raw(){
+  const sc=state.scheme.teaching;
+  let total=0;
+  state.data.teaching.forEach(x=>{
+    const credit = creditFromCode(x.code);
+    x.credit = credit;
+    const contact = contactHoursRow(x);
+    const students = Math.max(0,n(x.students));
+    total += (contact*sc.hourW) + ((students/100)*sc.studW) + (credit*sc.creditW);
+  });
+  return total;
+}
+
+function scoreSupervision_raw(){
+  const sc=state.scheme.supervision;
+  let total=0;
+  state.data.supervision.forEach(x=>{
+    const roleMultiplier = (x.role==="Main") ? 1.0 : 0.6;
+    const statusMultiplier = (x.status==="Active") ? 1.0 : 0.5;
+    let base = 0;
+    if(x.level==="Undergraduate") base=sc.ug;
+    if(x.level==="Master") base=sc.m;
+    if(x.level==="PhD") base=sc.phd;
+    total += base * roleMultiplier * statusMultiplier;
+  });
+  return total;
+}
+
+function scoreResearch_raw(){
+  const sc=state.scheme.research;
+  const lvlMap={University:0, National:1, International:2};
+  const roleMap={PI:0, "Co-I":1, Member:2};
+  let total=0;
+  state.data.research.forEach(x=>{
+    const statusMultiplier = (x.status==="Active") ? 1.0 : (x.status==="Applied") ? 0.6 : 0.3;
+    const li = lvlMap[x.level] ?? 0;
+    const ri = roleMap[x.role] ?? 2;
+    total += sc.base * sc.lvl[li] * sc.role[ri] * statusMultiplier;
+  });
+  return total;
+}
+
+function scorePublication_raw(){
+  const sc=state.scheme.publication;
+  const typeMap={"Journal":0,"Book/Chapter":1,"Proceeding":2,"Other":3};
+  const idxMap={"Yes":0,"No":1};
+  let total=0;
+  state.data.publication.forEach(x=>{
+    const ti = typeMap[x.type] ?? 3;
+    const ii = idxMap[x.indexed] ?? 1;
+    const roleMultiplier = (x.role==="First/Corresponding") ? 1.2 : 1.0;
+    total += sc.base * sc.type[ti] * sc.idx[ii] * roleMultiplier;
+  });
+  return total;
+}
+
+function scoreAdministration_raw(){
+  const sc=state.scheme.admin;
+  const lvlMap={"Programme":0,"Faculty":1,"University":2,"State":3,"National":4,"International":5,"Industry":6};
+  let total=0;
+  state.data.admin.forEach(x=>{
+    const li = lvlMap[x.level] ?? 1;
+    const base = sc.lvl[li];
+    const meetings = Math.max(0,n(x.meetings));
+    const months = Math.max(0,n(x.months));
+    const typeMultiplier = (x.type==="Official") ? 1.0 : 0.7;
+    total += (base + meetings*sc.meetW + months*sc.monthW) * typeMultiplier;
+  });
+  return total;
+}
+
+function scoreServices_raw(){
+  const sc=state.scheme.service;
+  const roleMap={Lead:0, Member:1};
+  let total=0;
+  state.data.service.forEach(x=>{
+    const hrs = Math.max(0,n(x.hours));
+    const pax = Math.max(0,n(x.participants));
+    const ri = roleMap[x.role] ?? 1;
+    total += (hrs*sc.hourW) + ((pax/10)*sc.paxW) + sc.bonus[ri];
+  });
+  return total;
+}
+
+function scoreLabOps_raw(){
+  const sc=state.scheme.lab;
+  const cxMap={Low:0, Medium:1, High:2};
+  const urMap={Normal:0, Tight:1, Critical:2};
+  let total=0;
+  state.data.lab.forEach(x=>{
+    const vol = Math.max(0,n(x.volume));
+    const hrs = Math.max(0,n(x.hours));
+    const ci = cxMap[x.complexity] ?? 1;
+    const ui = urMap[x.urgency] ?? 0;
+    const base = (vol*sc.volW) + (hrs*sc.hourW);
+    total += base * sc.cx[ci] * sc.ur[ui];
+  });
+  return total;
+}
+
+/* Professional & Scholarly Service:
+   workload indicators:
+   - quantity: number of manuscripts/examined theses/assignments/meetings handled
+   - rounds: review rounds or revision cycles (proxy for repeated effort)
+   - hours: optional (if known); if 0, rely on base*quantity*rounds
+*/
+function scoreProSch_raw(){
+  const sc=state.scheme.prosch;
+  const roleMap={Lead:0, Member:1};
+  const cxMap={Low:0, Medium:1, High:2};
+  const urMap={Normal:0, Tight:1, Critical:2};
+
+  let total=0;
+  state.data.prosch.forEach(x=>{
+    const qty = Math.max(0, Math.floor(n(x.quantity)));
+    const rnd = Math.max(1, Math.floor(n(x.rounds) || 1));
+    const hrs = Math.max(0, n(x.hours));
+    const ri = roleMap[x.role] ?? 1;
+    const ci = cxMap[x.complexity] ?? 1;
+    const ui = urMap[x.urgency] ?? 0;
+
+    // Workload base: base per item * quantity * rounds + (hours as extra if provided)
+    const baseEffort = (sc.base * qty * rnd) + hrs;
+    total += baseEffort * sc.role[ri] * sc.cx[ci] * sc.ur[ui];
+  });
+  return total;
+}
+
+/* Convert raw section score -> monthly normalized -> soft cap */
+function normalizeAndCap(sectionName, rawScore){
+  const months = periodMonths(state.profile.period);
+  const perMonth = (months>0) ? (Math.max(0,n(rawScore)) / months) : Math.max(0,n(rawScore));
+  const capCfg = state.scheme.caps[sectionName] || {cap:0, rate:1};
+  return applySoftCap(perMonth, capCfg.cap, capCfg.rate);
+}
+
+/* =========================================================
+   Benchmarks interpretation text
+========================================================= */
+function benchmarkText(index){
+  const b = state.benchmarks;
+  const parts = [];
+
+  if(n(b.avg)>0){
+    if(index < b.avg - 5) parts.push(`Below faculty average (${b.avg.toFixed(1)}).`);
+    else if(index > b.avg + 5) parts.push(`Above faculty average (${b.avg.toFixed(1)}).`);
+    else parts.push(`Around faculty average (${b.avg.toFixed(1)}).`);
+  }
+
+  // percentile band (approx)
+  const p25=n(b.p25), p50=n(b.p50), p75=n(b.p75);
+  if(p75>0 && p50>0 && p25>0){
+    let band = "";
+    if(index < p25) band = "Below 25th percentile (lighter workload relative to peers).";
+    else if(index < p50) band = "Between 25th–50th percentile.";
+    else if(index < p75) band = "Between 50th–75th percentile.";
+    else band = "Above 75th percentile (heavier workload relative to peers).";
+    parts.push(band);
+  }
+
+  if(parts.length===0) return "No benchmarks set by admin.";
+  return parts.join(" ");
+}
+
+/* =========================
+   PART 4 will continue with:
+   - Rendering all tables (including ProSch)
+   - Validation of activity rows
+   - Calculate() + chart + print + manual PDF (professional)
+========================= */
+</script>
+<!-- =========================
+     PART 4 / 5
+     JavaScript (Tables Rendering + Validation + Calculate + Chart + Print helpers)
+     Paste this IMMEDIATELY AFTER Part 3
+========================= -->
+<script>
+/* =========================================================
+   Tables: renderAll()
+========================================================= */
+let chart=null;
 
 function renderAll(){
   renderTeaching();
-  renderSv();
-  renderRes();
-  renderPub();
-  renderAdmin();
-  renderSvc();
-  renderLab();
-  bindAutoGrow();
+  renderSupervision();
+  renderResearch();
+  renderPublication();
+  renderAdministration();
+  renderServices();
+  renderLabOps();
+  renderProSch();
 }
 
+/* =========================================================
+   Teaching table
+========================================================= */
 function renderTeaching(){
   const tb = $("tblTeach").querySelector("tbody");
   tb.innerHTML="";
@@ -1309,26 +1786,26 @@ function renderTeaching(){
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
       <td><input data-k="code" placeholder="e.g., SJ24102"/></td>
-      <td><textarea data-k="name" class="autoGrow" rows="1" placeholder="Course name"></textarea></td>
+      <td><input data-k="name" placeholder="Course name"/></td>
       <td><input data-k="credit" disabled/></td>
       <td><input data-k="students" type="number" min="0" step="1"/></td>
-      <td><input data-k="lec" type="number" min="0" step="0.5"/></td>
-      <td><input data-k="tut" type="number" min="0" step="0.5"/></td>
-      <td><input data-k="lab" type="number" min="0" step="0.5"/></td>
+      <td><input data-k="lecture" type="number" min="0" step="0.5"/></td>
+      <td><input data-k="tutorial" type="number" min="0" step="0.5"/></td>
+      <td><input data-k="laboratory" type="number" min="0" step="0.5"/></td>
       <td><input data-k="field" type="number" min="0" step="0.5"/></td>
       <td><input data-k="contact" disabled/></td>
       <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
     `;
     tb.appendChild(tr);
 
-    tr.querySelector('[data-k="code"]').value=r.code;
-    tr.querySelector('[data-k="name"]').value=r.name;
-    tr.querySelector('[data-k="credit"]').value=r.credit;
-    tr.querySelector('[data-k="students"]').value=r.students;
-    tr.querySelector('[data-k="lec"]').value=r.lec;
-    tr.querySelector('[data-k="tut"]').value=r.tut;
-    tr.querySelector('[data-k="lab"]').value=r.lab;
-    tr.querySelector('[data-k="field"]').value=r.field;
+    tr.querySelector('[data-k="code"]').value=r.code || "";
+    tr.querySelector('[data-k="name"]').value=r.name || "";
+    tr.querySelector('[data-k="credit"]').value=r.credit || 0;
+    tr.querySelector('[data-k="students"]').value=n(r.students)||0;
+    tr.querySelector('[data-k="lecture"]').value=n(r.lecture)||0;
+    tr.querySelector('[data-k="tutorial"]').value=n(r.tutorial)||0;
+    tr.querySelector('[data-k="laboratory"]').value=n(r.laboratory)||0;
+    tr.querySelector('[data-k="field"]').value=n(r.field)||0;
     tr.querySelector('[data-k="contact"]').value=contactHoursRow(r).toFixed(1);
 
     tr.addEventListener("input",(e)=>{
@@ -1336,13 +1813,15 @@ function renderTeaching(){
       const obj=state.data.teaching.find(x=>x.id===tr.dataset.id); if(!obj) return;
 
       if(k==="code"){
-        obj.code=e.target.value.toUpperCase();
-        obj.credit=creditFromCode(obj.code);
+        obj.code = (e.target.value||"").toUpperCase();
+        obj.credit = creditFromCode(obj.code);
         tr.querySelector('[data-k="credit"]').value=obj.credit;
-      } else if(k==="name"){ obj.name=e.target.value; autoGrowTextarea(e.target); }
-      else if(["students","lec","tut","lab","field"].includes(k)){
-        obj[k]=Math.max(0,n(e.target.value)); e.target.value=obj[k];
-        tr.querySelector('[data-k="contact"]').value=contactHoursRow(obj).toFixed(1);
+      } else if(k==="name"){
+        obj.name = e.target.value || "";
+      } else if(["students","lecture","tutorial","laboratory","field"].includes(k)){
+        obj[k] = Math.max(0, n(e.target.value));
+        e.target.value = obj[k];
+        tr.querySelector('[data-k="contact"]').value = contactHoursRow(obj).toFixed(1);
       }
       autosave();
     });
@@ -1356,8 +1835,12 @@ function renderTeaching(){
   });
 }
 
-function renderSv(){
-  const tb=$("tblSv").querySelector("tbody"); tb.innerHTML="";
+/* =========================================================
+   Supervision table
+========================================================= */
+function renderSupervision(){
+  const tb=$("tblSv").querySelector("tbody");
+  tb.innerHTML="";
   state.data.supervision.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
@@ -1368,7 +1851,7 @@ function renderSv(){
           <option>PhD</option>
         </select>
       </td>
-      <td><textarea data-k="title" class="autoGrow" rows="1" placeholder="Student name / project"></textarea></td>
+      <td><input data-k="title" placeholder="Student name / project"/></td>
       <td>
         <select data-k="role">
           <option>Main</option>
@@ -1386,36 +1869,41 @@ function renderSv(){
       <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
     `;
     tb.appendChild(tr);
-    tr.querySelector('[data-k="level"]').value=r.level;
-    tr.querySelector('[data-k="title"]').value=r.title;
-    tr.querySelector('[data-k="role"]').value=r.role;
-    tr.querySelector('[data-k="status"]').value=r.status;
-    tr.querySelector('[data-k="start"]').value=r.start;
-    tr.querySelector('[data-k="end"]').value=r.end;
+
+    tr.querySelector('[data-k="level"]').value=r.level || "Undergraduate";
+    tr.querySelector('[data-k="title"]').value=r.title || "";
+    tr.querySelector('[data-k="role"]').value=r.role || "Main";
+    tr.querySelector('[data-k="status"]').value=r.status || "Active";
+    tr.querySelector('[data-k="start"]').value=r.start || "";
+    tr.querySelector('[data-k="end"]').value=r.end || "";
 
     tr.addEventListener("input",(e)=>{
       const k=e.target.getAttribute("data-k"); if(!k) return;
       const obj=state.data.supervision.find(x=>x.id===tr.dataset.id); if(!obj) return;
       obj[k]=e.target.value;
-      if(e.target.tagName==="TEXTAREA") autoGrowTextarea(e.target);
       autosave();
     });
+
     tr.addEventListener("click",(e)=>{
       if(e.target?.getAttribute("data-act")==="del"){
-        state.data.supervision=state.data.supervision.filter(x=>x.id!==tr.dataset.id);
+        state.data.supervision = state.data.supervision.filter(x=>x.id!==tr.dataset.id);
         ensureSeed(); renderAll(); autosave();
       }
     });
   });
 }
 
-function renderRes(){
-  const tb=$("tblRes").querySelector("tbody"); tb.innerHTML="";
+/* =========================================================
+   Research table
+========================================================= */
+function renderResearch(){
+  const tb=$("tblRes").querySelector("tbody");
+  tb.innerHTML="";
   state.data.research.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
       <td><input data-k="code" placeholder="Grant code"/></td>
-      <td><textarea data-k="title" class="autoGrow" rows="1" placeholder="Grant title"></textarea></td>
+      <td><input data-k="title" placeholder="Grant title"/></td>
       <td>
         <select data-k="level">
           <option>University</option>
@@ -1443,39 +1931,48 @@ function renderRes(){
       <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
     `;
     tb.appendChild(tr);
-    tr.querySelector('[data-k="code"]').value=r.code;
-    tr.querySelector('[data-k="title"]').value=r.title;
-    tr.querySelector('[data-k="level"]').value=r.level;
-    tr.querySelector('[data-k="status"]').value=r.status;
-    tr.querySelector('[data-k="role"]').value=r.role;
-    tr.querySelector('[data-k="amount"]').value=r.amount;
-    tr.querySelector('[data-k="start"]').value=r.start;
-    tr.querySelector('[data-k="end"]').value=r.end;
+
+    tr.querySelector('[data-k="code"]').value=r.code || "";
+    tr.querySelector('[data-k="title"]').value=r.title || "";
+    tr.querySelector('[data-k="level"]').value=r.level || "University";
+    tr.querySelector('[data-k="status"]').value=r.status || "Active";
+    tr.querySelector('[data-k="role"]').value=r.role || "PI";
+    tr.querySelector('[data-k="amount"]').value=n(r.amount)||0;
+    tr.querySelector('[data-k="start"]').value=r.start || "";
+    tr.querySelector('[data-k="end"]').value=r.end || "";
 
     tr.addEventListener("input",(e)=>{
       const k=e.target.getAttribute("data-k"); if(!k) return;
       const obj=state.data.research.find(x=>x.id===tr.dataset.id); if(!obj) return;
-      if(k==="amount") obj.amount=Math.max(0,n(e.target.value)), e.target.value=obj.amount;
-      else obj[k]=e.target.value;
-      if(e.target.tagName==="TEXTAREA") autoGrowTextarea(e.target);
+      if(k==="amount"){
+        obj.amount = Math.max(0, n(e.target.value));
+        e.target.value = obj.amount;
+      }else{
+        obj[k] = e.target.value;
+      }
       autosave();
     });
+
     tr.addEventListener("click",(e)=>{
       if(e.target?.getAttribute("data-act")==="del"){
-        state.data.research=state.data.research.filter(x=>x.id!==tr.dataset.id);
+        state.data.research = state.data.research.filter(x=>x.id!==tr.dataset.id);
         ensureSeed(); renderAll(); autosave();
       }
     });
   });
 }
 
-function renderPub(){
-  const tb=$("tblPub").querySelector("tbody"); tb.innerHTML="";
+/* =========================================================
+   Publication table
+========================================================= */
+function renderPublication(){
+  const tb=$("tblPub").querySelector("tbody");
+  tb.innerHTML="";
   state.data.publication.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
       <td><input data-k="year" type="number" min="1990" step="1"/></td>
-      <td><textarea data-k="title" class="autoGrow" rows="1" placeholder="Publication title"></textarea></td>
+      <td><input data-k="title" placeholder="Publication title"/></td>
       <td>
         <select data-k="type">
           <option>Journal</option>
@@ -1501,37 +1998,47 @@ function renderPub(){
       <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
     `;
     tb.appendChild(tr);
-    tr.querySelector('[data-k="year"]').value=r.year;
-    tr.querySelector('[data-k="title"]').value=r.title;
-    tr.querySelector('[data-k="type"]').value=r.type;
-    tr.querySelector('[data-k="indexed"]').value=r.indexed;
-    tr.querySelector('[data-k="role"]').value=r.role;
-    tr.querySelector('[data-k="start"]').value=r.start;
-    tr.querySelector('[data-k="end"]').value=r.end;
+
+    tr.querySelector('[data-k="year"]').value = r.year || (new Date()).getFullYear();
+    tr.querySelector('[data-k="title"]').value = r.title || "";
+    tr.querySelector('[data-k="type"]').value = r.type || "Journal";
+    tr.querySelector('[data-k="indexed"]').value = r.indexed || "Yes";
+    tr.querySelector('[data-k="role"]').value = r.role || "First/Corresponding";
+    tr.querySelector('[data-k="start"]').value = r.start || "";
+    tr.querySelector('[data-k="end"]').value = r.end || "";
 
     tr.addEventListener("input",(e)=>{
       const k=e.target.getAttribute("data-k"); if(!k) return;
       const obj=state.data.publication.find(x=>x.id===tr.dataset.id); if(!obj) return;
-      if(k==="year") obj.year=Math.max(1990, Math.floor(n(e.target.value)||new Date().getFullYear())), e.target.value=obj.year;
-      else obj[k]=e.target.value;
-      if(e.target.tagName==="TEXTAREA") autoGrowTextarea(e.target);
+
+      if(k==="year"){
+        obj.year = Math.max(1990, Math.floor(n(e.target.value) || (new Date()).getFullYear()));
+        e.target.value = obj.year;
+      }else{
+        obj[k] = e.target.value;
+      }
       autosave();
     });
+
     tr.addEventListener("click",(e)=>{
       if(e.target?.getAttribute("data-act")==="del"){
-        state.data.publication=state.data.publication.filter(x=>x.id!==tr.dataset.id);
+        state.data.publication = state.data.publication.filter(x=>x.id!==tr.dataset.id);
         ensureSeed(); renderAll(); autosave();
       }
     });
   });
 }
 
-function renderAdmin(){
-  const tb=$("tblAdmin").querySelector("tbody"); tb.innerHTML="";
+/* =========================================================
+   Administration table
+========================================================= */
+function renderAdministration(){
+  const tb=$("tblAdmin").querySelector("tbody");
+  tb.innerHTML="";
   state.data.admin.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
-      <td><textarea data-k="pos" class="autoGrow" rows="1" placeholder="Position / appointment"></textarea></td>
+      <td><input data-k="position" placeholder="Position / appointment"/></td>
       <td>
         <select data-k="type">
           <option>Official</option>
@@ -1551,40 +2058,50 @@ function renderAdmin(){
       </td>
       <td><input data-k="months" type="number" min="0" step="1"/></td>
       <td><input data-k="meetings" type="number" min="0" step="1"/></td>
-      <td><textarea data-k="notes" class="autoGrow" rows="1" placeholder="Key workload notes"></textarea></td>
+      <td><textarea data-k="notes" rows="2" placeholder="Key workload notes"></textarea></td>
       <td><input data-k="start" type="date"/></td>
       <td><input data-k="end" type="date"/></td>
       <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
     `;
     tb.appendChild(tr);
-    tr.querySelector('[data-k="pos"]').value=r.pos;
-    tr.querySelector('[data-k="type"]').value=r.type;
-    tr.querySelector('[data-k="level"]').value=r.level;
-    tr.querySelector('[data-k="months"]').value=r.months;
-    tr.querySelector('[data-k="meetings"]').value=r.meetings;
-    tr.querySelector('[data-k="notes"]').value=r.notes;
-    tr.querySelector('[data-k="start"]').value=r.start;
-    tr.querySelector('[data-k="end"]').value=r.end;
+
+    tr.querySelector('[data-k="position"]').value = r.position || "";
+    tr.querySelector('[data-k="type"]').value = r.type || "Official";
+    tr.querySelector('[data-k="level"]').value = r.level || "Faculty";
+    tr.querySelector('[data-k="months"]').value = Math.max(0, Math.floor(n(r.months)));
+    tr.querySelector('[data-k="meetings"]').value = Math.max(0, Math.floor(n(r.meetings)));
+    tr.querySelector('[data-k="notes"]').value = r.notes || "";
+    tr.querySelector('[data-k="start"]').value = r.start || "";
+    tr.querySelector('[data-k="end"]').value = r.end || "";
 
     tr.addEventListener("input",(e)=>{
       const k=e.target.getAttribute("data-k"); if(!k) return;
       const obj=state.data.admin.find(x=>x.id===tr.dataset.id); if(!obj) return;
-      if(k==="months"||k==="meetings"){ obj[k]=Math.max(0,Math.floor(n(e.target.value))); e.target.value=obj[k]; }
-      else obj[k]=e.target.value;
-      if(e.target.tagName==="TEXTAREA") autoGrowTextarea(e.target);
+
+      if(k==="months" || k==="meetings"){
+        obj[k] = Math.max(0, Math.floor(n(e.target.value)));
+        e.target.value = obj[k];
+      }else{
+        obj[k] = e.target.value;
+      }
       autosave();
     });
+
     tr.addEventListener("click",(e)=>{
       if(e.target?.getAttribute("data-act")==="del"){
-        state.data.admin=state.data.admin.filter(x=>x.id!==tr.dataset.id);
+        state.data.admin = state.data.admin.filter(x=>x.id!==tr.dataset.id);
         ensureSeed(); renderAll(); autosave();
       }
     });
   });
 }
 
-function renderSvc(){
-  const tb=$("tblSvc").querySelector("tbody"); tb.innerHTML="";
+/* =========================================================
+   Services table
+========================================================= */
+function renderServices(){
+  const tb=$("tblSvc").querySelector("tbody");
+  tb.innerHTML="";
   state.data.service.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
@@ -1596,7 +2113,7 @@ function renderSvc(){
           <option>Other</option>
         </select>
       </td>
-      <td><textarea data-k="activity" class="autoGrow" rows="1" placeholder="Describe activity"></textarea></td>
+      <td><textarea data-k="activity" rows="2" placeholder="Describe activity"></textarea></td>
       <td>
         <select data-k="role">
           <option>Lead</option>
@@ -1610,34 +2127,46 @@ function renderSvc(){
       <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
     `;
     tb.appendChild(tr);
-    tr.querySelector('[data-k="type"]').value=r.type;
-    tr.querySelector('[data-k="activity"]').value=r.activity;
-    tr.querySelector('[data-k="role"]').value=r.role;
-    tr.querySelector('[data-k="hours"]').value=r.hours;
-    tr.querySelector('[data-k="participants"]').value=r.participants;
-    tr.querySelector('[data-k="start"]').value=r.start;
-    tr.querySelector('[data-k="end"]').value=r.end;
+
+    tr.querySelector('[data-k="type"]').value = r.type || "Service to University";
+    tr.querySelector('[data-k="activity"]').value = r.activity || "";
+    tr.querySelector('[data-k="role"]').value = r.role || "Lead";
+    tr.querySelector('[data-k="hours"]').value = Math.max(0, n(r.hours));
+    tr.querySelector('[data-k="participants"]').value = Math.max(0, Math.floor(n(r.participants)));
+    tr.querySelector('[data-k="start"]').value = r.start || "";
+    tr.querySelector('[data-k="end"]').value = r.end || "";
 
     tr.addEventListener("input",(e)=>{
       const k=e.target.getAttribute("data-k"); if(!k) return;
       const obj=state.data.service.find(x=>x.id===tr.dataset.id); if(!obj) return;
-      if(k==="hours") obj.hours=Math.max(0,n(e.target.value)), e.target.value=obj.hours;
-      else if(k==="participants") obj.participants=Math.max(0,Math.floor(n(e.target.value))), e.target.value=obj.participants;
-      else obj[k]=e.target.value;
-      if(e.target.tagName==="TEXTAREA") autoGrowTextarea(e.target);
+
+      if(k==="hours"){
+        obj.hours = Math.max(0, n(e.target.value));
+        e.target.value = obj.hours;
+      } else if(k==="participants"){
+        obj.participants = Math.max(0, Math.floor(n(e.target.value)));
+        e.target.value = obj.participants;
+      } else {
+        obj[k] = e.target.value;
+      }
       autosave();
     });
+
     tr.addEventListener("click",(e)=>{
       if(e.target?.getAttribute("data-act")==="del"){
-        state.data.service=state.data.service.filter(x=>x.id!==tr.dataset.id);
+        state.data.service = state.data.service.filter(x=>x.id!==tr.dataset.id);
         ensureSeed(); renderAll(); autosave();
       }
     });
   });
 }
 
-function renderLab(){
-  const tb=$("tblLab").querySelector("tbody"); tb.innerHTML="";
+/* =========================================================
+   Lab Operations table
+========================================================= */
+function renderLabOps(){
+  const tb=$("tblLab").querySelector("tbody");
+  tb.innerHTML="";
   state.data.lab.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
@@ -1651,15 +2180,15 @@ function renderLab(){
           <option>Other</option>
         </select>
       </td>
-      <td><textarea data-k="desc" class="autoGrow" rows="1" placeholder="Describe briefly"></textarea></td>
+      <td><textarea data-k="desc" rows="2" placeholder="Describe briefly"></textarea></td>
       <td><input data-k="volume" type="number" min="0" step="1"/></td>
       <td>
-        <select data-k="cx">
+        <select data-k="complexity">
           <option>Low</option><option>Medium</option><option>High</option>
         </select>
       </td>
       <td>
-        <select data-k="ur">
+        <select data-k="urgency">
           <option>Normal</option><option>Tight</option><option>Critical</option>
         </select>
       </td>
@@ -1670,44 +2199,141 @@ function renderLab(){
     `;
     tb.appendChild(tr);
 
-    tr.querySelector('[data-k="type"]').value=r.type;
-    tr.querySelector('[data-k="desc"]').value=r.desc;
-    tr.querySelector('[data-k="volume"]').value=r.volume;
-    tr.querySelector('[data-k="cx"]').value=r.cx;
-    tr.querySelector('[data-k="ur"]').value=r.ur;
-    tr.querySelector('[data-k="hours"]').value=r.hours;
-    tr.querySelector('[data-k="start"]').value=r.start;
-    tr.querySelector('[data-k="end"]').value=r.end;
+    tr.querySelector('[data-k="type"]').value = r.type || "Equipment/Maintenance";
+    tr.querySelector('[data-k="desc"]').value = r.desc || "";
+    tr.querySelector('[data-k="volume"]').value = Math.max(0, Math.floor(n(r.volume)));
+    tr.querySelector('[data-k="complexity"]').value = r.complexity || "Medium";
+    tr.querySelector('[data-k="urgency"]').value = r.urgency || "Normal";
+    tr.querySelector('[data-k="hours"]').value = Math.max(0, n(r.hours));
+    tr.querySelector('[data-k="start"]').value = r.start || "";
+    tr.querySelector('[data-k="end"]').value = r.end || "";
 
     tr.addEventListener("input",(e)=>{
       const k=e.target.getAttribute("data-k"); if(!k) return;
       const obj=state.data.lab.find(x=>x.id===tr.dataset.id); if(!obj) return;
-      if(k==="volume") obj.volume=Math.max(0,Math.floor(n(e.target.value))), e.target.value=obj.volume;
-      else if(k==="hours") obj.hours=Math.max(0,n(e.target.value)), e.target.value=obj.hours;
-      else obj[k]=e.target.value;
-      if(e.target.tagName==="TEXTAREA") autoGrowTextarea(e.target);
+
+      if(k==="volume"){
+        obj.volume = Math.max(0, Math.floor(n(e.target.value)));
+        e.target.value = obj.volume;
+      } else if(k==="hours"){
+        obj.hours = Math.max(0, n(e.target.value));
+        e.target.value = obj.hours;
+      } else {
+        obj[k] = e.target.value;
+      }
       autosave();
     });
+
     tr.addEventListener("click",(e)=>{
       if(e.target?.getAttribute("data-act")==="del"){
-        state.data.lab=state.data.lab.filter(x=>x.id!==tr.dataset.id);
+        state.data.lab = state.data.lab.filter(x=>x.id!==tr.dataset.id);
         ensureSeed(); renderAll(); autosave();
       }
     });
   });
 }
 
-/* ========================= Add/Clear ========================= */
+/* =========================================================
+   Professional & Scholarly Service table (Reviewer / Editor / Examiner / Committee)
+========================================================= */
+function renderProSch(){
+  const tb=$("tblProSch").querySelector("tbody");
+  tb.innerHTML="";
+  state.data.prosch.forEach(r=>{
+    const tr=document.createElement("tr"); tr.dataset.id=r.id;
+    tr.innerHTML=`
+      <td>
+        <select data-k="activityType">
+          <option>Reviewer</option>
+          <option>Editor</option>
+          <option>External Examiner</option>
+          <option>Internal Examiner</option>
+          <option>Conference Committee</option>
+          <option>Journal Editorial Board</option>
+          <option>Grant Panel / Assessor</option>
+          <option>Other</option>
+        </select>
+      </td>
+      <td><textarea data-k="desc" rows="2" placeholder="Describe task (journal/conference/thesis, scope, key notes)"></textarea></td>
+      <td>
+        <select data-k="role">
+          <option>Lead</option>
+          <option>Member</option>
+        </select>
+      </td>
+      <td><input data-k="quantity" type="number" min="0" step="1" placeholder="e.g., 3"/></td>
+      <td><input data-k="rounds" type="number" min="1" step="1" placeholder="e.g., 2"/></td>
+      <td>
+        <select data-k="complexity">
+          <option>Low</option><option>Medium</option><option>High</option>
+        </select>
+      </td>
+      <td>
+        <select data-k="urgency">
+          <option>Normal</option><option>Tight</option><option>Critical</option>
+        </select>
+      </td>
+      <td><input data-k="hours" type="number" min="0" step="0.5" placeholder="optional"/></td>
+      <td><input data-k="start" type="date"/></td>
+      <td><input data-k="end" type="date"/></td>
+      <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
+    `;
+    tb.appendChild(tr);
+
+    tr.querySelector('[data-k="activityType"]').value = r.activityType || "Reviewer";
+    tr.querySelector('[data-k="desc"]').value = r.desc || "";
+    tr.querySelector('[data-k="role"]').value = r.role || "Member";
+    tr.querySelector('[data-k="quantity"]').value = Math.max(0, Math.floor(n(r.quantity) || 0));
+    tr.querySelector('[data-k="rounds"]').value = Math.max(1, Math.floor(n(r.rounds) || 1));
+    tr.querySelector('[data-k="complexity"]').value = r.complexity || "Medium";
+    tr.querySelector('[data-k="urgency"]').value = r.urgency || "Normal";
+    tr.querySelector('[data-k="hours"]').value = Math.max(0, n(r.hours) || 0);
+    tr.querySelector('[data-k="start"]').value = r.start || "";
+    tr.querySelector('[data-k="end"]').value = r.end || "";
+
+    tr.addEventListener("input",(e)=>{
+      const k=e.target.getAttribute("data-k"); if(!k) return;
+      const obj=state.data.prosch.find(x=>x.id===tr.dataset.id); if(!obj) return;
+
+      if(k==="quantity"){
+        obj.quantity = Math.max(0, Math.floor(n(e.target.value)));
+        e.target.value = obj.quantity;
+      } else if(k==="rounds"){
+        obj.rounds = Math.max(1, Math.floor(n(e.target.value) || 1));
+        e.target.value = obj.rounds;
+      } else if(k==="hours"){
+        obj.hours = Math.max(0, n(e.target.value));
+        e.target.value = obj.hours;
+      } else {
+        obj[k] = e.target.value;
+      }
+      autosave();
+    });
+
+    tr.addEventListener("click",(e)=>{
+      if(e.target?.getAttribute("data-act")==="del"){
+        state.data.prosch = state.data.prosch.filter(x=>x.id!==tr.dataset.id);
+        ensureSeed(); renderAll(); autosave();
+      }
+    });
+  });
+}
+
+/* =========================================================
+   Add / Clear actions
+========================================================= */
 function addRow(kind){
-  if(kind==="teach") state.data.teaching.push({id:uid(), code:"", name:"", credit:0, students:0, lec:0, tut:0, lab:0, field:0});
+  if(kind==="teach") state.data.teaching.push({id:uid(), code:"", name:"", credit:0, students:0, lecture:0, tutorial:0, laboratory:0, field:0});
   if(kind==="sv") state.data.supervision.push({id:uid(), level:"Undergraduate", title:"", role:"Main", status:"Active", start:"", end:""});
   if(kind==="res") state.data.research.push({id:uid(), code:"", title:"", level:"University", status:"Active", role:"PI", amount:0, start:"", end:""});
   if(kind==="pub") state.data.publication.push({id:uid(), year:(new Date()).getFullYear(), title:"", type:"Journal", indexed:"Yes", role:"First/Corresponding", start:"", end:""});
-  if(kind==="admin") state.data.admin.push({id:uid(), pos:"", type:"Official", level:"Faculty", months:0, meetings:0, notes:"", start:"", end:""});
+  if(kind==="admin") state.data.admin.push({id:uid(), position:"", type:"Official", level:"Faculty", months:0, meetings:0, notes:"", start:"", end:""});
   if(kind==="svc") state.data.service.push({id:uid(), type:"Service to University", activity:"", role:"Lead", hours:0, participants:0, start:"", end:""});
-  if(kind==="lab") state.data.lab.push({id:uid(), type:"Equipment/Maintenance", desc:"", volume:0, cx:"Medium", ur:"Normal", hours:0, start:"", end:""});
+  if(kind==="lab") state.data.lab.push({id:uid(), type:"Equipment/Maintenance", desc:"", volume:0, complexity:"Medium", urgency:"Normal", hours:0, start:"", end:""});
+  if(kind==="ps") state.data.prosch.push({id:uid(), activityType:"Reviewer", desc:"", role:"Member", quantity:1, rounds:1, complexity:"Medium", urgency:"Normal", hours:0, start:"", end:""});
   renderAll(); autosave();
 }
+
 function clearKind(kind){
   if(kind==="teach") state.data.teaching=[];
   if(kind==="sv") state.data.supervision=[];
@@ -1716,123 +2342,133 @@ function clearKind(kind){
   if(kind==="admin") state.data.admin=[];
   if(kind==="svc") state.data.service=[];
   if(kind==="lab") state.data.lab=[];
+  if(kind==="ps") state.data.prosch=[];
   ensureSeed(); renderAll(); autosave();
 }
 
-/* ========================= Scoring ========================= */
-function scoreTeaching(){
-  const sc=state.scheme.teaching;
-  let total=0;
-  state.data.teaching.forEach(x=>{
-    const credit = creditFromCode(x.code);
-    x.credit = credit;
-    const contact = contactHoursRow(x);
-    const students = Math.max(0,n(x.students));
-    total += (contact*sc.hourW) + ((students/100)*sc.studW) + (credit*sc.creditW);
-  });
-  return total;
-}
-function scoreSupervision(){
-  const sc=state.scheme.supervision;
-  let total=0;
-  state.data.supervision.forEach(x=>{
-    const roleMult = (x.role==="Main") ? 1.0 : 0.6;
-    const statusMult = (x.status==="Active") ? 1.0 : 0.5;
-    let base = 0;
-    if(x.level==="Undergraduate") base=sc.ug;
-    if(x.level==="Master") base=sc.m;
-    if(x.level==="PhD") base=sc.phd;
-    total += base*roleMult*statusMult;
-  });
-  return total;
-}
-function scoreResearch(){
-  const sc=state.scheme.research;
-  const lvlMap={University:0, National:1, International:2};
-  const roleMap={PI:0, "Co-I":1, Member:2};
-  let total=0;
-  state.data.research.forEach(x=>{
-    const statusMult = (x.status==="Active") ? 1.0 : (x.status==="Applied") ? 0.6 : 0.3;
-    const li = lvlMap[x.level] ?? 0;
-    const ri = roleMap[x.role] ?? 2;
-    total += sc.base * sc.lvl[li] * sc.role[ri] * statusMult;
-  });
-  return total;
-}
-function scorePublication(){
-  const sc=state.scheme.publication;
-  const typeMap={"Journal":0,"Book/Chapter":1,"Proceeding":2,"Other":3};
-  const idxMap={"Yes":0,"No":1};
-  let total=0;
-  state.data.publication.forEach(x=>{
-    const ti = typeMap[x.type] ?? 3;
-    const ii = idxMap[x.indexed] ?? 1;
-    const roleMult = (x.role==="First/Corresponding") ? 1.2 : 1.0;
-    total += sc.base * sc.type[ti] * sc.idx[ii] * roleMult;
-  });
-  return total;
-}
-function scoreAdmin(){
-  const sc=state.scheme.admin;
-  const lvlMap={"Programme":0,"Faculty":1,"University":2,"State":3,"National":4,"International":5,"Industry":6};
-  let total=0;
-  state.data.admin.forEach(x=>{
-    const li = lvlMap[x.level] ?? 1;
-    const base = sc.lvl[li];
-    const meetings = Math.max(0,n(x.meetings));
-    const months = Math.max(0,n(x.months));
-    const typeBonus = (x.type==="Official") ? 1.0 : 0.7;
-    total += (base + meetings*sc.meetW + months*sc.monthW) * typeBonus;
-  });
-  return total;
-}
-function scoreService(){
-  const sc=state.scheme.service;
-  const roleMap={Lead:0, Member:1};
-  let total=0;
-  state.data.service.forEach(x=>{
-    const hrs = Math.max(0,n(x.hours));
-    const pax = Math.max(0,n(x.participants));
-    const ri = roleMap[x.role] ?? 1;
-    total += (hrs*sc.hourW) + ((pax/10)*sc.paxW) + sc.bonus[ri];
-  });
-  return total;
-}
-function scoreLab(){
-  const sc=state.scheme.lab;
-  const cxMap={Low:0, Medium:1, High:2};
-  const urMap={Normal:0, Tight:1, Critical:2};
-  let total=0;
-  state.data.lab.forEach(x=>{
-    const vol = Math.max(0,n(x.volume));
-    const hrs = Math.max(0,n(x.hours));
-    const ci = cxMap[x.cx] ?? 1;
-    const ui = urMap[x.ur] ?? 0;
-    const base = (vol*sc.volW) + (hrs*sc.hourW);
-    total += base * sc.cx[ci] * sc.ur[ui];
-  });
-  return total;
+/* =========================================================
+   Validation (activity tables)
+========================================================= */
+function validateActivityTables(){
+  document.querySelectorAll("input.err,select.err,textarea.err").forEach(el=>el.classList.remove("err"));
+  let ok=true;
+
+  const requireText = (el)=>{ if(!el || !String(el.value||"").trim()){ el?.classList.add("err"); ok=false; } };
+  const requireNonNeg = (el, strictPositive=false)=>{
+    const v=n(el?.value);
+    if(v<0 || (strictPositive && v<=0)){ el?.classList.add("err"); ok=false; }
+  };
+  const requireDate = (el)=>{ if(!el || !el.value){ el?.classList.add("err"); ok=false; } };
+
+  if(state.enabled.Teaching){
+    $("tblTeach").querySelectorAll("tbody tr").forEach(tr=>{
+      requireText(tr.querySelector('[data-k="code"]'));
+      requireText(tr.querySelector('[data-k="name"]'));
+      requireNonNeg(tr.querySelector('[data-k="students"]'), true);
+      ["lecture","tutorial","laboratory","field"].forEach(k=>requireNonNeg(tr.querySelector(`[data-k="${k}"]`), false));
+    });
+  }
+
+  if(state.enabled.Supervision){
+    $("tblSv").querySelectorAll("tbody tr").forEach(tr=>{
+      requireText(tr.querySelector('[data-k="title"]'));
+      requireDate(tr.querySelector('[data-k="start"]'));
+      requireDate(tr.querySelector('[data-k="end"]'));
+    });
+  }
+
+  if(state.enabled.Research){
+    $("tblRes").querySelectorAll("tbody tr").forEach(tr=>{
+      requireText(tr.querySelector('[data-k="code"]'));
+      requireText(tr.querySelector('[data-k="title"]'));
+      requireNonNeg(tr.querySelector('[data-k="amount"]'), true);
+      requireDate(tr.querySelector('[data-k="start"]'));
+      requireDate(tr.querySelector('[data-k="end"]'));
+    });
+  }
+
+  if(state.enabled.Publication){
+    $("tblPub").querySelectorAll("tbody tr").forEach(tr=>{
+      requireNonNeg(tr.querySelector('[data-k="year"]'), true);
+      requireText(tr.querySelector('[data-k="title"]'));
+      requireDate(tr.querySelector('[data-k="start"]'));
+      requireDate(tr.querySelector('[data-k="end"]'));
+    });
+  }
+
+  if(state.enabled.Administration){
+    $("tblAdmin").querySelectorAll("tbody tr").forEach(tr=>{
+      requireText(tr.querySelector('[data-k="position"]'));
+      requireNonNeg(tr.querySelector('[data-k="months"]'), true);
+      requireNonNeg(tr.querySelector('[data-k="meetings"]'), false);
+      requireText(tr.querySelector('[data-k="notes"]'));
+      requireDate(tr.querySelector('[data-k="start"]'));
+      requireDate(tr.querySelector('[data-k="end"]'));
+    });
+  }
+
+  if(state.enabled.Services){
+    $("tblSvc").querySelectorAll("tbody tr").forEach(tr=>{
+      requireText(tr.querySelector('[data-k="activity"]'));
+      requireNonNeg(tr.querySelector('[data-k="hours"]'), true);
+      requireNonNeg(tr.querySelector('[data-k="participants"]'), true);
+      requireDate(tr.querySelector('[data-k="start"]'));
+      requireDate(tr.querySelector('[data-k="end"]'));
+    });
+  }
+
+  if(state.enabled.LabOps){
+    $("tblLab").querySelectorAll("tbody tr").forEach(tr=>{
+      requireText(tr.querySelector('[data-k="desc"]'));
+      requireNonNeg(tr.querySelector('[data-k="volume"]'), true);
+      requireNonNeg(tr.querySelector('[data-k="hours"]'), true);
+      requireDate(tr.querySelector('[data-k="start"]'));
+      requireDate(tr.querySelector('[data-k="end"]'));
+    });
+  }
+
+  if(state.enabled.ProSch){
+    $("tblProSch").querySelectorAll("tbody tr").forEach(tr=>{
+      requireText(tr.querySelector('[data-k="desc"]'));
+      requireNonNeg(tr.querySelector('[data-k="quantity"]'), true);
+      requireNonNeg(tr.querySelector('[data-k="rounds"]'), true);
+      // hours optional
+      requireDate(tr.querySelector('[data-k="start"]'));
+      requireDate(tr.querySelector('[data-k="end"]'));
+    });
+  }
+
+  if(!ok){
+    showMsg("warn","<b>Validation:</b> Please fill all required fields (no empty/negative values). Highlighted boxes require attention.");
+  }
+  return ok;
 }
 
-/* ========================= Results ========================= */
-let chart=null;
-
+/* =========================================================
+   Banding (interpretation)
+   Note: Now index is "points per month" (still clamped 0..100 for dashboard consistency).
+========================================================= */
 function bandFromIndex(x){
-  if(x<20) return {label:"Low workload", cls:"ok"};
-  if(x<45) return {label:"Normal workload", cls:"ok"};
-  if(x<70) return {label:"High workload", cls:"warn"};
-  return {label:"Overload risk", cls:"bad"};
+  // You can later align these to benchmarks if you prefer.
+  if(x<20) return {label:"Low workload (per month)", cls:"ok"};
+  if(x<45) return {label:"Normal workload (per month)", cls:"ok"};
+  if(x<70) return {label:"High workload (per month)", cls:"warn"};
+  return {label:"Overload risk (per month)", cls:"bad"};
 }
 
+/* =========================================================
+   Narrative (use full names, no abbreviations)
+========================================================= */
 function narrative(scores, aw){
   const items = [
-    ["Teaching", scores.T, aw.T, state.enabled.T],
-    ["Supervision", scores.SV, aw.SV, state.enabled.SV],
-    ["Research", scores.R, aw.R, state.enabled.R],
-    ["Publication", scores.P, aw.P, state.enabled.P],
-    ["Administration", scores.A, aw.A, state.enabled.A],
-    ["Services", scores.S, aw.S, state.enabled.S],
-    ["Laboratory Operations", scores.L, aw.L, state.enabled.L]
+    ["Teaching", scores.Teaching, aw.Teaching, state.enabled.Teaching],
+    ["Supervision", scores.Supervision, aw.Supervision, state.enabled.Supervision],
+    ["Research", scores.Research, aw.Research, state.enabled.Research],
+    ["Publication", scores.Publication, aw.Publication, state.enabled.Publication],
+    ["Administration", scores.Administration, aw.Administration, state.enabled.Administration],
+    ["Services", scores.Services, aw.Services, state.enabled.Services],
+    ["Lab Operations", scores.LabOps, aw.LabOps, state.enabled.LabOps],
+    ["Professional & Scholarly Service", scores.ProSch, aw.ProSch, state.enabled.ProSch]
   ].filter(x=>x[3]);
 
   items.sort((a,b)=> (b[1]*b[2]) - (a[1]*a[2]));
@@ -1841,26 +2477,23 @@ function narrative(scores, aw){
   const last = items[items.length-1];
 
   const topText = top ? `${top[0]} (weighted contribution ${(top[1]*top[2]).toFixed(1)})` : "—";
-  const secondText = second ? `${second[0]} (weighted contribution ${(second[1]*second[2]).toFixed(1)})` : "";
+  const secondText = second ? `${second[0]} (${(second[1]*second[2]).toFixed(1)})` : "";
   const lowText = last ? `${last[0]} (weighted contribution ${(last[1]*last[2]).toFixed(1)})` : "—";
 
-  return `Most of the busyness is driven by: ${topText}${secondText?`, followed by ${secondText}`:""}. The lowest contribution is from: ${lowText}. Consider balancing workload by reducing load in the top driver(s) or providing extra support for that section.`;
+  return `Most of the workload is driven by ${topText}${secondText ? `, followed by ${secondText}` : ""}. The lowest contribution is from ${lowText}. This index measures workload intensity (busyness), not performance or quality.`;
 }
 
 function deanViewSummary(index, band, aw){
-  const on = Object.entries(state.enabled)
-    .filter(([k,v])=>v)
-    .map(([k])=>SECTION_LABELS[k] || k)
-    .join(", ");
+  const on = Object.entries(state.enabled).filter(([k,v])=>v).map(([k])=>k).join(", ");
+  const w = Object.entries(aw).filter(([k,v])=>v>0).map(([k,v])=>`${k}:${v.toFixed(2)}`).join(" | ");
+  const bm = benchmarkText(index);
 
-  const w = Object.entries(aw)
-    .filter(([k,v])=>v>0)
-    .map(([k,v])=>`${SECTION_LABELS[k] || k}: ${v.toFixed(2)}`)
-    .join(" | ");
-
-  return `Full Name: ${state.profile.name} | Staff ID: ${state.profile.staffId} | Staff Category: ${state.profile.category} | Reporting Period: ${state.profile.period} | Sections ON: ${on} | Normalized weights (only ON sections): ${w} | Overall Busyness Index: ${index.toFixed(1)} (${band.label})`;
+  return `Name: ${state.profile.name} | Staff ID: ${state.profile.staffId} | Category: ${state.profile.category} | Reporting Period: ${state.profile.period} | Sections ON: ${on} | Normalized weights: ${w} | Busyness Index (points per month): ${index.toFixed(1)} (${band.label}) | Benchmark: ${bm}`;
 }
 
+/* =========================================================
+   Chart (kept for web view; print will hide colors via print CSS in Part 5)
+========================================================= */
 function drawChart(scores, aw){
   const labels=[], vals=[], colors=[];
   const pushIf=(on,label,raw,w,color)=>{
@@ -1869,19 +2502,21 @@ function drawChart(scores, aw){
     vals.push(raw*w);
     colors.push(color);
   };
-  pushIf(state.enabled.T, "Teaching", scores.T, aw.T, "rgba(167,139,250,.85)");
-  pushIf(state.enabled.SV, "Supervision", scores.SV, aw.SV, "rgba(56,189,248,.85)");
-  pushIf(state.enabled.R, "Research", scores.R, aw.R, "rgba(52,211,153,.85)");
-  pushIf(state.enabled.P, "Publication", scores.P, aw.P, "rgba(244,114,182,.85)");
-  pushIf(state.enabled.A, "Administration", scores.A, aw.A, "rgba(251,191,36,.85)");
-  pushIf(state.enabled.S, "Services", scores.S, aw.S, "rgba(251,113,133,.85)");
-  pushIf(state.enabled.L, "Laboratory Operations", scores.L, aw.L, "rgba(34,197,94,.85)");
+
+  pushIf(state.enabled.Teaching, "Teaching", scores.Teaching, aw.Teaching, "rgba(120,120,120,.75)");
+  pushIf(state.enabled.Supervision, "Supervision", scores.Supervision, aw.Supervision, "rgba(120,120,120,.75)");
+  pushIf(state.enabled.Research, "Research", scores.Research, aw.Research, "rgba(120,120,120,.75)");
+  pushIf(state.enabled.Publication, "Publication", scores.Publication, aw.Publication, "rgba(120,120,120,.75)");
+  pushIf(state.enabled.Administration, "Administration", scores.Administration, aw.Administration, "rgba(120,120,120,.75)");
+  pushIf(state.enabled.Services, "Services", scores.Services, aw.Services, "rgba(120,120,120,.75)");
+  pushIf(state.enabled.LabOps, "Lab Operations", scores.LabOps, aw.LabOps, "rgba(120,120,120,.75)");
+  pushIf(state.enabled.ProSch, "Professional & Scholarly Service", scores.ProSch, aw.ProSch, "rgba(120,120,120,.75)");
 
   const ctx=$("chart").getContext("2d");
   if(chart) chart.destroy();
   chart=new Chart(ctx,{
     type:"bar",
-    data:{ labels, datasets:[{ label:"Weighted contribution (raw score × normalized weight)", data:vals, backgroundColor:colors, borderColor:colors, borderWidth:1 }] },
+    data:{ labels, datasets:[{ label:"Weighted contribution (section points per month × normalized weight)", data:vals, backgroundColor:colors, borderColor:colors, borderWidth:1 }] },
     options:{
       responsive:true,
       plugins:{ legend:{ labels:{ color:"#eaf0ff"} } },
@@ -1893,6 +2528,9 @@ function drawChart(scores, aw){
   });
 }
 
+/* =========================================================
+   Calculate (now: period normalization + caps + index per month)
+========================================================= */
 function calculate(){
   hideMsg();
   syncProfileFromUI();
@@ -1905,11 +2543,10 @@ function calculate(){
   ensureSeed();
   renderAll();
 
-  if(!validateWeightsBaseline_ifAdmin()) {
+  if(!validateWeightsBaseline_ifAdmin()){
     showMsg("warn","<b>Admin validation:</b> Fix weights so baseline sum is 1.00.");
     return;
   }
-
   if(!validateActivityTables()) return;
 
   const aw = getActiveWeights();
@@ -1918,28 +2555,52 @@ function calculate(){
     return;
   }
 
-  const scores = {
-    T: state.enabled.T ? scoreTeaching() : 0,
-    SV: state.enabled.SV ? scoreSupervision() : 0,
-    R: state.enabled.R ? scoreResearch() : 0,
-    P: state.enabled.P ? scorePublication() : 0,
-    A: state.enabled.A ? scoreAdmin() : 0,
-    S: state.enabled.S ? scoreService() : 0,
-    L: state.enabled.L ? scoreLab() : 0
+  // raw scores (for full period)
+  const raw = {
+    Teaching: state.enabled.Teaching ? scoreTeaching_raw() : 0,
+    Supervision: state.enabled.Supervision ? scoreSupervision_raw() : 0,
+    Research: state.enabled.Research ? scoreResearch_raw() : 0,
+    Publication: state.enabled.Publication ? scorePublication_raw() : 0,
+    Administration: state.enabled.Administration ? scoreAdministration_raw() : 0,
+    Services: state.enabled.Services ? scoreServices_raw() : 0,
+    LabOps: state.enabled.LabOps ? scoreLabOps_raw() : 0,
+    ProSch: state.enabled.ProSch ? scoreProSch_raw() : 0
   };
 
-  $("outT").textContent = scores.T.toFixed(1);
-  $("outSV").textContent = scores.SV.toFixed(1);
-  $("outR").textContent = scores.R.toFixed(1);
-  $("outP").textContent = scores.P.toFixed(1);
-  $("outA").textContent = scores.A.toFixed(1);
-  $("outS").textContent = scores.S.toFixed(1);
-  $("outL").textContent = scores.L.toFixed(1);
+  // monthly normalized + capped
+  const scores = {
+    Teaching: state.enabled.Teaching ? normalizeAndCap("Teaching", raw.Teaching) : 0,
+    Supervision: state.enabled.Supervision ? normalizeAndCap("Supervision", raw.Supervision) : 0,
+    Research: state.enabled.Research ? normalizeAndCap("Research", raw.Research) : 0,
+    Publication: state.enabled.Publication ? normalizeAndCap("Publication", raw.Publication) : 0,
+    Administration: state.enabled.Administration ? normalizeAndCap("Administration", raw.Administration) : 0,
+    Services: state.enabled.Services ? normalizeAndCap("Services", raw.Services) : 0,
+    LabOps: state.enabled.LabOps ? normalizeAndCap("LabOps", raw.LabOps) : 0,
+    ProSch: state.enabled.ProSch ? normalizeAndCap("ProSch", raw.ProSch) : 0
+  };
 
-  const index = clamp(
-    (scores.T*aw.T) + (scores.SV*aw.SV) + (scores.R*aw.R) + (scores.P*aw.P) +
-    (scores.A*aw.A) + (scores.S*aw.S) + (scores.L*aw.L)
-  , 0, 100);
+  // output section points (per month)
+  $("outTeaching").textContent = scores.Teaching.toFixed(1);
+  $("outSupervision").textContent = scores.Supervision.toFixed(1);
+  $("outResearch").textContent = scores.Research.toFixed(1);
+  $("outPublication").textContent = scores.Publication.toFixed(1);
+  $("outAdministration").textContent = scores.Administration.toFixed(1);
+  $("outServices").textContent = scores.Services.toFixed(1);
+  $("outLabOps").textContent = scores.LabOps.toFixed(1);
+  $("outProSch").textContent = scores.ProSch.toFixed(1);
+
+  // overall index (points per month), then clamp to 0..100
+  const rawIndex =
+    (scores.Teaching*aw.Teaching) +
+    (scores.Supervision*aw.Supervision) +
+    (scores.Research*aw.Research) +
+    (scores.Publication*aw.Publication) +
+    (scores.Administration*aw.Administration) +
+    (scores.Services*aw.Services) +
+    (scores.LabOps*aw.LabOps) +
+    (scores.ProSch*aw.ProSch);
+
+  const index = clamp(rawIndex, 0, 100);
 
   $("outIndex").textContent = index.toFixed(1);
   const b = bandFromIndex(index);
@@ -1947,238 +2608,63 @@ function calculate(){
 
   $("outNarr").textContent = narrative(scores, aw);
   $("outDean").textContent = deanViewSummary(index, b, aw);
+
   drawChart(scores, aw);
 
   state.audit.last_calc_at = new Date().toISOString();
   autosave();
 
-  showMsg("ok", `<b>Calculated:</b> Overall Busyness Index = <b>${index.toFixed(1)}</b> (${b.label}). Weights were automatically re-normalized using only the sections that are ON.`);
+  showMsg("ok", `<b>Calculated:</b> Busyness Index = <b>${index.toFixed(1)}</b> (${b.label}). Scores are normalized to points per month and apply diminishing returns (soft caps) to reduce inflation from very large workloads.`);
 }
 
-/* ========================= Print ========================= */
+/* =========================================================
+   Print (PDF): keep window.print(), but ensure print name/id
+   Narrative wrapping will be handled via print CSS in Part 5
+========================================================= */
 function printPDF(){
-  syncProfileFromUI();
+  // Full name displayed in print signature box
   $("printName").textContent = state.profile.name || "";
   $("printId").textContent = state.profile.staffId || "";
   $("printDate").textContent = new Date().toLocaleString();
   window.print();
 }
 
-/* ========================= Manual PDF ========================= */
-function manualPDF(){
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({unit:"pt", format:"a4"});
-  const W = doc.internal.pageSize.getWidth();
-  const H = doc.internal.pageSize.getHeight();
-  const m = 48;
-  let y = 56;
+/* =========================
+   PART 5 will continue with:
+   - Export updates (include new fields)
+   - Manual PDF: professional layout, gray headers, full names, equations, 3 staff examples
+   - Print CSS: black/white/gray only + narrative wrap inside box
+   - Init wiring for new buttons + new section add/clear
+========================= */
+</script>
+<!-- =========================
+     PART 5 / 5
+     JavaScript (Export + Manual PDF professional + Init wiring)
+     + Print improvements (black/white/gray, narrative wrap)
+     Paste this IMMEDIATELY AFTER Part 4
+========================= -->
 
-  const ensureSpace = (need)=>{
-    if(y + need > H - m){
-      doc.addPage();
-      y = m;
-    }
-  };
+<script>
+/* =========================================================
+   PRINT IMPROVEMENTS (Black/White/Gray + force wrap narrative)
+   Note: CSS @media print rules are in PART 1.
+   Here we add a small runtime helper to ensure narrative wraps.
+========================================================= */
+function syncPrintFields(){
+  const name = (state.profile.name||"").trim();
+  const id = (state.profile.staffId||"").trim();
 
-  const write = (t, size=11, bold=false, gap=6)=>{
-    doc.setFont("helvetica", bold?"bold":"normal");
-    doc.setFontSize(size);
-    const lines = doc.splitTextToSize(t, W-m*2);
-    lines.forEach(line=>{
-      ensureSpace(size + gap + 2);
-      doc.text(line, m, y);
-      y += size + gap;
-    });
-  };
+  if($("printName")) $("printName").textContent = name;
+  if($("printId")) $("printId").textContent = id;
+  if($("printDate")) $("printDate").textContent = new Date().toLocaleString();
 
-  const boxBlock = (title, bodyLines)=>{
-    const titleSize=11;
-    const textSize=10;
-    const lineGap=5;
-
-    doc.setFont("helvetica","bold");
-    doc.setFontSize(titleSize);
-    const titleLines = doc.splitTextToSize(title, W-m*2 - 16);
-
-    doc.setFont("helvetica","normal");
-    doc.setFontSize(textSize);
-
-    const bodyText = Array.isArray(bodyLines) ? bodyLines.join("\n") : String(bodyLines||"");
-    const bodyLinesWrapped = doc.splitTextToSize(bodyText, W-m*2 - 16);
-
-    const h = 12 + (titleLines.length*(titleSize+3)) + 8 + (bodyLinesWrapped.length*(textSize+lineGap)) + 10;
-    ensureSpace(h + 10);
-
-    doc.setDrawColor(120);
-    doc.setLineWidth(0.8);
-    doc.rect(m, y, W-m*2, h);
-
-    let yy = y + 16;
-
-    doc.setFont("helvetica","bold");
-    doc.setFontSize(titleSize);
-    titleLines.forEach(line=>{
-      doc.text(line, m+8, yy);
-      yy += titleSize + 3;
-    });
-
-    yy += 6;
-
-    doc.setFont("helvetica","normal");
-    doc.setFontSize(textSize);
-    bodyLinesWrapped.forEach(line=>{
-      doc.text(line, m+8, yy);
-      yy += textSize + lineGap;
-    });
-
-    y = y + h + 12;
-  };
-
-  doc.setFont("helvetica","bold"); doc.setFontSize(16);
-  doc.text("FST UMS Staff Busyness Index – Calculation Manual", m, 38);
-  doc.setFont("helvetica","normal"); doc.setFontSize(10);
-  doc.setTextColor(90,90,90);
-  doc.text("© FST UMS", W-m, 38, {align:"right"});
-  doc.setTextColor(0,0,0);
-
-  write("Purpose (Busyness, not performance)", 13, true, 8);
-  write("This manual explains how the calculator estimates staff busyness (workload). It focuses on workload drivers such as time spent, task volume, meeting load, and role responsibilities. It does not measure performance or quality (for example, it does not use journal ranking, impact factor, awards, or citations).", 11, false, 6);
-
-  write("A) How the calculator handles different staff categories", 13, true, 8);
-  write("The calculator supports Academic Staff, Administrative Staff, and Laboratory Staff by allowing sections to be turned ON or OFF. Only the sections that are ON are used to calculate the Overall Busyness Index.", 11);
-
-  write("B) Weight re-normalization (important)", 13, true, 8);
-  write("Baseline weights are set by the admin for each section. When some sections are OFF, the calculator automatically re-normalizes weights using only the ON sections so the index remains fair.", 11);
-  write("Mathematical formula:", 11, true);
-  write("Let baseline weights be w_i for each section i. Let the ON sections set be Ω. The normalized weight for a section i that is ON is:", 11);
-  write("normalized_weight_i = w_i / ( Σ w_j for all j in Ω ).", 11);
-
-  write("C) Overall Busyness Index formula", 13, true, 8);
-  write("The Overall Busyness Index is the sum of each section score multiplied by its normalized weight:", 11);
-  write("Overall Busyness Index = Σ ( section_score_i × normalized_weight_i ) for all ON sections i.", 11);
-
-  write("D) Section score formulas (how each section score is computed)", 13, true, 8);
-
-  boxBlock("Teaching score",
-`Teaching score = (contact_hours × points_per_contact_hour) + ((number_of_students / 100) × points_per_100_students) + (course_credit × points_per_credit)
-
-Notes:
-- Contact hours = Lecture hours + Tutorial hours + Laboratory hours + Field hours
-- Course credit is automatically extracted from the last digit of the course code (example: SJ24102 gives credit = 2)`);
-
-  boxBlock("Supervision score",
-`For each supervision entry:
-supervision_points = base_points_by_level × role_multiplier × status_multiplier
-
-Where:
-- base_points_by_level = Undergraduate, Master, or PhD points (set by admin)
-- role_multiplier = 1.0 for Main supervisor; 0.6 for Co-supervisor
-- status_multiplier = 1.0 for Active; 0.5 for Completed`);
-
-  boxBlock("Research score",
-`For each grant or project:
-research_points = base_points × grant_level_multiplier × role_multiplier × status_multiplier
-
-Where:
-- grant_level_multiplier = University / National / International (set by admin)
-- role_multiplier = Principal Investigator / Co-Investigator / Member (set by admin)
-- status_multiplier = 1.0 for Active; 0.6 for Applied; 0.3 for Ended`);
-
-  boxBlock("Publication score",
-`For each publication item:
-publication_points = base_points × publication_type_multiplier × indexing_multiplier × role_multiplier
-
-Where:
-- publication_type_multiplier = Journal / Book-Chapter / Proceeding / Other (set by admin)
-- indexing_multiplier = Yes or No (set by admin)
-- role_multiplier = 1.2 for First/Corresponding; 1.0 for Co-author`);
-
-  boxBlock("Administration score",
-`For each administration appointment:
-administration_points = (level_base_points + (number_of_meetings × points_per_meeting) + (months × points_per_month)) × appointment_type_multiplier
-
-Where:
-- level_base_points depends on Programme / Faculty / University / State / National / International / Industry
-- appointment_type_multiplier = 1.0 for Official; 0.7 for Ad-hoc`);
-
-  boxBlock("Services score",
-`For each service activity:
-services_points = (hours × points_per_hour) + ((participants / 10) × points_per_10_participants) + role_bonus
-
-Where:
-- role_bonus is different for Lead vs Member (set by admin)`);
-
-  boxBlock("Laboratory Operations score",
-`For each laboratory operation entry:
-laboratory_operations_points = (volume × points_per_volume + hours × points_per_hour) × complexity_multiplier × urgency_multiplier
-
-Where:
-- complexity_multiplier = Low / Medium / High (set by admin)
-- urgency_multiplier = Normal / Tight / Critical (set by admin)`);
-
-  write("E) Worked examples (3 staff categories)", 13, true, 8);
-
-  boxBlock("Example 1: Academic Staff (typical sections ON: Teaching, Supervision, Research, Publication, Administration, Services)",
-`Assume sections ON are Teaching, Supervision, Research, Publication, Administration, Services.
-Baseline weights (example): Teaching 0.30, Supervision 0.15, Research 0.20, Publication 0.10, Administration 0.15, Services 0.10.
-
-Because all 6 sections are ON, normalized weights are the same as baseline.
-
-Assume section scores (example):
-Teaching = 22.0
-Supervision = 10.5
-Research = 14.0
-Publication = 8.0
-Administration = 12.0
-Services = 6.0
-
-Overall Busyness Index
-= 22.0×0.30 + 10.5×0.15 + 14.0×0.20 + 8.0×0.10 + 12.0×0.15 + 6.0×0.10
-= 6.60 + 1.58 + 2.80 + 0.80 + 1.80 + 0.60
-= 14.18`);
-
-  boxBlock("Example 2: Administrative Staff (typical sections ON: Administration, Services)",
-`Assume only Administration and Services are ON.
-Baseline weights (example): Administration 0.60, Services 0.40.
-
-Normalized weights:
-Administration normalized weight = 0.60 / (0.60 + 0.40) = 0.60
-Services normalized weight = 0.40 / (0.60 + 0.40) = 0.40
-
-Assume section scores (example):
-Administration = 28.0
-Services = 18.0
-
-Overall Busyness Index
-= 28.0×0.60 + 18.0×0.40
-= 16.80 + 7.20
-= 24.00`);
-
-  boxBlock("Example 3: Laboratory Staff (typical sections ON: Administration, Services, Laboratory Operations)",
-`Assume Administration, Services, and Laboratory Operations are ON.
-Baseline weights (example): Administration 0.45, Services 0.25, Laboratory Operations 0.30.
-
-Normalized weights:
-Administration = 0.45 / (0.45+0.25+0.30) = 0.45
-Services = 0.25 / (0.45+0.25+0.30) = 0.25
-Laboratory Operations = 0.30 / (0.45+0.25+0.30) = 0.30
-
-Assume section scores (example):
-Administration = 30.0
-Services = 18.0
-Laboratory Operations = 22.0
-
-Overall Busyness Index
-= 30.0×0.45 + 18.0×0.25 + 22.0×0.30
-= 13.50 + 4.50 + 6.60
-= 24.60`);
-
-  write("Admin can adjust weights and scoring parameters in Settings after unlocking with admin password.", 11);
-
-  doc.save("FST_UMS_Busyness_Index_Manual.pdf");
+  // ensure the print narrative box contains full text (no truncation)
+  // (the CSS print rule in Part 1 should set white-space: pre-wrap and word-break)
 }
 
-/* ========================= Export ========================= */
+/* =========================================================
+   EXPORT
+========================================================= */
 function download(filename, content, mime="text/plain"){
   const blob = new Blob([content], {type:mime});
   const url = URL.createObjectURL(blob);
@@ -2191,24 +2677,31 @@ function exportSummaryCSV(){
   const aw = getActiveWeights() || {};
   const rows = [
     ["timestamp", new Date().toISOString()],
-    ["full_name", state.profile.name],
+    ["name", state.profile.name],
     ["staff_id", state.profile.staffId],
-    ["staff_category", state.profile.category],
-    ["programme_unit", state.profile.unit],
+    ["category", state.profile.category],
+    ["unit", state.profile.unit],
     ["grade", (state.profile.grade==="Others")?state.profile.gradeOther:state.profile.grade],
-    ["employment_status", (state.profile.status==="Others")?state.profile.statusOther:state.profile.status],
+    ["status", (state.profile.status==="Others")?state.profile.statusOther:state.profile.status],
     ["reporting_period", state.profile.period],
+    ["months_in_period", periodMonths(state.profile.period)],
     ["enabled_sections", JSON.stringify(state.enabled)],
+    ["baseline_weights", JSON.stringify(state.weights)],
     ["active_weights_normalized", JSON.stringify(aw)],
-    ["teaching_score", $("outT").textContent],
-    ["supervision_score", $("outSV").textContent],
-    ["research_score", $("outR").textContent],
-    ["publication_score", $("outP").textContent],
-    ["administration_score", $("outA").textContent],
-    ["services_score", $("outS").textContent],
-    ["laboratory_operations_score", $("outL").textContent],
-    ["overall_busyness_index", $("outIndex").textContent],
-    ["workload_band", $("outBand").textContent]
+    ["Teaching_points_per_month", $("outTeaching").textContent],
+    ["Supervision_points_per_month", $("outSupervision").textContent],
+    ["Research_points_per_month", $("outResearch").textContent],
+    ["Publication_points_per_month", $("outPublication").textContent],
+    ["Administration_points_per_month", $("outAdministration").textContent],
+    ["Services_points_per_month", $("outServices").textContent],
+    ["Lab_Operations_points_per_month", $("outLabOps").textContent],
+    ["Professional_and_Scholarly_Service_points_per_month", $("outProSch").textContent],
+    ["busyness_index_points_per_month", $("outIndex").textContent],
+    ["band", $("outBand").textContent],
+    ["benchmark_faculty_mean", String(state.benchmarks?.facultyMean ?? "")],
+    ["benchmark_p25", String(state.benchmarks?.p25 ?? "")],
+    ["benchmark_p50", String(state.benchmarks?.p50 ?? "")],
+    ["benchmark_p75", String(state.benchmarks?.p75 ?? "")]
   ];
   const csv = rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(",")).join("\n");
   download("FST_UMS_Busyness_Summary.csv", csv, "text/csv");
@@ -2218,7 +2711,7 @@ function exportDetailedCSV(){
   const lines = [];
   const pushSection = (name, arr)=>{
     lines.push(`SECTION,${name}`);
-    if(arr.length===0){ lines.push("EMPTY"); lines.push(""); return; }
+    if(!arr || arr.length===0){ lines.push("EMPTY"); lines.push(""); return; }
     const keys = Object.keys(arr[0]);
     lines.push(keys.join(","));
     arr.forEach(o=>{
@@ -2226,48 +2719,250 @@ function exportDetailedCSV(){
     });
     lines.push("");
   };
+
   pushSection("Teaching", state.data.teaching);
   pushSection("Supervision", state.data.supervision);
   pushSection("Research", state.data.research);
   pushSection("Publication", state.data.publication);
   pushSection("Administration", state.data.admin);
   pushSection("Services", state.data.service);
-  pushSection("Laboratory Operations", state.data.lab);
+  pushSection("Lab Operations", state.data.lab);
+  pushSection("Professional & Scholarly Service", state.data.prosch);
 
   download("FST_UMS_Busyness_Detailed.csv", lines.join("\n"), "text/csv");
 }
 
 function exportJSON(){
   const payload = {
-    meta:{ generated_at:new Date().toISOString(), app:"FST UMS Staff Busyness Index", version:"1.1" },
+    meta:{ generated_at:new Date().toISOString(), app:"FST UMS Staff Busyness Index", version:"2.0" },
     profile: state.profile,
     enabled_sections: state.enabled,
     baseline_weights: state.weights,
     active_weights_normalized: getActiveWeights(),
     scheme: state.scheme,
+    caps: state.caps,
+    benchmarks: state.benchmarks,
+    period_months: periodMonths(state.profile.period),
     data: state.data,
     results:{
-      teaching_score:$("outT").textContent,
-      supervision_score:$("outSV").textContent,
-      research_score:$("outR").textContent,
-      publication_score:$("outP").textContent,
-      administration_score:$("outA").textContent,
-      services_score:$("outS").textContent,
-      laboratory_operations_score:$("outL").textContent,
-      overall_busyness_index:$("outIndex").textContent,
-      workload_band:$("outBand").textContent,
-      dean_summary:$("outDean").textContent,
-      narrative_summary:$("outNarr").textContent
+      Teaching_points_per_month: $("outTeaching").textContent,
+      Supervision_points_per_month: $("outSupervision").textContent,
+      Research_points_per_month: $("outResearch").textContent,
+      Publication_points_per_month: $("outPublication").textContent,
+      Administration_points_per_month: $("outAdministration").textContent,
+      Services_points_per_month: $("outServices").textContent,
+      Lab_Operations_points_per_month: $("outLabOps").textContent,
+      Professional_and_Scholarly_Service_points_per_month: $("outProSch").textContent,
+      busyness_index_points_per_month: $("outIndex").textContent,
+      band: $("outBand").textContent,
+      dean_summary: $("outDean").textContent,
+      narrative: $("outNarr").textContent
     },
     audit: state.audit
   };
   download("FST_UMS_Busyness_Full.json", JSON.stringify(payload,null,2), "application/json");
 }
 
-/* ========================= Storage ========================= */
+/* =========================================================
+   MANUAL PDF (Professional, gray headers, full names, formulas, 3 examples)
+========================================================= */
+function manualPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:"pt", format:"a4"});
+  const W = doc.internal.pageSize.getWidth();
+  const H = doc.internal.pageSize.getHeight();
+  const m = 44;
+  let y = 48;
+
+  const setBody = ()=>{ doc.setFont("helvetica","normal"); doc.setFontSize(11); doc.setTextColor(0,0,0); };
+  const setSmall = ()=>{ doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(60,60,60); };
+  const setBold = ()=>{ doc.setFont("helvetica","bold"); doc.setTextColor(0,0,0); };
+
+  const newPageIfNeeded = (hNeed=0)=>{
+    if(y + hNeed > H - m){
+      doc.addPage();
+      y = m;
+    }
+  };
+
+  const hr = ()=>{
+    newPageIfNeeded(12);
+    doc.setDrawColor(180,180,180);
+    doc.setLineWidth(0.8);
+    doc.line(m, y, W-m, y);
+    y += 12;
+  };
+
+  const headerBox = (title)=>{
+    newPageIfNeeded(44);
+    doc.setFillColor(235,235,235);
+    doc.setDrawColor(160,160,160);
+    doc.setLineWidth(0.8);
+    doc.rect(m, y, W-m*2, 26, "FD");
+    doc.setFont("helvetica","bold");
+    doc.setFontSize(12);
+    doc.setTextColor(0,0,0);
+    doc.text(title, m+10, y+17);
+    y += 36;
+  };
+
+  const paragraph = (text, fontSize=11)=>{
+    setBody();
+    doc.setFontSize(fontSize);
+    const lines = doc.splitTextToSize(text, W - m*2);
+    lines.forEach(line=>{
+      newPageIfNeeded(fontSize+8);
+      doc.text(line, m, y);
+      y += fontSize + 6;
+    });
+  };
+
+  const formula = (text)=>{
+    newPageIfNeeded(18);
+    doc.setFont("courier","normal");
+    doc.setFontSize(10);
+    doc.setTextColor(0,0,0);
+    const lines = doc.splitTextToSize(text, W - m*2);
+    lines.forEach(line=>{
+      newPageIfNeeded(16);
+      doc.text(line, m, y);
+      y += 14;
+    });
+    setBody();
+  };
+
+  const bullet = (items)=>{
+    items.forEach(it=>{
+      const lines = doc.splitTextToSize(it, W - m*2 - 18);
+      lines.forEach((ln,idx)=>{
+        newPageIfNeeded(16);
+        doc.setFont("helvetica","normal"); doc.setFontSize(11);
+        doc.text(idx===0 ? "•" : " ", m, y);
+        doc.text(ln, m+14, y);
+        y += 14;
+      });
+    });
+  };
+
+  // Title page header
+  doc.setFont("helvetica","bold"); doc.setFontSize(16); doc.setTextColor(0,0,0);
+  doc.text("FST UMS Staff Busyness Index", m, y); y+=18;
+  doc.setFont("helvetica","normal"); doc.setFontSize(11);
+  doc.text("Calculation Manual (Points per Month, with Soft Caps)", m, y); y+=14;
+  setSmall();
+  doc.text("This tool measures busyness (workload intensity) based on activities and time/effort proxies. It does not measure performance or quality.", m, y); y+=18;
+  hr();
+
+  headerBox("1. Key Concepts (Plain Language)");
+  paragraph("This calculator converts recorded staff activities into workload points. The points are then normalized to a per-month basis based on the reporting period (Monthly, Quarterly, Semester, Annual).");
+  bullet([
+    "Busyness = how much work you carried (quantity, time, complexity, urgency).",
+    "Performance = how well you did the work (quality, outcomes, awards). Performance is intentionally NOT scored here.",
+    "Soft caps (diminishing returns) prevent unusually large workloads from inflating the index excessively."
+  ]);
+  hr();
+
+  headerBox("2. Period Normalization (Points per Month)");
+  paragraph("First, each section is computed as total points for the reporting period. Then the system converts to points per month.");
+  formula("months_in_period = { Monthly:1, Quarterly:3, Semester:6, Annual:12 }\nsection_points_per_month = section_points_total / months_in_period");
+  paragraph("Example: If Services total points in a semester is 36, then Services points per month = 36 / 6 = 6.");
+  hr();
+
+  headerBox("3. Soft Caps (Diminishing Returns)");
+  paragraph("Soft caps reduce the effect of very large values (for example, too many activities). This keeps the index fair and focuses on workload intensity rather than simply accumulating more counts.");
+  formula("If x <= cap: adjusted = x\nIf x > cap: adjusted = cap + (x - cap) * tail_rate\nwhere 0 < tail_rate < 1 (e.g., 0.35)");
+  paragraph("In the Settings, the admin can set a cap and tail-rate for each section.");
+  hr();
+
+  headerBox("4. Section Weighting and Re-normalization");
+  paragraph("Each section has a baseline weight. If some sections are turned OFF, the tool re-normalizes weights so only ON sections sum to 1.00.");
+  formula("normalized_weight_i = baseline_weight_i / (sum of baseline weights for ON sections)");
+  paragraph("This supports fair comparison across Academic, Administrative, and Laboratory categories.");
+  hr();
+
+  headerBox("5. Overall Busyness Index (Points per Month)");
+  paragraph("After each section becomes points per month (and soft caps are applied), the overall index is calculated as a weighted sum.");
+  formula("busyness_index_raw = Σ( section_points_per_month_i × normalized_weight_i )\nfinal_busyness_index = clamp(busyness_index_raw, 0, 100)");
+  paragraph("The final index is capped between 0 and 100 for dashboard readability.");
+  hr();
+
+  headerBox("6. Section Formulas (All Terms Explained)");
+  paragraph("The following formulas show how each section total is computed before normalization and soft caps.");
+
+  paragraph("Teaching (total points in the reporting period):");
+  formula("For each course:\ncontact_hours = lecture + tutorial + laboratory + field\ncredit = last digit of course code (e.g., SJ24102 -> credit=2)\ncourse_points = (contact_hours × points_per_contact_hour)\n             + ((students / 100) × points_per_100_students)\n             + (credit × points_per_credit)\nTeaching_total = Σ(course_points)");
+
+  paragraph("Supervision (total points):");
+  formula("For each student/project:\nbase = {Undergraduate, Master, PhD} points\nrole_multiplier = {Main:1.0, Co-supervisor:0.6}\nstatus_multiplier = {Active:1.0, Completed:0.5}\nitem_points = base × role_multiplier × status_multiplier\nSupervision_total = Σ(item_points)");
+
+  paragraph("Research (Grants/Projects, total points):");
+  formula("For each grant/project:\nstatus_multiplier = {Active:1.0, Applied:0.6, Ended:0.3}\nlevel_multiplier = {University, National, International}\nrole_multiplier = {PI, Co-I, Member}\nitem_points = base_points × level_multiplier × role_multiplier × status_multiplier\nResearch_total = Σ(item_points)");
+
+  paragraph("Publication (total points):");
+  formula("For each publication:\nrole_multiplier = {First/Corresponding:1.2, Co-author:1.0}\ntype_multiplier = {Journal, Book/Chapter, Proceeding, Other}\nindexed_multiplier = {Yes, No}\nitem_points = base_points × type_multiplier × indexed_multiplier × role_multiplier\nPublication_total = Σ(item_points)");
+
+  paragraph("Administration (total points):");
+  formula("For each admin role:\nbase_by_level = {Programme, Faculty, University, State, National, International, Industry}\ntype_multiplier = {Official:1.0, Ad-hoc:0.7}\nitem_points = (base_by_level + meetings × points_per_meeting + months × points_per_month) × type_multiplier\nAdministration_total = Σ(item_points)");
+
+  paragraph("Services (total points):");
+  formula("For each service activity:\nrole_bonus = {Lead, Member}\nitem_points = (hours × points_per_hour) + ((participants / 10) × points_per_10_participants) + role_bonus\nServices_total = Σ(item_points)");
+
+  paragraph("Lab Operations (total points):");
+  formula("For each lab activity:\nbase = (volume × points_per_volume) + (hours × points_per_hour)\ncomplexity_multiplier = {Low, Medium, High}\nurgency_multiplier = {Normal, Tight, Critical}\nitem_points = base × complexity_multiplier × urgency_multiplier\nLabOps_total = Σ(item_points)");
+
+  paragraph("Professional & Scholarly Service (total points):");
+  formula("For each item (reviewer/editor/examiner/committee/etc.):\nbase = (quantity × points_per_item) + (rounds × points_per_round) + (hours × points_per_hour)\ncomplexity_multiplier = {Low, Medium, High}\nurgency_multiplier = {Normal, Tight, Critical}\nrole_multiplier = {Lead:1.1, Member:1.0}\nitem_points = base × complexity_multiplier × urgency_multiplier × role_multiplier\nProSch_total = Σ(item_points)");
+
+  hr();
+
+  headerBox("7. Worked Examples (3 Staff Categories)");
+  paragraph("These examples use simple numbers for illustration. Your actual points depend on the admin settings.");
+
+  paragraph("Example A: Academic Staff (Semester reporting period = 6 months)");
+  bullet([
+    "Teaching_total = 48 points; Supervision_total = 18 points; Research_total = 24 points; Publication_total = 12 points; Administration_total = 20 points; Services_total = 10 points.",
+    "Convert to points per month: Teaching=48/6=8.0; Supervision=18/6=3.0; Research=24/6=4.0; Publication=12/6=2.0; Administration=20/6≈3.3; Services=10/6≈1.7.",
+    "Apply soft caps if any section exceeds cap (not shown here).",
+    "Multiply each section by normalized weights (based on ON sections). Sum to get Busyness Index per month."
+  ]);
+
+  paragraph("Example B: Administrative Staff (Quarterly reporting period = 3 months)");
+  bullet([
+    "Administration_total = 54 points; Services_total = 30 points.",
+    "Points per month: Administration=54/3=18.0; Services=30/3=10.0.",
+    "If only these two sections are ON: normalized weights might become Administration=0.60 and Services=0.40.",
+    "Busyness Index = 18.0×0.60 + 10.0×0.40 = 10.8 + 4.0 = 14.8."
+  ]);
+
+  paragraph("Example C: Laboratory Staff (Monthly reporting period = 1 month)");
+  bullet([
+    "LabOps_total = 22 points; Administration_total = 15 points; Services_total = 8 points; ProSch_total = 3 points.",
+    "Points per month are the same as totals (because monthly = 1).",
+    "With weights (example): LabOps=0.30, Administration=0.45, Services=0.20, ProSch=0.05.",
+    "Busyness Index = 22×0.30 + 15×0.45 + 8×0.20 + 3×0.05 = 6.6 + 6.75 + 1.6 + 0.15 = 15.1."
+  ]);
+
+  hr();
+
+  headerBox("8. Notes for Data Entry (Layman-Friendly)");
+  bullet([
+    "Write activities clearly. Long descriptions are allowed; the form will expand automatically.",
+    "Use start and end dates to confirm the activity belongs to the reporting period.",
+    "For Professional & Scholarly Service: use Quantity (e.g., number of review reports), Rounds (e.g., revision rounds), and optional Hours if known."
+  ]);
+
+  setSmall();
+  paragraph("© Faculty of Science and Technology (FST), Universiti Malaysia Sabah (UMS).", 9);
+
+  doc.save("FST_UMS_Busyness_Index_Manual.pdf");
+}
+
+/* =========================================================
+   STORAGE
+========================================================= */
 function autosave(){
   state.audit.last_saved_at = new Date().toISOString();
-  localStorage.setItem("fst_busyness_v1", JSON.stringify(state));
+  localStorage.setItem("fst_busyness_v2", JSON.stringify(state));
 }
 function saveNow(){
   syncProfileFromUI();
@@ -2277,22 +2972,38 @@ function saveNow(){
   showMsg("ok","<b>Saved locally:</b> Data stored in your browser (localStorage).");
 }
 function loadLocal(){
-  const raw = localStorage.getItem("fst_busyness_v1");
+  const raw = localStorage.getItem("fst_busyness_v2");
   if(!raw) return;
   try{
     const obj = JSON.parse(raw);
+    // Keep defaults if new keys missing
     Object.assign(state, obj);
+    state.caps = state.caps || {
+      Teaching:{cap:40, tail:0.35},
+      Supervision:{cap:30, tail:0.35},
+      Research:{cap:30, tail:0.35},
+      Publication:{cap:25, tail:0.35},
+      Administration:{cap:35, tail:0.35},
+      Services:{cap:30, tail:0.35},
+      LabOps:{cap:35, tail:0.35},
+      ProSch:{cap:25, tail:0.35}
+    };
+    state.benchmarks = state.benchmarks || {facultyMean:35, p25:22, p50:35, p75:48};
   }catch(e){}
 }
 
-/* ========================= Reset ========================= */
+/* =========================================================
+   RESET
+========================================================= */
 function resetAll(){
   if(!confirm("Reset all data? This will clear local saved data for this tool on this browser.")) return;
-  localStorage.removeItem("fst_busyness_v1");
+  localStorage.removeItem("fst_busyness_v2");
   location.reload();
 }
 
-/* ========================= Init ========================= */
+/* =========================================================
+   INIT (wiring all buttons + new ProSch + new benchmark display)
+========================================================= */
 function init(){
   loadLocal();
   ensureSeed();
@@ -2300,8 +3011,9 @@ function init(){
   applySectionVisibility();
   renderAll();
   setAdminUI();
-  bindAutoGrow();
+  updateBenchmarkUI();
 
+  // Profile other fields
   $("pGrade").addEventListener("change", ()=>{
     $("pGradeOtherWrap").style.display = ($("pGrade").value==="Others") ? "block" : "none";
   });
@@ -2309,12 +3021,14 @@ function init(){
     $("pStatusOtherWrap").style.display = ($("pStatus").value==="Others") ? "block" : "none";
   });
 
+  // Category template
   $("pCategory").addEventListener("change", ()=>{
     syncProfileFromUI();
     if(state.profile.category) applyTemplateByCategory(state.profile.category);
   });
 
-  ["enTeaching","enSupervision","enResearch","enPublication","enAdministration","enServices","enLabOps"].forEach(id=>{
+  // Toggles
+  ["enTeaching","enSupervision","enResearch","enPublication","enAdministration","enServices","enLabOps","enProSch"].forEach(id=>{
     $(id).addEventListener("change", ()=>{
       syncEnabledFromUI();
       applySectionVisibility();
@@ -2322,34 +3036,57 @@ function init(){
     });
   });
 
+  // Admin
   $("btnAdminUnlock").addEventListener("click",(e)=>{ e.preventDefault(); unlockAdmin(); });
   $("btnAdminLock").addEventListener("click",(e)=>{ e.preventDefault(); lockAdmin(); });
 
+  // Add/Clear
   $("addTeach").onclick=(e)=>{e.preventDefault(); addRow("teach");};
   $("clearTeach").onclick=(e)=>{e.preventDefault(); clearKind("teach");};
+
   $("addSv").onclick=(e)=>{e.preventDefault(); addRow("sv");};
   $("clearSv").onclick=(e)=>{e.preventDefault(); clearKind("sv");};
+
   $("addRes").onclick=(e)=>{e.preventDefault(); addRow("res");};
   $("clearRes").onclick=(e)=>{e.preventDefault(); clearKind("res");};
+
   $("addPub").onclick=(e)=>{e.preventDefault(); addRow("pub");};
   $("clearPub").onclick=(e)=>{e.preventDefault(); clearKind("pub");};
+
   $("addAdmin").onclick=(e)=>{e.preventDefault(); addRow("admin");};
   $("clearAdmin").onclick=(e)=>{e.preventDefault(); clearKind("admin");};
+
   $("addSvc").onclick=(e)=>{e.preventDefault(); addRow("svc");};
   $("clearSvc").onclick=(e)=>{e.preventDefault(); clearKind("svc");};
+
   $("addLab").onclick=(e)=>{e.preventDefault(); addRow("lab");};
   $("clearLab").onclick=(e)=>{e.preventDefault(); clearKind("lab");};
 
+  // ProSch
+  $("addProSch").onclick=(e)=>{e.preventDefault(); addRow("ps");};
+  $("clearProSch").onclick=(e)=>{e.preventDefault(); clearKind("ps");};
+
+  // Calculate / Print / Manual / Export
   $("btnCalc").onclick=(e)=>{e.preventDefault(); calculate();};
-  $("btnPrint").onclick=(e)=>{e.preventDefault(); printPDF();};
+
+  $("btnPrint").onclick=(e)=>{
+    e.preventDefault();
+    syncProfileFromUI();
+    syncPrintFields();
+    window.print();
+  };
+
   $("btnManual").onclick=(e)=>{e.preventDefault(); manualPDF();};
+
   $("btnExportSummaryCSV").onclick=(e)=>{e.preventDefault(); exportSummaryCSV();};
   $("btnExportDetailedCSV").onclick=(e)=>{e.preventDefault(); exportDetailedCSV();};
   $("btnExportJSON").onclick=(e)=>{e.preventDefault(); exportJSON();};
 
+  // Save / Reset
   $("btnSaveLocal").onclick=(e)=>{e.preventDefault(); saveNow();};
   $("btnReset").onclick=(e)=>{e.preventDefault(); resetAll();};
 
+  // Presets (admin only)
   $("btnPresetAcademic").onclick=(e)=>{e.preventDefault(); if(!isAdmin) return; applyTemplateByCategory("Academic");};
   $("btnPresetAdmin").onclick=(e)=>{e.preventDefault(); if(!isAdmin) return; applyTemplateByCategory("Administrative");};
   $("btnPresetLab").onclick=(e)=>{e.preventDefault(); if(!isAdmin) return; applyTemplateByCategory("Laboratory");};
