@@ -113,6 +113,19 @@
       user-select:none;
       font-family: var(--font);
     }
+    .btn[data-icon]{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .btn[data-icon]::before{
+      content: attr(data-icon);
+      font-size:1em;
+      line-height:1;
+    }
+    .btn .btn-label{display:inline}
+    .btn.icon-only{justify-content:center}
+    .btn.icon-only .btn-label{display:none}
     .btn:hover{background:rgba(255,255,255,.10)}
     .btn:active{transform: translateY(1px)}
     .btn.primary{background:linear-gradient(180deg, rgba(45,212,191,.35), rgba(45,212,191,.16)); border-color: rgba(45,212,191,.45)}
@@ -455,12 +468,12 @@
 
       <div class="adminPanel">
         <input type="password" id="adminPass" placeholder="Admin password (for Settings)">
-        <button class="btn warn" id="btnAdminUnlock">Unlock</button>
-        <button class="btn ghost" id="btnAdminLock" style="display:none;">Lock</button>
+        <button class="btn warn" id="btnAdminUnlock" data-icon="🔓"><span class="btn-label">Unlock</span></button>
+        <button class="btn ghost" id="btnAdminLock" data-icon="🔒" style="display:none;"><span class="btn-label">Lock</span></button>
       </div>
 
-      <button class="btn" id="btnSaveLocal">Save</button>
-      <button class="btn danger" id="btnReset">Reset</button>
+      <button class="btn" id="btnSaveLocal" data-icon="💾"><span class="btn-label">Save</span></button>
+      <button class="btn danger" id="btnReset" data-icon="🔄"><span class="btn-label">Reset</span></button>
     </div>
   </div>
 
@@ -630,9 +643,9 @@
 
       <div class="spacer"></div>
       <div class="row noPrint">
-        <button class="btn adminOnly" id="btnPresetAcademic">Preset: Academic</button>
-        <button class="btn adminOnly" id="btnPresetAdmin">Preset: Administrative</button>
-        <button class="btn adminOnly" id="btnPresetLab">Preset: Laboratory</button>
+        <button class="btn adminOnly" id="btnPresetAcademic" data-icon="🎓"><span class="btn-label">Preset: Academic</span></button>
+        <button class="btn adminOnly" id="btnPresetAdmin" data-icon="🗂️"><span class="btn-label">Preset: Administrative</span></button>
+        <button class="btn adminOnly" id="btnPresetLab" data-icon="🧪"><span class="btn-label">Preset: Laboratory</span></button>
       </div>
 
       <div class="spacer"></div>
@@ -715,8 +728,8 @@
         <div class="sub">Credit is auto-extracted from the <b>last digit</b> of course code (e.g., SJ24102 → credit=2). Contact hours are auto-computed.</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn" id="addTeach">+ Add course</button>
-        <button class="btn ghost" id="clearTeach">Clear</button>
+        <button class="btn" id="addTeach" data-icon="➕"><span class="btn-label">Add course</span></button>
+        <button class="btn ghost" id="clearTeach" data-icon="🧹"><span class="btn-label">Clear</span></button>
       </div>
     </header>
     <div class="content">
@@ -750,8 +763,8 @@
         <div class="sub">Include active supervision load for the reporting period (Undergraduate, Master, PhD).</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn" id="addSv">+ Add supervision</button>
-        <button class="btn ghost" id="clearSv">Clear</button>
+        <button class="btn" id="addSv" data-icon="➕"><span class="btn-label">Add supervision</span></button>
+        <button class="btn ghost" id="clearSv" data-icon="🧹"><span class="btn-label">Clear</span></button>
       </div>
     </header>
     <div class="content">
@@ -782,8 +795,8 @@
         <div class="sub">Specify grant level, status, role, amount and duration.</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn" id="addRes">+ Add grant</button>
-        <button class="btn ghost" id="clearRes">Clear</button>
+        <button class="btn" id="addRes" data-icon="➕"><span class="btn-label">Add grant</span></button>
+        <button class="btn ghost" id="clearRes" data-icon="🧹"><span class="btn-label">Clear</span></button>
       </div>
     </header>
     <div class="content">
@@ -816,8 +829,8 @@
         <div class="sub">If ON, record publication output for the reporting period. This captures workload (count/handling), not quality metrics.</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn" id="addPub">+ Add publication</button>
-        <button class="btn ghost" id="clearPub">Clear</button>
+        <button class="btn" id="addPub" data-icon="➕"><span class="btn-label">Add publication</span></button>
+        <button class="btn ghost" id="clearPub" data-icon="🧹"><span class="btn-label">Clear</span></button>
       </div>
     </header>
     <div class="content">
@@ -849,8 +862,8 @@
         <div class="sub">Include appointments, level, duration (months) and meeting workload. Notes should describe workload clearly.</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn" id="addAdmin">+ Add admin role</button>
-        <button class="btn ghost" id="clearAdmin">Clear</button>
+        <button class="btn" id="addAdmin" data-icon="➕"><span class="btn-label">Add admin role</span></button>
+        <button class="btn ghost" id="clearAdmin" data-icon="🧹"><span class="btn-label">Clear</span></button>
       </div>
     </header>
     <div class="content">
@@ -885,8 +898,8 @@
         <div class="sub">Service to university / industry / community. Include start and end dates.</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn" id="addSvc">+ Add service</button>
-        <button class="btn ghost" id="clearSvc">Clear</button>
+        <button class="btn" id="addSvc" data-icon="➕"><span class="btn-label">Add service</span></button>
+        <button class="btn ghost" id="clearSvc" data-icon="🧹"><span class="btn-label">Clear</span></button>
       </div>
     </header>
     <div class="content">
@@ -918,8 +931,8 @@
         <div class="sub">For lab staff or lab-support work. Scored using (volume + hours) × complexity × urgency.</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn" id="addLab">+ Add lab activity</button>
-        <button class="btn ghost" id="clearLab">Clear</button>
+        <button class="btn" id="addLab" data-icon="➕"><span class="btn-label">Add lab activity</span></button>
+        <button class="btn ghost" id="clearLab" data-icon="🧹"><span class="btn-label">Clear</span></button>
       </div>
     </header>
     <div class="content">
@@ -955,8 +968,8 @@
         </div>
       </div>
       <div class="row right noPrint">
-        <button class="btn" id="addProSch">+ Add item</button>
-        <button class="btn ghost" id="clearProSch">Clear</button>
+        <button class="btn" id="addProSch" data-icon="➕"><span class="btn-label">Add item</span></button>
+        <button class="btn ghost" id="clearProSch" data-icon="🧹"><span class="btn-label">Clear</span></button>
       </div>
     </header>
     <div class="content">
@@ -1041,17 +1054,17 @@
       <div class="spacer"></div>
 
       <div class="row noPrint" style="justify-content:flex-end">
-        <button class="btn primary" id="btnCalc">Calculate</button>
-        <button class="btn" id="btnPrint">Print PDF</button>
-        <button class="btn warn" id="btnManual">Download Manual (PDF)</button>
+        <button class="btn primary" id="btnCalc" data-icon="🧮"><span class="btn-label">Calculate</span></button>
+        <button class="btn" id="btnPrint" data-icon="🖨️"><span class="btn-label">Print PDF</span></button>
+        <button class="btn warn" id="btnManual" data-icon="📘"><span class="btn-label">Download Manual (PDF)</span></button>
       </div>
 
       <div class="spacer"></div>
 
       <div class="row noPrint">
-        <button class="btn" id="btnExportSummaryCSV">Export Summary CSV</button>
-        <button class="btn" id="btnExportDetailedCSV">Export Detailed CSV</button>
-        <button class="btn" id="btnExportJSON">Export Full JSON</button>
+        <button class="btn" id="btnExportSummaryCSV" data-icon="📤"><span class="btn-label">Export Summary CSV</span></button>
+        <button class="btn" id="btnExportDetailedCSV" data-icon="📤"><span class="btn-label">Export Detailed CSV</span></button>
+        <button class="btn" id="btnExportJSON" data-icon="🧾"><span class="btn-label">Export Full JSON</span></button>
       </div>
 
       <!-- PRINT-ONLY SIGNATURES -->
@@ -1767,7 +1780,7 @@ function renderTeaching(){
       <td><input data-k="laboratory" type="number" min="0" step="0.5"/></td>
       <td><input data-k="field" type="number" min="0" step="0.5"/></td>
       <td><input data-k="contact" disabled/></td>
-      <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
+      <td><button class="btn danger icon-only" data-act="del" data-icon="🗑️" style="padding:6px 10px;font-size:.8rem" aria-label="Delete row"><span class="btn-label">Delete</span></button></td>
     `;
     tb.appendChild(tr);
 
@@ -1839,7 +1852,7 @@ function renderSupervision(){
       </td>
       <td><input data-k="start" type="date"/></td>
       <td><input data-k="end" type="date"/></td>
-      <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
+      <td><button class="btn danger icon-only" data-act="del" data-icon="🗑️" style="padding:6px 10px;font-size:.8rem" aria-label="Delete row"><span class="btn-label">Delete</span></button></td>
     `;
     tb.appendChild(tr);
 
@@ -1901,7 +1914,7 @@ function renderResearch(){
       <td><input data-k="amount" type="number" min="0" step="1" placeholder="RM"/></td>
       <td><input data-k="start" type="date"/></td>
       <td><input data-k="end" type="date"/></td>
-      <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
+      <td><button class="btn danger icon-only" data-act="del" data-icon="🗑️" style="padding:6px 10px;font-size:.8rem" aria-label="Delete row"><span class="btn-label">Delete</span></button></td>
     `;
     tb.appendChild(tr);
 
@@ -1968,7 +1981,7 @@ function renderPublication(){
       </td>
       <td><input data-k="start" type="date"/></td>
       <td><input data-k="end" type="date"/></td>
-      <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
+      <td><button class="btn danger icon-only" data-act="del" data-icon="🗑️" style="padding:6px 10px;font-size:.8rem" aria-label="Delete row"><span class="btn-label">Delete</span></button></td>
     `;
     tb.appendChild(tr);
 
@@ -2034,7 +2047,7 @@ function renderAdministration(){
       <td><textarea data-k="notes" rows="2" placeholder="Key workload notes"></textarea></td>
       <td><input data-k="start" type="date"/></td>
       <td><input data-k="end" type="date"/></td>
-      <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
+      <td><button class="btn danger icon-only" data-act="del" data-icon="🗑️" style="padding:6px 10px;font-size:.8rem" aria-label="Delete row"><span class="btn-label">Delete</span></button></td>
     `;
     tb.appendChild(tr);
 
@@ -2097,7 +2110,7 @@ function renderServices(){
       <td><input data-k="participants" type="number" min="0" step="1"/></td>
       <td><input data-k="start" type="date"/></td>
       <td><input data-k="end" type="date"/></td>
-      <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
+      <td><button class="btn danger icon-only" data-act="del" data-icon="🗑️" style="padding:6px 10px;font-size:.8rem" aria-label="Delete row"><span class="btn-label">Delete</span></button></td>
     `;
     tb.appendChild(tr);
 
@@ -2168,7 +2181,7 @@ function renderLabOps(){
       <td><input data-k="hours" type="number" min="0" step="0.5"/></td>
       <td><input data-k="start" type="date"/></td>
       <td><input data-k="end" type="date"/></td>
-      <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
+      <td><button class="btn danger icon-only" data-act="del" data-icon="🗑️" style="padding:6px 10px;font-size:.8rem" aria-label="Delete row"><span class="btn-label">Delete</span></button></td>
     `;
     tb.appendChild(tr);
 
@@ -2249,7 +2262,7 @@ function renderProSch(){
       <td><input data-k="hours" type="number" min="0" step="0.5" placeholder="optional"/></td>
       <td><input data-k="start" type="date"/></td>
       <td><input data-k="end" type="date"/></td>
-      <td><button class="btn danger" data-act="del" style="padding:6px 10px;font-size:.8rem">✖</button></td>
+      <td><button class="btn danger icon-only" data-act="del" data-icon="🗑️" style="padding:6px 10px;font-size:.8rem" aria-label="Delete row"><span class="btn-label">Delete</span></button></td>
     `;
     tb.appendChild(tr);
 
