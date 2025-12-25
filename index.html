@@ -554,23 +554,7 @@
             <option value="Semester">Semester</option>
             <option value="Annual">Annual</option>
           </select>
-          <div class="hint">All scores will be normalized into <b>points per month</b> for fair comparisons.</div>
-        </div>
-      </div>
-
-      <div class="spacer"></div>
-
-      <!-- NEW: default titles adjustable -->
-      <div class="grid two">
-        <div>
-          <label>Default Grant/Project Title (optional)</label>
-          <input id="pGrantTitle" placeholder="e.g., FRGS: Machine Learning for Wage Inequality (default for new grant row)"/>
-          <div class="hint">If filled, clicking “+ Add grant” will pre-fill the grant Title column with this text (you can still edit per row).</div>
-        </div>
-        <div>
-          <label>Default Publication Title (optional)</label>
-          <input id="pPubTitle" placeholder="e.g., Toward Sustainable Energy and Livelihood Solutions (default for new publication row)"/>
-          <div class="hint">If filled, clicking “+ Add publication” will pre-fill the publication Title column with this text (you can still edit per row).</div>
+      <div class="hint">All scores will be normalized into <b>points per month</b> for fair comparisons.</div>
         </div>
       </div>
 
@@ -1151,9 +1135,7 @@ const state = {
     name:"", staffId:"", category:"", unit:"",
     grade:"", gradeOther:"",
     status:"", statusOther:"",
-    period:"",
-    defaultGrantTitle:"",
-    defaultPubTitle:""
+    period:""
   },
 
   enabled:{
@@ -1312,9 +1294,6 @@ function syncProfileFromUI(){
   state.profile.status = $("pStatus").value;
   state.profile.statusOther = $("pStatusOther").value.trim();
   state.profile.period = $("pPeriod").value;
-
-  state.profile.defaultGrantTitle = $("pGrantTitle").value.trim();
-  state.profile.defaultPubTitle = $("pPubTitle").value.trim();
 }
 
 function syncEnabledFromUI(){
@@ -1395,8 +1374,6 @@ function syncUIFromState(){
   $("pStatus").value = state.profile.status || "";
   $("pStatusOther").value = state.profile.statusOther || "";
   $("pPeriod").value = state.profile.period || "";
-  $("pGrantTitle").value = state.profile.defaultGrantTitle || "";
-  $("pPubTitle").value = state.profile.defaultPubTitle || "";
 
   $("pGradeOtherWrap").style.display = (state.profile.grade==="Others") ? "block" : "none";
   $("pStatusOtherWrap").style.display = (state.profile.status==="Others") ? "block" : "none";
@@ -1561,9 +1538,9 @@ function ensureSeed(){
   if(state.data.supervision.length===0)
     state.data.supervision.push({id:uid(), level:"Undergraduate", title:"", role:"Main", status:"Active", start:"", end:""});
   if(state.data.research.length===0)
-    state.data.research.push({id:uid(), code:"", title:(state.profile.defaultGrantTitle||""), level:"University", status:"Active", role:"PI", amount:0, start:"", end:""});
+    state.data.research.push({id:uid(), code:"", title:"", level:"University", status:"Active", role:"PI", amount:0, start:"", end:""});
   if(state.data.publication.length===0)
-    state.data.publication.push({id:uid(), year:(new Date()).getFullYear(), title:(state.profile.defaultPubTitle||""), type:"Journal", indexed:"Yes", role:"First/Corresponding", start:"", end:""});
+    state.data.publication.push({id:uid(), year:(new Date()).getFullYear(), title:"", type:"Journal", indexed:"Yes", role:"First/Corresponding", start:"", end:""});
   if(state.data.admin.length===0)
     state.data.admin.push({id:uid(), position:"", type:"Official", level:"Faculty", months:0, meetings:0, notes:"", start:"", end:""});
   if(state.data.service.length===0)
@@ -2315,7 +2292,7 @@ function addRow(kind){
   if(kind==="res") state.data.research.push({
     id:uid(),
     code:"",
-    title:(state.profile.defaultGrantTitle||""),
+    title:"",
     level:"University",
     status:"Active",
     role:"PI",
@@ -2327,7 +2304,7 @@ function addRow(kind){
   if(kind==="pub") state.data.publication.push({
     id:uid(),
     year:(new Date()).getFullYear(),
-    title:(state.profile.defaultPubTitle||""),
+    title:"",
     type:"Journal",
     indexed:"Yes",
     role:"First/Corresponding",
@@ -2655,8 +2632,6 @@ function exportSummaryCSV(){
     ["status", (state.profile.status==="Others")?state.profile.statusOther:state.profile.status],
     ["reporting_period", state.profile.period],
     ["months_in_period", periodMonths(state.profile.period)],
-    ["default_grant_title", state.profile.defaultGrantTitle],
-    ["default_publication_title", state.profile.defaultPubTitle],
     ["enabled_sections", JSON.stringify(state.enabled)],
     ["baseline_weights", JSON.stringify(state.weights)],
     ["active_weights_normalized", JSON.stringify(aw)],
@@ -2908,10 +2883,6 @@ function init(){
     $("pStatusOtherWrap").style.display = ($("pStatus").value==="Others") ? "block" : "none";
     autosave();
   });
-
-  // Save default titles instantly
-  $("pGrantTitle").addEventListener("input", ()=>{ syncProfileFromUI(); autosave(); });
-  $("pPubTitle").addEventListener("input", ()=>{ syncProfileFromUI(); autosave(); });
 
   // Category template
   $("pCategory").addEventListener("change", ()=>{
