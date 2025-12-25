@@ -288,6 +288,15 @@
       overflow-wrap:anywhere;
     }
 
+    /* Keep research titles readable even when long */
+    #tblRes th:nth-child(2),
+    #tblRes td:nth-child(2){
+      min-width: 260px;
+    }
+    #tblRes td:nth-child(2) input{
+      min-width: 240px;
+    }
+
     .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .row.right{justify-content:flex-end}
 
