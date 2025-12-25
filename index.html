@@ -288,6 +288,21 @@
       overflow-wrap:anywhere;
     }
 
+    /* Keep research titles readable even when long */
+    #tblRes th:nth-child(2),
+    #tblRes td:nth-child(2){
+      min-width: 260px;
+    }
+    #tblRes td:nth-child(2) textarea{
+      min-width: 240px;
+      min-height: 42px;
+      line-height: 1.3;
+      white-space: pre-wrap;
+      overflow-wrap:anywhere;
+      word-break:break-word;
+      resize:vertical;
+    }
+
     .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .row.right{justify-content:flex-end}
 
@@ -1094,6 +1109,12 @@ const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
 const n = (v)=>{ const x=parseFloat(v); return isNaN(x)?0:x; };
 const uid = ()=>Math.random().toString(16).slice(2)+Date.now().toString(16);
 
+function autoGrow(el){
+  if(!el) return;
+  el.style.height = "auto";
+  el.style.height = `${el.scrollHeight}px`;
+}
+
 function showMsg(kind, html){
   const el = $("msgGlobal");
   el.className = "notice " + (kind==="bad"?"bad":kind==="ok"?"ok":"warn");
@@ -1866,7 +1887,7 @@ function renderResearch(){
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
       <td><input data-k="code" placeholder="Grant code"/></td>
-      <td><input data-k="title" placeholder="Grant title"/></td>
+      <td><textarea data-k="title" placeholder="Grant title" class="autoGrow"></textarea></td>
       <td>
         <select data-k="level">
           <option>University</option>
@@ -1896,7 +1917,9 @@ function renderResearch(){
     tb.appendChild(tr);
 
     tr.querySelector('[data-k="code"]').value=r.code || "";
-    tr.querySelector('[data-k="title"]').value=r.title || "";
+    const titleBox = tr.querySelector('[data-k="title"]');
+    titleBox.value = r.title || "";
+    autoGrow(titleBox);
     tr.querySelector('[data-k="level"]').value=r.level || "University";
     tr.querySelector('[data-k="status"]').value=r.status || "Active";
     tr.querySelector('[data-k="role"]').value=r.role || "PI";
@@ -1910,6 +1933,9 @@ function renderResearch(){
       if(k==="amount"){
         obj.amount = Math.max(0, n(e.target.value));
         e.target.value = obj.amount;
+      }else if(k==="title"){
+        obj.title = e.target.value;
+        autoGrow(e.target);
       }else{
         obj[k] = e.target.value;
       }
