@@ -416,6 +416,17 @@
         font-family: var(--font) !important;
       }
 
+      /* Force all text to print in black for readability */
+      *, *::before, *::after{
+        color:#000 !important;
+        text-shadow:none !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      input::placeholder, textarea::placeholder{
+        color:#000 !important;
+      }
+
       /* Hide web controls */
       .topbar,.noPrint,#secSettings,#secToggles{display:none !important}
 
