@@ -2769,6 +2769,7 @@ function manualPDF(){
 
   const setBody = ()=>{ doc.setFont("helvetica","normal"); doc.setFontSize(11); doc.setTextColor(0,0,0); };
   const setSmall = ()=>{ doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(60,60,60); };
+  const setSubhead = ()=>{ doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(0,0,0); };
 
   const newPageIfNeeded = (hNeed=0)=>{
     if(y + hNeed > H - m){
@@ -2836,6 +2837,14 @@ function manualPDF(){
     });
   };
 
+  const subhead = (text)=>{
+    newPageIfNeeded(18);
+    setSubhead();
+    doc.text(text, m, y);
+    y += 16;
+    setBody();
+  };
+
   doc.setFont("helvetica","bold"); doc.setFontSize(16); doc.setTextColor(0,0,0);
   doc.text("FST UMS Staff Busyness Index", m, y); y+=18;
   doc.setFont("helvetica","normal"); doc.setFontSize(11);
@@ -2844,31 +2853,123 @@ function manualPDF(){
   doc.text("This tool measures busyness (workload intensity) based on activities and time/effort proxies. It does not measure performance or quality.", m, y); y+=18;
   hr();
 
-  headerBox("1. Period Normalization (Points per Month)");
-  paragraph("Each section is computed as total points for the reporting period, then converted to points per month.");
-  formula("months_in_period = { Monthly:1, Quarterly:3, Semester:6, Annual:12 }\nsection_points_per_month = section_points_total / months_in_period");
+  headerBox("1. Purpose & How to Use");
+  paragraph("This manual explains required fields, scoring logic, soft caps and worked examples for Academic, Administrative and Laboratory staff categories. The index captures workload intensity only.");
+  bullet([
+    "Choose reporting period (Monthly, Quarterly, Semester, Annual). All section scores are normalized to points per month.",
+    "Select Category preset to auto-set ON/OFF sections and baseline weights. You may still toggle sections if needed.",
+    "Fill required fields (marked *) in each section, then click Calculate. Use Print for a B/W summary or Export for CSV/JSON.",
+    "Admin may unlock Settings to adjust baseline weights, caps and scoring parameters."
+  ]);
   hr();
 
-  headerBox("2. Soft Caps (Diminishing Returns)");
-  paragraph("Soft caps reduce inflation when section points are extremely large.");
-  formula("If x <= cap: adjusted = x\nIf x > cap: adjusted = cap + (x - cap) * tail_rate\n(0 < tail_rate < 1)");
+  headerBox("2. Required Fields & Data Entry");
+  paragraph("Complete these inputs before calculating. Required fields are marked * inside the calculator.");
+  bullet([
+    "Profile: Name, Staff ID, Category (Academic / Administrative / Laboratory), Unit/School/Department, Grade (or Other + text), Status (or Other + text), Reporting Period.",
+    "Section toggles: Turn ON only relevant sections. Category presets update ON/OFF and baseline weights automatically.",
+    "Teaching: Course code and name, enrolled students, lecture/tutorial/lab/field contact hours, start/end. Credit is auto-read from the last digit of the course code; contact hours auto-sum.",
+    "Supervision: Level (Undergraduate, Master, PhD), student/project title, role (Main/Co), status (Active/Completed/Applied), start/end.",
+    "Research (Grants/Projects): Grant code, title, level (University/National/International), status, role (PI/Co-I/Member), amount (RM), start/end.",
+    "Publication: Year, title, type (Journal/Book-Chapter/Proceeding/Other), indexed? (Yes/No), role (First/Corresponding/Co-Author), start/end.",
+    "Administration: Position, type (Official/Other), level (Programme to Industry), months in role, meetings, workload notes, start/end.",
+    "Services: Service type, activity, role (Lead/Member), hours, participants, start/end.",
+    "Laboratory Operations: Type, description, volume, complexity, urgency, hours, start/end. Turn ON for Laboratory staff or roles with lab duties.",
+    "Professional & Scholarly Service: Activity type (Reviewer/Editor/Examiner/Committee), description, role, quantity, rounds, complexity, urgency, hours, start/end."
+  ]);
   hr();
 
-  headerBox("3. Overall Index");
-  paragraph("The index is a weighted sum using normalized weights of ON sections.");
-  formula("normalized_weight_i = baseline_weight_i / Σ(baseline weights for ON sections)\nindex = Σ(adjusted_section_points_per_month_i × normalized_weight_i)\nfinal_index = clamp(index, 0, 100)");
+  headerBox("3. Calculation Pipeline");
+  bullet([
+    "A) Raw section score: computed per section using workload proxies (hours, students, rounds, meetings, etc.).",
+    "B) Period normalization: raw section score / months_in_period (points per month).",
+    "C) Soft caps (diminishing returns): prevent inflation when a section is extremely large.",
+    "D) Weighting: normalized weights use only ON sections. Sum of normalized weights = 1.",
+    "E) Clamp: final index is clamped between 0 and 100 points per month (for display consistency)."
+  ]);
+  formula("months_in_period = { Monthly:1, Quarterly:3, Semester:6, Annual:12 }
+section_points_per_month = section_points_total / months_in_period
+soft_cap(x, cap, tail) = (x <= cap) ? x : cap + (x - cap) * tail    (0 < tail < 1)
+normalized_weight_i = baseline_weight_i / sum(baseline weights for ON sections)
+index = sum(adjusted_section_points_per_month_i * normalized_weight_i)
+final_index = clamp(index, 0, 100)");
   hr();
 
-  headerBox("4. Professional & Scholarly Service Formula (Implemented)");
-  paragraph("This section uses quantity, rounds and optional hours (then multiplies by role, complexity and urgency).");
-  formula("baseEffort = (base_points_per_item × quantity × rounds) + hours\nitem_points = baseEffort × role_multiplier × complexity_multiplier × urgency_multiplier\nProSch_total = Σ(item_points)");
+  headerBox("4. Section Formulas (Busyness-based)");
+  formula(
+"""Teaching = sum[(contact_hours * hourW) + ((students/100) * studW) + (credit * creditW)]
+Supervision = sum[base(level) * role_multiplier * status_multiplier]
+Research = sum[base * level_multiplier * role_multiplier * status_multiplier]
+Publication = sum[base * type_multiplier * indexed_multiplier * role_multiplier]
+Administration = sum[(base(level) + meetings * meetW + months * monthW) * type_multiplier]
+Services = sum[(hours * hourW) + ((participants/10) * paxW) + role_bonus]
+Lab Operations = sum[(volume * volW + hours * hourW) * complexity_multiplier * urgency_multiplier]
+Professional & Scholarly Service = sum[((base * quantity * rounds) + hours) * role_multiplier * complexity_multiplier * urgency_multiplier]""");
+  hr();
+
+  headerBox("5. Soft Caps (after monthly normalization)");
+  paragraph("Caps are applied per section with tail rates (diminishing returns beyond the cap).");
+  formula(
+"""Teaching cap=35, tail=0.40
+Supervision cap=25, tail=0.45
+Research cap=30, tail=0.45
+Publication cap=20, tail=0.50
+Administration cap=35, tail=0.45
+Services cap=25, tail=0.50
+Laboratory Operations cap=35, tail=0.45
+Professional & Scholarly Service cap=25, tail=0.50""");
+  hr();
+
+  headerBox("6. Worked Examples by Staff Category (using default presets)");
+  paragraph("Examples use current default scoring parameters (version 2.0). Points shown are already normalized to the selected reporting period.");
+
+  subhead("Academic (period: Monthly; sections ON: Teaching, Supervision, Research, Publication, Administration, Services, ProSch)");
+  paragraph("Baseline weights: Teaching 0.28, Supervision 0.14, Research 0.20, Publication 0.10, Administration 0.12, Services 0.08, Professional & Scholarly Service 0.08.");
+  formula(
+"""Data entered:
+- Teaching: 2 courses -> 10.12 pts (contact hours + students + credits)
+- Supervision: 2 Master (Main, Active) + 1 PhD (Main, Active) -> 10.50 pts
+- Research: 1 National grant (PI, Active) -> 13.44 pts
+- Publication: 2 indexed journal papers (First/Corresponding) -> 20.16 raw -> 20.08 after cap (cap 20, tail 0.50)
+- Administration: Faculty appointment (12 months, 4 meetings) -> 14.60 pts
+- Services: Lead outreach (10 hours, 60 pax) -> 18.80 pts
+- Professional & Scholarly Service: Reviewer (3 manuscripts, 2 rounds, High complexity, Tight urgency, +5 hours) -> 46.00 raw -> 35.50 after cap (cap 25, tail 0.50)
+ Index = (10.12*0.28)+(10.50*0.14)+(13.44*0.20)+(20.08*0.10)+(14.60*0.12)+(18.80*0.08)+(35.50*0.08)
+ Index ≈ 15.10 points per month""");
+
+  subhead("Administrative (period: Quarterly = 3 months; sections ON: Administration, Services, ProSch)");
+  paragraph("Baseline weights: Administration 0.55, Services 0.30, Professional & Scholarly Service 0.15.");
+  formula(
+"""Data entered:
+- Administration: 2 roles (Faculty level: 3 months, 8 meetings; University level: 3 months, 4 meetings) -> 31.80 raw -> 10.60 per month
+- Services: Lead outreach (15 hours, 120 pax) + Member support (6 hours, 40 pax) -> 39.30 raw -> 13.10 per month
+- Professional & Scholarly Service: External examiner (2 rounds, High complexity, Normal urgency, +6 hours, Lead) -> 24.96 raw -> 8.32 per month
+ Index = (10.60*0.55) + (13.10*0.30) + (8.32*0.15)
+ Index ≈ 11.00 points per month""");
+
+  subhead("Laboratory (period: Monthly; sections ON: Administration, Services, Lab Operations, ProSch)");
+  paragraph("Baseline weights: Administration 0.40, Services 0.20, Laboratory Operations 0.30, Professional & Scholarly Service 0.10.");
+  formula(
+"""Data entered:
+- Laboratory Operations: Equipment maintenance (vol=25, hrs=14, Medium, Tight) + Sample processing (vol=40, hrs=20, High, Critical) -> 207.38 raw -> 112.57 after cap (cap 35, tail 0.45)
+- Administration: Lab safety officer (12 months, 4 meetings, Faculty level) -> 14.60 pts
+- Services: Training session (Lead, 8 hours, 30 participants) -> 14.40 pts
+- Professional & Scholarly Service: 2 reviews (1 round, Medium complexity, Normal urgency, +4 hours) -> 13.00 pts
+ Index = (112.57*0.30) + (14.60*0.40) + (14.40*0.20) + (13.00*0.10)
+ Index ≈ 43.79 points per month""");
+
+  subhead("Exports & Evidence");
+  bullet([
+    "Use Print for a clean black-and-white PDF (hides settings).",
+    "Export Summary CSV for monthly-normalized section totals; Detailed CSV for row-level data; Full JSON for all inputs, weights and outputs.",
+    "For auditability, keep start/end dates and workload notes clear and specific."
+  ]);
 
   setSmall();
   paragraph("© Faculty of Science and Technology (FST), Universiti Malaysia Sabah (UMS).", 9);
 
   doc.save("FST_UMS_Busyness_Index_Manual.pdf");
 }
-
 /* =========================================================
    STORAGE
 ========================================================= */
