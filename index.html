@@ -6,8 +6,8 @@
   <title>FST UMS – Staff Busyness Index (Calculator)</title>
 
   <!-- =========================================================
-       ADMIN PASSWORD (EDIT HERE)
-       Change this anytime to update admin access for Settings.
+       ADVANCED SETTINGS PASSPHRASE (EDIT HERE)
+       Change this anytime to update local settings access.
        NOTE: This is front-end only (GitHub Pages static).
        ========================================================= -->
   <script>
@@ -21,25 +21,29 @@
 
   <style>
     :root{
-      /* Web theme (unchanged look & feel). Print will override to B/W + gray. */
+      /* Web theme (professional dark). Print will override to B/W + gray. */
       --bg:#0b1220;
-      --text:#eaf0ff;
-      --muted:#b8c3e6;
-      --line:rgba(255,255,255,.12);
+      --surface:#101a2d;
+      --surface-2:#141f36;
+      --border:rgba(255,255,255,.12);
       --shadow: 0 18px 60px rgba(0,0,0,.45);
       --radius: 18px;
 
+      --text:#eaf0ff;
+      --muted:#b8c3e6;
+
+      --primary:#4cc7ff;
+      --accent:#2bd4bf;
       --danger:#ff5b6e;
       --warn:#ffb020;
-      --ok:#2bd4bf;
 
-      --t:#a78bfa;
-      --sv:#38bdf8;
-      --r:#34d399;
-      --p:#f472b6;
-      --a:#fbbf24;
-      --s:#fb7185;
-      --l:#22c55e;
+      --t:#7c9dff;
+      --sv:#3cc9ff;
+      --r:#32d29c;
+      --p:#f094c4;
+      --a:#f2b44a;
+      --s:#fb8898;
+      --l:#43d389;
       --set:#60a5fa;
 
       /* ONE font family everywhere (web + print + manual). */
@@ -68,7 +72,7 @@
     ========================= */
     .topbar{
       display:flex;align-items:center;justify-content:space-between;gap:14px;
-      padding:14px 16px;border:1px solid var(--line);
+      padding:14px 16px;border:1px solid var(--border);
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       border-radius: var(--radius);
       box-shadow: var(--shadow);
@@ -100,6 +104,7 @@
       white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
       max-width: 520px;
     }
+    .title-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 
     .top-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
 
@@ -107,31 +112,34 @@
       border:1px solid rgba(255,255,255,.14);
       background:rgba(255,255,255,.06);
       color:var(--text);
-      padding:10px 12px;border-radius:12px;
+      padding:10px 14px;border-radius:12px;
       cursor:pointer; font-weight:650;
       transition: transform .08s ease, background .2s ease, border .2s ease;
       user-select:none;
       font-family: var(--font);
+      display:inline-flex;align-items:center;gap:8px;
     }
-    .btn[data-icon]{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-    }
-    .btn[data-icon]::before{
-      content: attr(data-icon);
-      font-size:1em;
-      line-height:1;
-    }
-    .btn .btn-label{display:inline}
-    .btn.icon-only{justify-content:center}
-    .btn.icon-only .btn-label{display:none}
     .btn:hover{background:rgba(255,255,255,.10)}
     .btn:active{transform: translateY(1px)}
-    .btn.primary{background:linear-gradient(180deg, rgba(45,212,191,.35), rgba(45,212,191,.16)); border-color: rgba(45,212,191,.45)}
-    .btn.warn{background:linear-gradient(180deg, rgba(255,176,32,.38), rgba(255,176,32,.16)); border-color: rgba(255,176,32,.55)}
-    .btn.danger{background:linear-gradient(180deg, rgba(255,91,110,.35), rgba(255,91,110,.14)); border-color: rgba(255,91,110,.55)}
-    .btn.ghost{background:transparent}
+    .btn-primary{
+      background:linear-gradient(180deg, rgba(76,199,255,.45), rgba(76,199,255,.18));
+      border-color: rgba(76,199,255,.65);
+      color:#041521;
+    }
+    .btn-secondary{background:rgba(255,255,255,.08)}
+    .btn-ghost{background:transparent}
+    .btn-danger{
+      background:linear-gradient(180deg, rgba(255,91,110,.35), rgba(255,91,110,.14));
+      border-color: rgba(255,91,110,.55);
+    }
+    .btn-warn{
+      background:linear-gradient(180deg, rgba(255,176,32,.38), rgba(255,176,32,.16));
+      border-color: rgba(255,176,32,.55);
+    }
+    .btn-sm{padding:6px 10px;border-radius:10px;font-size:.82rem}
+    .btn-md{padding:12px 18px;border-radius:14px;font-size:.95rem}
+    .btn-icon{padding:6px 8px;min-width:36px;justify-content:center}
+    .btn-icon svg{width:16px;height:16px;fill:currentColor}
 
     .pill{
       padding:8px 10px;border-radius:999px;
@@ -151,7 +159,7 @@
       font-size:12px;color:var(--muted);
       font-family: var(--font);
     }
-    .dot{width:9px;height:9px;border-radius:99px;background:var(--ok);box-shadow:0 0 0 4px rgba(45,212,191,.15)}
+    .dot{width:9px;height:9px;border-radius:99px;background:var(--accent);box-shadow:0 0 0 4px rgba(45,212,191,.15)}
     .dot.lock{background:var(--warn);box-shadow:0 0 0 4px rgba(255,176,32,.15)}
 
     /* =========================
@@ -258,6 +266,11 @@
       font-size: 14px;
       line-height: 1.25;
     }
+    input:focus,select:focus,textarea:focus{border-color:rgba(76,199,255,.8);box-shadow:0 0 0 3px rgba(76,199,255,.2)}
+    input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{
+      outline:3px solid rgba(76,199,255,.85);
+      outline-offset:2px;
+    }
     textarea{
       min-height:70px;
       resize:vertical;
@@ -268,15 +281,17 @@
     .requiredMark::after{content:" *"; color: var(--warn); font-weight:800}
 
     /* =========================
-       Tables: mobile-friendly (horizontal scroll)
+       Tables: responsive
     ========================= */
     .tableWrap{
       width:100%;
       overflow-x:auto;
       -webkit-overflow-scrolling: touch;
       border-radius: 14px;
+      border:1px solid rgba(255,255,255,.1);
+      background:rgba(8,14,28,.35);
     }
-    table{width:100%;border-collapse:collapse;min-width:980px}
+    table{width:100%;border-collapse:collapse;min-width:0}
     th,td{
       border-bottom:1px solid rgba(255,255,255,.10);
       padding:10px 8px;
@@ -299,28 +314,37 @@
       overflow-wrap:anywhere;
     }
 
-    /* Keep research titles readable even when long */
-    #tblTeach th:nth-child(2),
-    #tblTeach td:nth-child(2){
-      min-width: 260px;
-    }
-
-    #tblSv th:nth-child(2),
-    #tblSv td:nth-child(2){
-      min-width: 240px;
-    }
-
-    #tblRes th:nth-child(2),
-    #tblRes td:nth-child(2){
-      min-width: 280px;
-    }
-    #tblRes td:nth-child(2) input{
-      min-width: 260px;
-    }
-
-    #tblAdmin th:nth-child(1),
-    #tblAdmin td:nth-child(1){
-      min-width: 240px;
+    @media (max-width:980px){
+      .tableWrap{overflow:visible}
+      table thead{display:none}
+      table tbody tr{
+        display:block;
+        margin:12px;
+        border:1px solid rgba(255,255,255,.12);
+        border-radius:14px;
+        padding:8px 12px;
+        background:rgba(12,18,35,.8);
+      }
+      table tbody tr td{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        border:none;
+        padding:6px 0;
+      }
+      table tbody tr td::before{
+        content:attr(data-label);
+        color:var(--muted);
+        font-weight:600;
+        width:42%;
+      }
+      table tbody tr td input,
+      table tbody tr td select,
+      table tbody tr td textarea{
+        width:58%;
+      }
+      table tbody tr td.cell-actions::before{display:none}
     }
 
     .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -369,6 +393,33 @@
     }
     .spacer{height:10px}
 
+    .icon-btn{
+      border:1px solid rgba(255,255,255,.2);
+      background:rgba(255,255,255,.08);
+      color:var(--text);
+      width:34px;height:34px;border-radius:10px;
+      display:inline-flex;align-items:center;justify-content:center;
+      cursor:pointer;
+    }
+    .icon-btn svg{width:16px;height:16px;fill:currentColor}
+
+    .dropdown{position:relative;display:inline-flex}
+    .dropdown-menu{
+      position:absolute;right:0;top:calc(100% + 8px);
+      background:var(--surface-2);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:12px;
+      padding:8px;
+      min-width:220px;
+      box-shadow:var(--shadow);
+      display:none;
+      z-index:30;
+    }
+    .dropdown-menu.open{display:block}
+    .dropdown-menu button{
+      width:100%;justify-content:flex-start;border-radius:10px;
+    }
+
     /* Admin panel */
     .adminPanel{
       display:flex;gap:8px;align-items:center;flex-wrap:wrap;
@@ -377,6 +428,7 @@
       width:220px;
       background:rgba(7,11,21,.65);
     }
+    .adminPanel .small{flex-basis:100%}
     .small{font-size:12px;color:var(--muted);font-family:var(--font)}
 
     /* =========================
@@ -392,7 +444,6 @@
       .grid.two,.grid.three{grid-template-columns:1fr}
       .kpi{grid-template-columns:repeat(2, minmax(0,1fr))}
       .btn{padding:12px 12px}
-      table{min-width:920px}
     }
     @media(max-width:520px){
       .kpi{grid-template-columns:1fr}
@@ -504,7 +555,13 @@
       </div>
       <div class="title">
         <h1>FST UMS – Staff Busyness Index Calculator</h1>
-        <div class="sub">Single-file tool (GitHub Pages). Admin can lock weights/mark scheme; staff only enter workload activities.</div>
+        <div class="sub">Single-file, local-only tool for workload recording and reporting. Advanced settings are for local configuration only (no security control).</div>
+        <div class="title-actions noPrint">
+          <span class="small">Need help?</span>
+          <button class="icon-btn" id="btnManual" aria-label="Download user guide (PDF)" title="Download user guide (PDF)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10A10.01 10.01 0 0 0 12 2Zm.02 17a1.25 1.25 0 1 1 1.23-1.25A1.24 1.24 0 0 1 12.02 19Zm2.2-7.43-.86.88a2.33 2.33 0 0 0-.74 1.76v.29h-1.5v-.41a3.4 3.4 0 0 1 .93-2.36l1.07-1.09a1.48 1.48 0 0 0-.25-2.4 1.67 1.67 0 0 0-2.2.49 1.93 1.93 0 0 0-.32.86H8.85a3.17 3.17 0 0 1 .57-1.69A3.15 3.15 0 0 1 13.7 6.8a3.03 3.03 0 0 1 .46 4.77Z"/></svg>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -513,13 +570,14 @@
       <span class="badge"><span id="lockDot" class="dot lock"></span><span id="lockText">Settings locked</span></span>
 
       <div class="adminPanel">
-        <input type="password" id="adminPass" placeholder="Admin password (for Settings)">
-        <button class="btn warn" id="btnAdminUnlock" data-icon="🔓"><span class="btn-label">Unlock</span></button>
-        <button class="btn ghost" id="btnAdminLock" data-icon="🔒" style="display:none;"><span class="btn-label">Lock</span></button>
+        <input type="password" id="adminPass" placeholder="Advanced Settings (Local) passphrase">
+        <button class="btn btn-warn btn-sm" id="btnAdminUnlock"><span class="btn-label">Enable Settings</span></button>
+        <button class="btn btn-ghost btn-sm" id="btnAdminLock" style="display:none;"><span class="btn-label">Disable</span></button>
+        <div class="small">Local configuration only — not a security control.</div>
       </div>
 
-      <button class="btn" id="btnSaveLocal" data-icon="💾"><span class="btn-label">Save</span></button>
-      <button class="btn danger" id="btnReset" data-icon="🔄"><span class="btn-label">Reset</span></button>
+      <button class="btn btn-secondary" id="btnSaveLocal"><span class="btn-label">Save</span></button>
+      <button class="btn btn-danger" id="btnReset"><span class="btn-label">Reset</span></button>
     </div>
   </div>
 
@@ -528,14 +586,14 @@
     <header>
       <div>
         <h2>Staff Profile</h2>
-        <div class="sub">All fields are required. Staff ID example: <b>250505-02025</b>.</div>
+        <div class="sub">All fields are required. Example Staff ID: <b>250505-02025</b>.</div>
       </div>
     </header>
     <div class="content">
       <div class="grid three">
         <div>
           <label class="requiredMark">Full Name</label>
-          <input id="pName" placeholder="e.g., Assis Kamu"/>
+          <input id="pName" placeholder="e.g., Dr. Amina Yusuf"/>
         </div>
         <div>
           <label class="requiredMark">Staff ID</label>
@@ -546,14 +604,14 @@
           <select id="pCategory">
             <option value="">Select</option>
             <option value="Academic">Academic</option>
-            <option value="Administrative">Administrative Staff</option>
-            <option value="Laboratory">Laboratory Staff</option>
+            <option value="Administrative">Administrative</option>
+            <option value="Laboratory">Laboratory</option>
           </select>
-          <div class="hint">Selecting category will auto-apply ON/OFF sections and default weights.</div>
+          <div class="hint">Selecting a category auto-applies section ON/OFF states and default weights.</div>
         </div>
 
         <div>
-          <label class="requiredMark">Programme/Unit</label>
+          <label class="requiredMark">School/Unit</label>
           <input id="pUnit" placeholder="e.g., Mathematics with Economics / Finance Unit / Chemistry Lab"/>
         </div>
 
@@ -572,8 +630,8 @@
           </select>
         </div>
         <div id="pGradeOtherWrap" style="display:none;">
-          <label class="requiredMark">Grade (Others) – please specify</label>
-          <input id="pGradeOther" placeholder="Type grade here"/>
+          <label class="requiredMark">Other grade (specify)</label>
+          <input id="pGradeOther" placeholder="Type the grade"/>
         </div>
 
         <div>
@@ -587,8 +645,8 @@
           </select>
         </div>
         <div id="pStatusOtherWrap" style="display:none;">
-          <label class="requiredMark">Status (Others) – please specify</label>
-          <input id="pStatusOther" placeholder="Type status here"/>
+          <label class="requiredMark">Other status (specify)</label>
+          <input id="pStatusOther" placeholder="Type the status"/>
         </div>
 
         <div>
@@ -600,7 +658,7 @@
             <option value="Semester">Semester</option>
             <option value="Annual">Annual</option>
           </select>
-      <div class="hint">All scores will be normalized into <b>points per month</b> for fair comparisons.</div>
+      <div class="hint">All scores are normalized to <b>points per month</b> for fair comparisons.</div>
         </div>
       </div>
 
@@ -613,10 +671,10 @@
   <section class="section toggles" id="secToggles">
     <header>
       <div>
-        <h2>Section Applicability (ON/OFF)</h2>
+        <h2>Section Applicability (On/Off)</h2>
         <div class="sub">
-          Turn ON only relevant sections. The calculator will <b>auto re-normalize weights</b> using ON sections only.
-          (This supports Academic, Administrative, and Laboratory roles fairly.)
+          Turn on only relevant sections. The calculator will <b>re-normalize weights</b> using active sections only.
+          This supports Academic, Administrative, and Laboratory roles fairly.
         </div>
       </div>
       <div class="row right noPrint">
@@ -626,13 +684,13 @@
     <div class="content">
       <div class="grid three">
         <div><label><input type="checkbox" id="enTeaching" checked> Teaching</label></div>
-        <div><label><input type="checkbox" id="enSupervision" checked> Supervision</label></div>
-        <div><label><input type="checkbox" id="enResearch" checked> Research (Grants / Projects)</label></div>
+        <div><label><input type="checkbox" id="enSupervision" checked> Student Supervision</label></div>
+        <div><label><input type="checkbox" id="enResearch" checked> Research (Grants/Projects)</label></div>
         <div><label><input type="checkbox" id="enPublication" checked> Publication</label></div>
         <div><label><input type="checkbox" id="enAdministration" checked> Administration</label></div>
-        <div><label><input type="checkbox" id="enServices" checked> Services</label></div>
+        <div><label><input type="checkbox" id="enServices" checked> Service & Engagement</label></div>
         <div><label><input type="checkbox" id="enLabOps"> Laboratory Operations</label></div>
-        <div><label><input type="checkbox" id="enProSch" checked> Professional & Scholarly Service (Reviewer / Editor / Examiner / Committee)</label></div>
+        <div><label><input type="checkbox" id="enProSch" checked> Professional & Scholarly Service (Reviewer/Editor/Examiner/Committee)</label></div>
       </div>
       <div class="spacer"></div>
       <div id="toggleWarn" class="notice warn" style="display:none;"></div>
@@ -643,10 +701,10 @@
   <section class="section settings" id="secSettings">
     <header>
       <div>
-        <h2>Settings (Weights, Scoring Scheme & Benchmarks) – Admin Only</h2>
+        <h2>Advanced Settings (Local Configuration)</h2>
         <div class="sub">
-          Locked by default. Admin must unlock using password to edit.
-          <span class="small">Baseline weights must sum to 1.00.</span>
+          Locked by default. Unlock locally to edit weights, scoring scheme, and benchmarks.
+          <span class="small">This is for local configuration only; it does not provide security. Baseline weights must sum to 1.00.</span>
         </div>
       </div>
     </header>
@@ -662,25 +720,25 @@
 
       <div class="grid three">
         <div><label class="requiredMark">Weight: Teaching</label><input class="adminOnly" id="wTeaching" type="number" step="0.01" min="0" value="0.30"/></div>
-        <div><label class="requiredMark">Weight: Supervision</label><input class="adminOnly" id="wSupervision" type="number" step="0.01" min="0" value="0.15"/></div>
+        <div><label class="requiredMark">Weight: Student Supervision</label><input class="adminOnly" id="wSupervision" type="number" step="0.01" min="0" value="0.15"/></div>
         <div><label class="requiredMark">Weight: Research</label><input class="adminOnly" id="wResearch" type="number" step="0.01" min="0" value="0.20"/></div>
         <div><label class="requiredMark">Weight: Publication</label><input class="adminOnly" id="wPublication" type="number" step="0.01" min="0" value="0.10"/></div>
         <div><label class="requiredMark">Weight: Administration</label><input class="adminOnly" id="wAdministration" type="number" step="0.01" min="0" value="0.15"/></div>
-        <div><label class="requiredMark">Weight: Services</label><input class="adminOnly" id="wServices" type="number" step="0.01" min="0" value="0.10"/></div>
+        <div><label class="requiredMark">Weight: Service & Engagement</label><input class="adminOnly" id="wServices" type="number" step="0.01" min="0" value="0.10"/></div>
         <div><label class="requiredMark">Weight: Laboratory Operations</label><input class="adminOnly" id="wLabOps" type="number" step="0.01" min="0" value="0.00"/></div>
         <div><label class="requiredMark">Weight: Professional & Scholarly Service</label><input class="adminOnly" id="wProSch" type="number" step="0.01" min="0" value="0.00"/></div>
       </div>
 
       <div class="spacer"></div>
       <div class="row noPrint">
-        <button class="btn adminOnly" id="btnPresetAcademic" data-icon="🎓"><span class="btn-label">Preset: Academic</span></button>
-        <button class="btn adminOnly" id="btnPresetAdmin" data-icon="🗂️"><span class="btn-label">Preset: Administrative</span></button>
-        <button class="btn adminOnly" id="btnPresetLab" data-icon="🧪"><span class="btn-label">Preset: Laboratory</span></button>
+        <button class="btn adminOnly" id="btnPresetAcademic"><span class="btn-label">Preset: Academic</span></button>
+        <button class="btn adminOnly" id="btnPresetAdmin"><span class="btn-label">Preset: Administrative</span></button>
+        <button class="btn adminOnly" id="btnPresetLab"><span class="btn-label">Preset: Laboratory</span></button>
       </div>
 
       <div class="spacer"></div>
       <div class="notice">
-        <b>Weight logic:</b> Baseline weights (admin) must sum to <b>1.00</b>.
+        <b>Weight logic:</b> Baseline weights must sum to <b>1.00</b>.
         During calculation, the tool uses only ON sections and re-normalizes weights automatically.
       </div>
 
@@ -689,7 +747,7 @@
 
       <!-- Benchmarks (Admin input: A) -->
       <div class="notice">
-        <b>Institutional Benchmarks (Admin input):</b>
+        <b>Institutional Benchmarks (advanced settings input):</b>
         These values are used for interpretation only (e.g., below/around/above faculty average; percentile band).
         They do not change the score calculation.
       </div>
@@ -711,9 +769,9 @@
         <div><label>Teaching – points per student (scaled /100)</label><input class="adminOnly" id="tStudW" type="number" step="0.1" min="0" value="0.6"/></div>
         <div><label>Teaching – multiplier per credit</label><input class="adminOnly" id="tCreditW" type="number" step="0.1" min="0" value="0.4"/></div>
 
-        <div><label>Supervision – Undergraduate (per student)</label><input class="adminOnly" id="svUG" type="number" step="0.1" min="0" value="1.5"/></div>
-        <div><label>Supervision – Master (per student)</label><input class="adminOnly" id="svM" type="number" step="0.1" min="0" value="3.0"/></div>
-        <div><label>Supervision – PhD (per student)</label><input class="adminOnly" id="svPHD" type="number" step="0.1" min="0" value="4.5"/></div>
+        <div><label>Student Supervision – Undergraduate (per student)</label><input class="adminOnly" id="svUG" type="number" step="0.1" min="0" value="1.5"/></div>
+        <div><label>Student Supervision – Master (per student)</label><input class="adminOnly" id="svM" type="number" step="0.1" min="0" value="3.0"/></div>
+        <div><label>Student Supervision – PhD (per student)</label><input class="adminOnly" id="svPHD" type="number" step="0.1" min="0" value="4.5"/></div>
 
         <div><label>Research – base points per grant</label><input class="adminOnly" id="rBase" type="number" step="0.1" min="0" value="6"/></div>
         <div><label>Research – level multipliers (University,National,International)</label><input class="adminOnly" id="rUniNatIntl" type="text" value="1.0,1.4,1.8"/></div>
@@ -727,9 +785,9 @@
         <div><label>Administration – points per meeting</label><input class="adminOnly" id="aMeetW" type="number" step="0.1" min="0" value="1.5"/></div>
         <div><label>Administration – points per month in role</label><input class="adminOnly" id="aMonthW" type="number" step="0.1" min="0" value="0.3"/></div>
 
-        <div><label>Services – points per hour</label><input class="adminOnly" id="sHourW" type="number" step="0.1" min="0" value="1.0"/></div>
-        <div><label>Services – points per participants (scaled /10)</label><input class="adminOnly" id="sPaxW" type="number" step="0.1" min="0" value="0.8"/></div>
-        <div><label>Services – role bonus (Lead,Member)</label><input class="adminOnly" id="sRoleBonus" type="text" value="4,1.5"/></div>
+        <div><label>Service & Engagement – points per hour</label><input class="adminOnly" id="sHourW" type="number" step="0.1" min="0" value="1.0"/></div>
+        <div><label>Service & Engagement – points per participants (scaled /10)</label><input class="adminOnly" id="sPaxW" type="number" step="0.1" min="0" value="0.8"/></div>
+        <div><label>Service & Engagement – role bonus (Lead,Member)</label><input class="adminOnly" id="sRoleBonus" type="text" value="4,1.5"/></div>
 
         <div><label>Laboratory Operations – points per volume</label><input class="adminOnly" id="lVolW" type="number" step="0.1" min="0" value="1.0"/></div>
         <div><label>Laboratory Operations – points per hour</label><input class="adminOnly" id="lHourW" type="number" step="0.1" min="0" value="1.0"/></div>
@@ -745,7 +803,7 @@
 
       <div class="spacer"></div>
       <div class="notice">
-        <b>Admin password location:</b> At the very top of this <code>index.html</code>, search for <code>ADMIN_PASSWORD</code>.
+        <b>Passphrase location:</b> At the very top of this <code>index.html</code>, search for <code>ADMIN_PASSWORD</code>.
       </div>
     </div>
   </section>
@@ -758,8 +816,8 @@
         <div class="sub">Credit is auto-extracted from the <b>last digit</b> of course code (e.g., SJ24102 → credit=2). Contact hours are auto-computed.</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn" id="addTeach" data-icon="➕"><span class="btn-label">Add course</span></button>
-        <button class="btn ghost" id="clearTeach" data-icon="🧹"><span class="btn-label">Clear</span></button>
+        <button class="btn" id="addTeach"><span class="btn-label">Add course</span></button>
+        <button class="btn btn-ghost" id="clearTeach"><span class="btn-label">Clear</span></button>
       </div>
     </header>
     <div class="content">
@@ -768,15 +826,15 @@
           <thead>
             <tr>
               <th style="width:14%">Course Code *</th>
-              <th>Course Name *</th>
+              <th>Course Title *</th>
               <th style="width:8%">Credit</th>
               <th style="width:10%">Students *</th>
               <th style="width:10%">Lecture *</th>
               <th style="width:10%">Tutorial *</th>
               <th style="width:10%">Lab *</th>
               <th style="width:10%">Field *</th>
-              <th style="width:10%">Contact hours</th>
-              <th style="width:6%">Del</th>
+              <th style="width:10%">Contact Hours</th>
+              <th style="width:6%">Action</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -789,12 +847,12 @@
   <section class="section supervision" id="secSupervision">
     <header>
       <div>
-        <h2>Supervision</h2>
+        <h2>Student Supervision</h2>
         <div class="sub">Include active supervision load for the reporting period (Undergraduate, Master, PhD).</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn" id="addSv" data-icon="➕"><span class="btn-label">Add supervision</span></button>
-        <button class="btn ghost" id="clearSv" data-icon="🧹"><span class="btn-label">Clear</span></button>
+        <button class="btn" id="addSv"><span class="btn-label">Add supervision</span></button>
+        <button class="btn btn-ghost" id="clearSv"><span class="btn-label">Clear</span></button>
       </div>
     </header>
     <div class="content">
@@ -808,7 +866,7 @@
               <th style="width:12%">Status *</th>
               <th style="width:12%">Start *</th>
               <th style="width:12%">End *</th>
-              <th style="width:8%">Del</th>
+              <th style="width:8%">Action</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -825,8 +883,8 @@
         <div class="sub">Specify grant level, status, role, amount and duration.</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn" id="addRes" data-icon="➕"><span class="btn-label">Add grant</span></button>
-        <button class="btn ghost" id="clearRes" data-icon="🧹"><span class="btn-label">Clear</span></button>
+        <button class="btn" id="addRes"><span class="btn-label">Add grant</span></button>
+        <button class="btn btn-ghost" id="clearRes"><span class="btn-label">Clear</span></button>
       </div>
     </header>
     <div class="content">
@@ -842,7 +900,7 @@
               <th style="width:12%">Amount (RM) *</th>
               <th style="width:10%">Start *</th>
               <th style="width:10%">End *</th>
-              <th style="width:6%">Del</th>
+              <th style="width:6%">Action</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -859,8 +917,8 @@
         <div class="sub">If ON, record publication output for the reporting period. This captures workload (count/handling), not quality metrics.</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn" id="addPub" data-icon="➕"><span class="btn-label">Add publication</span></button>
-        <button class="btn ghost" id="clearPub" data-icon="🧹"><span class="btn-label">Clear</span></button>
+        <button class="btn" id="addPub"><span class="btn-label">Add publication</span></button>
+        <button class="btn btn-ghost" id="clearPub"><span class="btn-label">Clear</span></button>
       </div>
     </header>
     <div class="content">
@@ -875,7 +933,7 @@
               <th style="width:14%">Role *</th>
               <th style="width:12%">Start *</th>
               <th style="width:12%">End *</th>
-              <th style="width:6%">Del</th>
+              <th style="width:6%">Action</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -892,8 +950,8 @@
         <div class="sub">Include appointments, level, duration (months) and meeting workload. Notes should describe workload clearly.</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn" id="addAdmin" data-icon="➕"><span class="btn-label">Add admin role</span></button>
-        <button class="btn ghost" id="clearAdmin" data-icon="🧹"><span class="btn-label">Clear</span></button>
+        <button class="btn" id="addAdmin"><span class="btn-label">Add admin role</span></button>
+        <button class="btn btn-ghost" id="clearAdmin"><span class="btn-label">Clear</span></button>
       </div>
     </header>
     <div class="content">
@@ -909,14 +967,14 @@
               <th>Workload Notes *</th>
               <th style="width:10%">Start *</th>
               <th style="width:10%">End *</th>
-              <th style="width:6%">Del</th>
+              <th style="width:6%">Action</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
       <div class="spacer"></div>
-      <div class="notice">Tip: For conference committee work (AJK), record it under <b>Professional & Scholarly Service</b> (recommended) or under Administration if it is an official appointment. Describe workload in Notes.</div>
+      <div class="notice">Tip: Record conference committee work under <b>Professional & Scholarly Service</b> (recommended) or Administration if it is an official appointment. Describe workload clearly in Notes.</div>
     </div>
   </section>
 
@@ -924,12 +982,12 @@
   <section class="section service" id="secService">
     <header>
       <div>
-        <h2>Services</h2>
-        <div class="sub">Service to university / industry / community. Include start and end dates.</div>
+        <h2>Service & Engagement</h2>
+        <div class="sub">Service to university, industry, or community. Include start and end dates.</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn" id="addSvc" data-icon="➕"><span class="btn-label">Add service</span></button>
-        <button class="btn ghost" id="clearSvc" data-icon="🧹"><span class="btn-label">Clear</span></button>
+        <button class="btn" id="addSvc"><span class="btn-label">Add service</span></button>
+        <button class="btn btn-ghost" id="clearSvc"><span class="btn-label">Clear</span></button>
       </div>
     </header>
     <div class="content">
@@ -940,11 +998,11 @@
               <th style="width:18%">Service Type *</th>
               <th>Activity *</th>
               <th style="width:12%">Role *</th>
-              <th style="width:10%">Hours *</th>
+              <th style="width:10%">Hours (optional)</th>
               <th style="width:10%">Participants *</th>
               <th style="width:12%">Start *</th>
               <th style="width:12%">End *</th>
-              <th style="width:6%">Del</th>
+              <th style="width:6%">Action</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -961,8 +1019,8 @@
         <div class="sub">For lab staff or lab-support work. Scored using (volume + hours) × complexity × urgency.</div>
       </div>
       <div class="row right noPrint">
-        <button class="btn" id="addLab" data-icon="➕"><span class="btn-label">Add lab activity</span></button>
-        <button class="btn ghost" id="clearLab" data-icon="🧹"><span class="btn-label">Clear</span></button>
+        <button class="btn" id="addLab"><span class="btn-label">Add lab activity</span></button>
+        <button class="btn btn-ghost" id="clearLab"><span class="btn-label">Clear</span></button>
       </div>
     </header>
     <div class="content">
@@ -978,7 +1036,7 @@
               <th style="width:10%">Hours *</th>
               <th style="width:12%">Start *</th>
               <th style="width:12%">End *</th>
-              <th style="width:6%">Del</th>
+              <th style="width:6%">Action</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -998,8 +1056,8 @@
         </div>
       </div>
       <div class="row right noPrint">
-        <button class="btn" id="addProSch" data-icon="➕"><span class="btn-label">Add item</span></button>
-        <button class="btn ghost" id="clearProSch" data-icon="🧹"><span class="btn-label">Clear</span></button>
+        <button class="btn" id="addProSch"><span class="btn-label">Add item</span></button>
+        <button class="btn btn-ghost" id="clearProSch"><span class="btn-label">Clear</span></button>
       </div>
     </header>
     <div class="content">
@@ -1008,7 +1066,7 @@
           <thead>
             <tr>
               <th style="width:18%">Activity Type *</th>
-              <th>Description / Notes *</th>
+              <th>Description *</th>
               <th style="width:12%">Role *</th>
               <th style="width:10%">Quantity *</th>
               <th style="width:10%">Rounds *</th>
@@ -1017,7 +1075,7 @@
               <th style="width:10%">Hours *</th>
               <th style="width:10%">Start *</th>
               <th style="width:10%">End *</th>
-              <th style="width:6%">Del</th>
+              <th style="width:6%">Action</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -1037,7 +1095,7 @@
       <div>
         <h2>Results</h2>
         <div class="sub">
-          Calculate monthly-normalized busyness index, view contributions, export for dashboard, and print a professional black-and-white form (no settings shown).
+          Calculate a monthly-normalized busyness index, review contributions, export data, and print a professional black-and-white form (settings hidden in print).
         </div>
       </div>
     </header>
@@ -1047,12 +1105,12 @@
       <!-- KPIs -->
       <div class="kpi">
         <div class="box"><div class="k">Teaching</div><div class="v" id="outTeaching">0.0</div><div class="s">Monthly-normalized workload points</div></div>
-        <div class="box"><div class="k">Supervision</div><div class="v" id="outSupervision">0.0</div><div class="s">Monthly-normalized workload points</div></div>
+        <div class="box"><div class="k">Student Supervision</div><div class="v" id="outSupervision">0.0</div><div class="s">Monthly-normalized workload points</div></div>
         <div class="box"><div class="k">Research (Grants / Projects)</div><div class="v" id="outResearch">0.0</div><div class="s">Monthly-normalized workload points</div></div>
         <div class="box"><div class="k">Publication</div><div class="v" id="outPublication">0.0</div><div class="s">Monthly-normalized workload points</div></div>
 
         <div class="box"><div class="k">Administration</div><div class="v" id="outAdministration">0.0</div><div class="s">Monthly-normalized workload points</div></div>
-        <div class="box"><div class="k">Services</div><div class="v" id="outServices">0.0</div><div class="s">Monthly-normalized workload points</div></div>
+        <div class="box"><div class="k">Service & Engagement</div><div class="v" id="outServices">0.0</div><div class="s">Monthly-normalized workload points</div></div>
         <div class="box"><div class="k">Laboratory Operations</div><div class="v" id="outLabOps">0.0</div><div class="s">Monthly-normalized workload points</div></div>
         <div class="box"><div class="k">Professional & Scholarly Service</div><div class="v" id="outProSch">0.0</div><div class="s">Monthly-normalized workload points</div></div>
 
@@ -1063,7 +1121,7 @@
         </div>
 
         <div class="box">
-          <div class="k">Benchmark Interpretation (Admin input)</div>
+          <div class="k">Benchmark Interpretation (Advanced Settings)</div>
           <div class="s wrapText" id="outBenchmark">—</div>
         </div>
       </div>
@@ -1083,18 +1141,29 @@
 
       <div class="spacer"></div>
 
-      <div class="row noPrint" style="justify-content:flex-end">
-        <button class="btn primary" id="btnCalc" data-icon="🧮"><span class="btn-label">Calculate</span></button>
-        <button class="btn" id="btnPrint" data-icon="🖨️"><span class="btn-label">Print PDF</span></button>
-        <button class="btn warn" id="btnManual" data-icon="📘"><span class="btn-label">Download Manual (PDF)</span></button>
+      <div class="box">
+        <div class="k">Top 3 contributors</div>
+        <ol class="hint wrapText" id="outTop3">
+          <li>—</li>
+        </ol>
       </div>
 
       <div class="spacer"></div>
 
-      <div class="row noPrint">
-        <button class="btn" id="btnExportSummaryCSV" data-icon="📤"><span class="btn-label">Export Summary CSV</span></button>
-        <button class="btn" id="btnExportDetailedCSV" data-icon="📤"><span class="btn-label">Export Detailed CSV</span></button>
-        <button class="btn" id="btnExportJSON" data-icon="🧾"><span class="btn-label">Export Full JSON</span></button>
+      <div class="row noPrint" style="justify-content:flex-end">
+        <button class="btn btn-primary btn-md" id="btnCalc"><span class="btn-label">Calculate</span></button>
+        <button class="btn btn-secondary" id="btnPrint"><span class="btn-label">Print PDF</span></button>
+        <div class="dropdown">
+          <button class="btn btn-secondary" id="btnExportToggle" aria-haspopup="true" aria-expanded="false" aria-controls="exportMenu">
+            <span class="btn-label">Export</span>
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 7l5 6 5-6H5z"/></svg>
+          </button>
+          <div class="dropdown-menu" id="exportMenu" role="menu">
+            <button class="btn btn-ghost" id="btnExportSummaryCSV" role="menuitem">Summary CSV</button>
+            <button class="btn btn-ghost" id="btnExportDetailedCSV" role="menuitem">Detailed CSV</button>
+            <button class="btn btn-ghost" id="btnExportJSON" role="menuitem">Full JSON</button>
+          </div>
+        </div>
       </div>
 
       <!-- PRINT-ONLY SIGNATURES -->
@@ -1115,6 +1184,11 @@
             <div>Date: _______________________</div>
             <div style="height:110px;border:1px solid #000;margin-top:10px;padding:10px">Dean Signature:</div>
           </div>
+        </div>
+        <div style="margin-top:12px;font-size:11px;color:#000">
+          <div><strong>Note:</strong> This busyness index reflects workload intensity only and is not a performance evaluation.</div>
+          <div>Use alongside qualitative review and departmental context.</div>
+          <div style="margin-top:6px">Printed on: <span id="printFooterDate"></span></div>
         </div>
         <div style="margin-top:10px;font-size:11px;color:#000">© FST UMS</div>
       </div>
@@ -1147,6 +1221,9 @@ function showMsg(kind, html){
   el.style.display = "block";
 }
 function hideMsg(){ $("msgGlobal").style.display="none"; }
+function confirmDelete(message="Delete this record? This action cannot be undone."){
+  return window.confirm(message);
+}
 
 /* =========================================================
    Period normalization (points per month)
@@ -1252,10 +1329,10 @@ const state = {
    Admin lock
 ========================================================= */
 function setAdminUI(){
-  $("modeText").textContent = isAdmin ? "Admin" : "Staff";
+  $("modeText").textContent = isAdmin ? "Advanced Settings" : "Staff";
   $("btnAdminLock").style.display = isAdmin ? "inline-block" : "none";
   $("lockDot").className = "dot " + (isAdmin ? "" : "lock");
-  $("lockText").textContent = isAdmin ? "Settings unlocked" : "Settings locked";
+  $("lockText").textContent = isAdmin ? "Settings unlocked (local)" : "Settings locked";
 
   document.querySelectorAll(".adminOnly").forEach(el=>{
     el.disabled = !isAdmin;
@@ -1267,11 +1344,11 @@ function unlockAdmin(){
   if(pw === ADMIN_PASSWORD){
     isAdmin = true;
     setAdminUI();
-    showMsg("ok","<b>Admin unlocked:</b> You can now edit weights, scoring scheme, and benchmarks.");
+    showMsg("ok","<b>Settings unlocked:</b> You can now edit weights, scoring scheme, and benchmarks (local only).");
   }else{
     isAdmin = false;
     setAdminUI();
-    showMsg("bad","<b>Access denied:</b> Wrong admin password.");
+    showMsg("bad","<b>Passphrase mismatch:</b> Unable to unlock advanced settings.");
   }
 }
 function lockAdmin(){
@@ -1554,7 +1631,7 @@ function validateWeightsBaseline_ifAdmin(){
 
   const ok = Math.abs(sum-1.00) <= 0.005;
   $("msgSettings").style.display = ok ? "none" : "block";
-  if(!ok) $("msgSettings").innerHTML = `<b>Admin validation:</b> Baseline weights must sum to 1.00. Current sum = <b>${sum.toFixed(2)}</b>.`;
+  if(!ok) $("msgSettings").innerHTML = `<b>Settings validation:</b> Baseline weights must sum to 1.00. Current sum = <b>${sum.toFixed(2)}</b>.`;
   return ok;
 }
 
@@ -1763,7 +1840,7 @@ function benchmarkText(index){
     parts.push(band);
   }
 
-  if(parts.length===0) return "No benchmarks set by admin.";
+  if(parts.length===0) return "No benchmarks set in advanced settings.";
   return parts.join(" ");
 }
 </script>
@@ -1773,6 +1850,11 @@ function benchmarkText(index){
    Tables: renderAll()
 ========================================================= */
 let chart=null;
+
+const deleteButtonHTML = (label="Delete record") => `
+  <button class="btn btn-danger btn-sm btn-icon" data-act="del" aria-label="${label}">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l1 2h5v2H3V5h5l1-2Zm1 6h2v9h-2V9Zm4 0h2v9h-2V9ZM6 9h2v9H6V9Zm1 12h10a2 2 0 0 0 2-2V9H5v10a2 2 0 0 0 2 2Z"/></svg>
+  </button>`;
 
 function renderAll(){
   renderTeaching();
@@ -1794,16 +1876,16 @@ function renderTeaching(){
   state.data.teaching.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
-      <td><input data-k="code" placeholder="e.g., SJ24102"/></td>
-      <td><input data-k="name" placeholder="Course name"/></td>
-      <td><input data-k="credit" disabled/></td>
-      <td><input data-k="students" type="number" min="0" step="1"/></td>
-      <td><input data-k="lecture" type="number" min="0" step="0.5"/></td>
-      <td><input data-k="tutorial" type="number" min="0" step="0.5"/></td>
-      <td><input data-k="laboratory" type="number" min="0" step="0.5"/></td>
-      <td><input data-k="field" type="number" min="0" step="0.5"/></td>
-      <td><input data-k="contact" disabled/></td>
-      <td><button class="btn danger icon-only" data-act="del" data-icon="🗑️" style="padding:6px 10px;font-size:.8rem" aria-label="Delete row"><span class="btn-label">Delete</span></button></td>
+      <td data-label="Course Code *"><input data-k="code" placeholder="e.g., SJ24102"/></td>
+      <td data-label="Course Title *"><input data-k="name" placeholder="Course title"/></td>
+      <td data-label="Credit"><input data-k="credit" disabled/></td>
+      <td data-label="Students *"><input data-k="students" type="number" min="0" step="1"/></td>
+      <td data-label="Lecture *"><input data-k="lecture" type="number" min="0" step="0.5"/></td>
+      <td data-label="Tutorial *"><input data-k="tutorial" type="number" min="0" step="0.5"/></td>
+      <td data-label="Lab *"><input data-k="laboratory" type="number" min="0" step="0.5"/></td>
+      <td data-label="Field *"><input data-k="field" type="number" min="0" step="0.5"/></td>
+      <td data-label="Contact Hours"><input data-k="contact" disabled/></td>
+      <td class="cell-actions" data-label="Action">${deleteButtonHTML("Delete course")}</td>
     `;
     tb.appendChild(tr);
 
@@ -1837,6 +1919,7 @@ function renderTeaching(){
 
     tr.addEventListener("click",(e)=>{
       if(e.target?.getAttribute("data-act")==="del"){
+        if(!confirmDelete("Delete this course record?")) return;
         state.data.teaching = state.data.teaching.filter(x=>x.id!==tr.dataset.id);
         ensureSeed(); renderAll(); autosave();
       }
@@ -1853,29 +1936,29 @@ function renderSupervision(){
   state.data.supervision.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
-      <td>
+      <td data-label="Level *">
         <select data-k="level">
           <option>Undergraduate</option>
           <option>Master</option>
           <option>PhD</option>
         </select>
       </td>
-      <td><input data-k="title" placeholder="Student name / project"/></td>
-      <td>
+      <td data-label="Student / Project *"><input data-k="title" placeholder="Student name or project"/></td>
+      <td data-label="Role *">
         <select data-k="role">
           <option>Main</option>
           <option>Co-supervisor</option>
         </select>
       </td>
-      <td>
+      <td data-label="Status *">
         <select data-k="status">
           <option>Active</option>
           <option>Completed</option>
         </select>
       </td>
-      <td><input data-k="start" type="date"/></td>
-      <td><input data-k="end" type="date"/></td>
-      <td><button class="btn danger icon-only" data-act="del" data-icon="🗑️" style="padding:6px 10px;font-size:.8rem" aria-label="Delete row"><span class="btn-label">Delete</span></button></td>
+      <td data-label="Start Date *"><input data-k="start" type="date"/></td>
+      <td data-label="End Date *"><input data-k="end" type="date"/></td>
+      <td class="cell-actions" data-label="Action">${deleteButtonHTML("Delete supervision record")}</td>
     `;
     tb.appendChild(tr);
 
@@ -1895,6 +1978,7 @@ function renderSupervision(){
 
     tr.addEventListener("click",(e)=>{
       if(e.target?.getAttribute("data-act")==="del"){
+        if(!confirmDelete("Delete this supervision record?")) return;
         state.data.supervision = state.data.supervision.filter(x=>x.id!==tr.dataset.id);
         ensureSeed(); renderAll(); autosave();
       }
@@ -1911,33 +1995,33 @@ function renderResearch(){
   state.data.research.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
-      <td><input data-k="code" placeholder="Grant code"/></td>
-      <td><input data-k="title" placeholder="Grant title"/></td>
-      <td>
+      <td data-label="Grant Code *"><input data-k="code" placeholder="Grant code"/></td>
+      <td data-label="Title *"><input data-k="title" placeholder="Grant title"/></td>
+      <td data-label="Level *">
         <select data-k="level">
           <option>University</option>
           <option>National</option>
           <option>International</option>
         </select>
       </td>
-      <td>
+      <td data-label="Status *">
         <select data-k="status">
           <option>Active</option>
           <option>Applied</option>
           <option>Ended</option>
         </select>
       </td>
-      <td>
+      <td data-label="Role *">
         <select data-k="role">
           <option>PI</option>
           <option>Co-I</option>
           <option>Member</option>
         </select>
       </td>
-      <td><input data-k="amount" type="number" min="0" step="1" placeholder="RM"/></td>
-      <td><input data-k="start" type="date"/></td>
-      <td><input data-k="end" type="date"/></td>
-      <td><button class="btn danger icon-only" data-act="del" data-icon="🗑️" style="padding:6px 10px;font-size:.8rem" aria-label="Delete row"><span class="btn-label">Delete</span></button></td>
+      <td data-label="Amount (RM) *"><input data-k="amount" type="number" min="0" step="1" placeholder="RM"/></td>
+      <td data-label="Start Date *"><input data-k="start" type="date"/></td>
+      <td data-label="End Date *"><input data-k="end" type="date"/></td>
+      <td class="cell-actions" data-label="Action">${deleteButtonHTML("Delete research record")}</td>
     `;
     tb.appendChild(tr);
 
@@ -1964,6 +2048,7 @@ function renderResearch(){
 
     tr.addEventListener("click",(e)=>{
       if(e.target?.getAttribute("data-act")==="del"){
+        if(!confirmDelete("Delete this research record?")) return;
         state.data.research = state.data.research.filter(x=>x.id!==tr.dataset.id);
         ensureSeed(); renderAll(); autosave();
       }
@@ -1980,9 +2065,9 @@ function renderPublication(){
   state.data.publication.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
-      <td><input data-k="year" type="number" min="1990" step="1"/></td>
-      <td><input data-k="title" placeholder="Publication title"/></td>
-      <td>
+      <td data-label="Year *"><input data-k="year" type="number" min="1990" step="1"/></td>
+      <td data-label="Title *"><input data-k="title" placeholder="Publication title"/></td>
+      <td data-label="Type *">
         <select data-k="type">
           <option>Journal</option>
           <option>Book/Chapter</option>
@@ -1990,21 +2075,21 @@ function renderPublication(){
           <option>Other</option>
         </select>
       </td>
-      <td>
+      <td data-label="Indexed? *">
         <select data-k="indexed">
           <option>Yes</option>
           <option>No</option>
         </select>
       </td>
-      <td>
+      <td data-label="Role *">
         <select data-k="role">
           <option>First/Corresponding</option>
           <option>Co-author</option>
         </select>
       </td>
-      <td><input data-k="start" type="date"/></td>
-      <td><input data-k="end" type="date"/></td>
-      <td><button class="btn danger icon-only" data-act="del" data-icon="🗑️" style="padding:6px 10px;font-size:.8rem" aria-label="Delete row"><span class="btn-label">Delete</span></button></td>
+      <td data-label="Start Date *"><input data-k="start" type="date"/></td>
+      <td data-label="End Date *"><input data-k="end" type="date"/></td>
+      <td class="cell-actions" data-label="Action">${deleteButtonHTML("Delete publication record")}</td>
     `;
     tb.appendChild(tr);
 
@@ -2031,6 +2116,7 @@ function renderPublication(){
 
     tr.addEventListener("click",(e)=>{
       if(e.target?.getAttribute("data-act")==="del"){
+        if(!confirmDelete("Delete this publication record?")) return;
         state.data.publication = state.data.publication.filter(x=>x.id!==tr.dataset.id);
         ensureSeed(); renderAll(); autosave();
       }
@@ -2047,14 +2133,14 @@ function renderAdministration(){
   state.data.admin.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
-      <td><input data-k="position" placeholder="Position / appointment"/></td>
-      <td>
+      <td data-label="Position *"><input data-k="position" placeholder="Position or appointment"/></td>
+      <td data-label="Type *">
         <select data-k="type">
           <option>Official</option>
           <option>Ad-hoc</option>
         </select>
       </td>
-      <td>
+      <td data-label="Level *">
         <select data-k="level">
           <option>Programme</option>
           <option>Faculty</option>
@@ -2065,12 +2151,12 @@ function renderAdministration(){
           <option>Industry</option>
         </select>
       </td>
-      <td><input data-k="months" type="number" min="0" step="1"/></td>
-      <td><input data-k="meetings" type="number" min="0" step="1"/></td>
-      <td><textarea data-k="notes" rows="2" placeholder="Key workload notes"></textarea></td>
-      <td><input data-k="start" type="date"/></td>
-      <td><input data-k="end" type="date"/></td>
-      <td><button class="btn danger icon-only" data-act="del" data-icon="🗑️" style="padding:6px 10px;font-size:.8rem" aria-label="Delete row"><span class="btn-label">Delete</span></button></td>
+      <td data-label="Months *"><input data-k="months" type="number" min="0" step="1"/></td>
+      <td data-label="Meetings *"><input data-k="meetings" type="number" min="0" step="1"/></td>
+      <td data-label="Workload Notes *"><textarea data-k="notes" rows="2" placeholder="Key workload notes"></textarea></td>
+      <td data-label="Start Date *"><input data-k="start" type="date"/></td>
+      <td data-label="End Date *"><input data-k="end" type="date"/></td>
+      <td class="cell-actions" data-label="Action">${deleteButtonHTML("Delete administration record")}</td>
     `;
     tb.appendChild(tr);
 
@@ -2098,6 +2184,7 @@ function renderAdministration(){
 
     tr.addEventListener("click",(e)=>{
       if(e.target?.getAttribute("data-act")==="del"){
+        if(!confirmDelete("Delete this administration record?")) return;
         state.data.admin = state.data.admin.filter(x=>x.id!==tr.dataset.id);
         ensureSeed(); renderAll(); autosave();
       }
@@ -2114,7 +2201,7 @@ function renderServices(){
   state.data.service.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
-      <td>
+      <td data-label="Service Type *">
         <select data-k="type">
           <option>Service to University</option>
           <option>Service to Industry</option>
@@ -2122,18 +2209,18 @@ function renderServices(){
           <option>Other</option>
         </select>
       </td>
-      <td><textarea data-k="activity" rows="2" placeholder="Describe activity"></textarea></td>
-      <td>
+      <td data-label="Activity *"><textarea data-k="activity" rows="2" placeholder="Describe the activity"></textarea></td>
+      <td data-label="Role *">
         <select data-k="role">
           <option>Lead</option>
           <option>Member</option>
         </select>
       </td>
-      <td><input data-k="hours" type="number" min="0" step="0.5"/></td>
-      <td><input data-k="participants" type="number" min="0" step="1"/></td>
-      <td><input data-k="start" type="date"/></td>
-      <td><input data-k="end" type="date"/></td>
-      <td><button class="btn danger icon-only" data-act="del" data-icon="🗑️" style="padding:6px 10px;font-size:.8rem" aria-label="Delete row"><span class="btn-label">Delete</span></button></td>
+      <td data-label="Hours *"><input data-k="hours" type="number" min="0" step="0.5"/></td>
+      <td data-label="Participants *"><input data-k="participants" type="number" min="0" step="1"/></td>
+      <td data-label="Start Date *"><input data-k="start" type="date"/></td>
+      <td data-label="End Date *"><input data-k="end" type="date"/></td>
+      <td class="cell-actions" data-label="Action">${deleteButtonHTML("Delete service record")}</td>
     `;
     tb.appendChild(tr);
 
@@ -2163,6 +2250,7 @@ function renderServices(){
 
     tr.addEventListener("click",(e)=>{
       if(e.target?.getAttribute("data-act")==="del"){
+        if(!confirmDelete("Delete this service record?")) return;
         state.data.service = state.data.service.filter(x=>x.id!==tr.dataset.id);
         ensureSeed(); renderAll(); autosave();
       }
@@ -2179,7 +2267,7 @@ function renderLabOps(){
   state.data.lab.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
-      <td>
+      <td data-label="Activity Type *">
         <select data-k="type">
           <option>Lab Sessions Support</option>
           <option>Equipment/Maintenance</option>
@@ -2189,22 +2277,22 @@ function renderLabOps(){
           <option>Other</option>
         </select>
       </td>
-      <td><textarea data-k="desc" rows="2" placeholder="Describe briefly"></textarea></td>
-      <td><input data-k="volume" type="number" min="0" step="1"/></td>
-      <td>
+      <td data-label="Description *"><textarea data-k="desc" rows="2" placeholder="Describe briefly"></textarea></td>
+      <td data-label="Volume *"><input data-k="volume" type="number" min="0" step="1"/></td>
+      <td data-label="Complexity *">
         <select data-k="complexity">
           <option>Low</option><option>Medium</option><option>High</option>
         </select>
       </td>
-      <td>
+      <td data-label="Urgency *">
         <select data-k="urgency">
           <option>Normal</option><option>Tight</option><option>Critical</option>
         </select>
       </td>
-      <td><input data-k="hours" type="number" min="0" step="0.5"/></td>
-      <td><input data-k="start" type="date"/></td>
-      <td><input data-k="end" type="date"/></td>
-      <td><button class="btn danger icon-only" data-act="del" data-icon="🗑️" style="padding:6px 10px;font-size:.8rem" aria-label="Delete row"><span class="btn-label">Delete</span></button></td>
+      <td data-label="Hours *"><input data-k="hours" type="number" min="0" step="0.5"/></td>
+      <td data-label="Start Date *"><input data-k="start" type="date"/></td>
+      <td data-label="End Date *"><input data-k="end" type="date"/></td>
+      <td class="cell-actions" data-label="Action">${deleteButtonHTML("Delete lab operations record")}</td>
     `;
     tb.appendChild(tr);
 
@@ -2235,6 +2323,7 @@ function renderLabOps(){
 
     tr.addEventListener("click",(e)=>{
       if(e.target?.getAttribute("data-act")==="del"){
+        if(!confirmDelete("Delete this lab operations record?")) return;
         state.data.lab = state.data.lab.filter(x=>x.id!==tr.dataset.id);
         ensureSeed(); renderAll(); autosave();
       }
@@ -2251,7 +2340,7 @@ function renderProSch(){
   state.data.prosch.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
-      <td>
+      <td data-label="Activity Type *">
         <select data-k="activityType">
           <option>Reviewer</option>
           <option>Editor</option>
@@ -2263,29 +2352,29 @@ function renderProSch(){
           <option>Other</option>
         </select>
       </td>
-      <td><textarea data-k="desc" rows="2" placeholder="Describe task (journal/conference/thesis, scope, key notes)"></textarea></td>
-      <td>
+      <td data-label="Description *"><textarea data-k="desc" rows="2" placeholder="Describe task (journal/conference/thesis scope, key notes)"></textarea></td>
+      <td data-label="Role *">
         <select data-k="role">
           <option>Lead</option>
           <option>Member</option>
         </select>
       </td>
-      <td><input data-k="quantity" type="number" min="0" step="1" placeholder="e.g., 3"/></td>
-      <td><input data-k="rounds" type="number" min="1" step="1" placeholder="e.g., 2"/></td>
-      <td>
+      <td data-label="Quantity *"><input data-k="quantity" type="number" min="0" step="1" placeholder="e.g., 3"/></td>
+      <td data-label="Rounds *"><input data-k="rounds" type="number" min="1" step="1" placeholder="e.g., 2"/></td>
+      <td data-label="Complexity *">
         <select data-k="complexity">
           <option>Low</option><option>Medium</option><option>High</option>
         </select>
       </td>
-      <td>
+      <td data-label="Urgency *">
         <select data-k="urgency">
           <option>Normal</option><option>Tight</option><option>Critical</option>
         </select>
       </td>
-      <td><input data-k="hours" type="number" min="0" step="0.5" placeholder="optional"/></td>
-      <td><input data-k="start" type="date"/></td>
-      <td><input data-k="end" type="date"/></td>
-      <td><button class="btn danger icon-only" data-act="del" data-icon="🗑️" style="padding:6px 10px;font-size:.8rem" aria-label="Delete row"><span class="btn-label">Delete</span></button></td>
+      <td data-label="Hours (optional)"><input data-k="hours" type="number" min="0" step="0.5" placeholder="optional"/></td>
+      <td data-label="Start Date *"><input data-k="start" type="date"/></td>
+      <td data-label="End Date *"><input data-k="end" type="date"/></td>
+      <td class="cell-actions" data-label="Action">${deleteButtonHTML("Delete professional service record")}</td>
     `;
     tb.appendChild(tr);
 
@@ -2321,6 +2410,7 @@ function renderProSch(){
 
     tr.addEventListener("click",(e)=>{
       if(e.target?.getAttribute("data-act")==="del"){
+        if(!confirmDelete("Delete this professional service record?")) return;
         state.data.prosch = state.data.prosch.filter(x=>x.id!==tr.dataset.id);
         ensureSeed(); renderAll(); autosave();
       }
@@ -2490,12 +2580,12 @@ function bandFromIndex(x){
 function narrative(scores, aw){
   const items = [
     ["Teaching", scores.Teaching, aw.Teaching, state.enabled.Teaching],
-    ["Supervision", scores.Supervision, aw.Supervision, state.enabled.Supervision],
+    ["Student Supervision", scores.Supervision, aw.Supervision, state.enabled.Supervision],
     ["Research", scores.Research, aw.Research, state.enabled.Research],
     ["Publication", scores.Publication, aw.Publication, state.enabled.Publication],
     ["Administration", scores.Administration, aw.Administration, state.enabled.Administration],
-    ["Services", scores.Services, aw.Services, state.enabled.Services],
-    ["Lab Operations", scores.LabOps, aw.LabOps, state.enabled.LabOps],
+    ["Service & Engagement", scores.Services, aw.Services, state.enabled.Services],
+    ["Laboratory Operations", scores.LabOps, aw.LabOps, state.enabled.LabOps],
     ["Professional & Scholarly Service", scores.ProSch, aw.ProSch, state.enabled.ProSch]
   ].filter(x=>x[3]);
 
@@ -2511,9 +2601,50 @@ function narrative(scores, aw){
   return `Most of the workload is driven by ${topText}${secondText ? `, followed by ${secondText}` : ""}. The lowest contribution is from ${lowText}. This index measures workload intensity (busyness), not performance or quality.`;
 }
 
+function renderTopContributors(scores, aw){
+  const items = [
+    {label:"Teaching", value:scores.Teaching*aw.Teaching, enabled:state.enabled.Teaching},
+    {label:"Student Supervision", value:scores.Supervision*aw.Supervision, enabled:state.enabled.Supervision},
+    {label:"Research", value:scores.Research*aw.Research, enabled:state.enabled.Research},
+    {label:"Publication", value:scores.Publication*aw.Publication, enabled:state.enabled.Publication},
+    {label:"Administration", value:scores.Administration*aw.Administration, enabled:state.enabled.Administration},
+    {label:"Service & Engagement", value:scores.Services*aw.Services, enabled:state.enabled.Services},
+    {label:"Laboratory Operations", value:scores.LabOps*aw.LabOps, enabled:state.enabled.LabOps},
+    {label:"Professional & Scholarly Service", value:scores.ProSch*aw.ProSch, enabled:state.enabled.ProSch}
+  ].filter(x=>x.enabled);
+
+  items.sort((a,b)=>b.value-a.value);
+  const top = items.slice(0,3);
+  const list = $("outTop3");
+  list.innerHTML = "";
+  if(top.length===0){
+    const li = document.createElement("li");
+    li.textContent = "—";
+    list.appendChild(li);
+    return;
+  }
+  top.forEach(item=>{
+    const li = document.createElement("li");
+    li.innerHTML = `<strong>${item.label}</strong> — ${item.value.toFixed(1)} weighted points`;
+    list.appendChild(li);
+  });
+}
+
 function deanViewSummary(index, band, aw){
-  const on = Object.entries(state.enabled).filter(([k,v])=>v).map(([k])=>k).join(", ");
-  const w = Object.entries(aw).filter(([k,v])=>v>0).map(([k,v])=>`${k}:${v.toFixed(2)}`).join(" | ");
+  const labelMap = {
+    Supervision:"Student Supervision",
+    Services:"Service & Engagement",
+    LabOps:"Laboratory Operations",
+    ProSch:"Professional & Scholarly Service"
+  };
+  const on = Object.entries(state.enabled)
+    .filter(([k,v])=>v)
+    .map(([k])=>labelMap[k] || k)
+    .join(", ");
+  const w = Object.entries(aw)
+    .filter(([k,v])=>v>0)
+    .map(([k,v])=>`${labelMap[k] || k}:${v.toFixed(2)}`)
+    .join(" | ");
   const bm = benchmarkText(index);
 
   return `Name: ${state.profile.name} | Staff ID: ${state.profile.staffId} | Category: ${state.profile.category} | Reporting Period: ${state.profile.period} | Sections ON: ${on} | Normalized weights: ${w} | Busyness Index (points per month): ${index.toFixed(1)} (${band.label}) | Benchmark: ${bm}`;
@@ -2524,6 +2655,16 @@ function deanViewSummary(index, band, aw){
 ========================================================= */
 function drawChart(scores, aw){
   const labels=[], vals=[], colors=[];
+  const palette = {
+    Teaching: "rgba(124,157,255,0.82)",
+    Supervision: "rgba(60,201,255,0.82)",
+    Research: "rgba(50,210,156,0.82)",
+    Publication: "rgba(240,148,196,0.82)",
+    Administration: "rgba(242,180,74,0.82)",
+    Services: "rgba(251,136,152,0.82)",
+    LabOps: "rgba(67,211,137,0.82)",
+    ProSch: "rgba(160,170,190,0.82)"
+  };
   const pushIf=(on,label,raw,w,color)=>{
     if(!on) return;
     labels.push(label);
@@ -2531,14 +2672,14 @@ function drawChart(scores, aw){
     colors.push(color);
   };
 
-  pushIf(state.enabled.Teaching, "Teaching", scores.Teaching, aw.Teaching, "rgba(120,120,120,.75)");
-  pushIf(state.enabled.Supervision, "Supervision", scores.Supervision, aw.Supervision, "rgba(120,120,120,.75)");
-  pushIf(state.enabled.Research, "Research", scores.Research, aw.Research, "rgba(120,120,120,.75)");
-  pushIf(state.enabled.Publication, "Publication", scores.Publication, aw.Publication, "rgba(120,120,120,.75)");
-  pushIf(state.enabled.Administration, "Administration", scores.Administration, aw.Administration, "rgba(120,120,120,.75)");
-  pushIf(state.enabled.Services, "Services", scores.Services, aw.Services, "rgba(120,120,120,.75)");
-  pushIf(state.enabled.LabOps, "Lab Operations", scores.LabOps, aw.LabOps, "rgba(120,120,120,.75)");
-  pushIf(state.enabled.ProSch, "Professional & Scholarly Service", scores.ProSch, aw.ProSch, "rgba(120,120,120,.75)");
+  pushIf(state.enabled.Teaching, "Teaching", scores.Teaching, aw.Teaching, palette.Teaching);
+  pushIf(state.enabled.Supervision, "Student Supervision", scores.Supervision, aw.Supervision, palette.Supervision);
+  pushIf(state.enabled.Research, "Research", scores.Research, aw.Research, palette.Research);
+  pushIf(state.enabled.Publication, "Publication", scores.Publication, aw.Publication, palette.Publication);
+  pushIf(state.enabled.Administration, "Administration", scores.Administration, aw.Administration, palette.Administration);
+  pushIf(state.enabled.Services, "Service & Engagement", scores.Services, aw.Services, palette.Services);
+  pushIf(state.enabled.LabOps, "Laboratory Operations", scores.LabOps, aw.LabOps, palette.LabOps);
+  pushIf(state.enabled.ProSch, "Professional & Scholarly Service", scores.ProSch, aw.ProSch, palette.ProSch);
 
   const ctx=$("chart").getContext("2d");
   if(chart) chart.destroy();
@@ -2572,7 +2713,7 @@ function calculate(){
   renderAll();
 
   if(!validateWeightsBaseline_ifAdmin()){
-    showMsg("warn","<b>Admin validation:</b> Fix weights so baseline sum is 1.00.");
+    showMsg("warn","<b>Settings validation:</b> Fix weights so baseline sum is 1.00.");
     return;
   }
   if(!validateActivityTables()) return;
@@ -2632,6 +2773,7 @@ function calculate(){
 
   $("outNarr").textContent = narrative(scores, aw);
   $("outDean").textContent = deanViewSummary(index, b, aw);
+  renderTopContributors(scores, aw);
 
   updateBenchmarkUI(index);
   drawChart(scores, aw);
@@ -2651,6 +2793,7 @@ function syncPrintFields(){
   $("printName").textContent = name;
   $("printId").textContent = id;
   $("printDate").textContent = new Date().toLocaleString();
+  $("printFooterDate").textContent = new Date().toLocaleDateString();
 }
 </script>
 
@@ -2864,7 +3007,7 @@ function manualPDF(){
     "Choose reporting period (Monthly, Quarterly, Semester, Annual). All section scores are normalized to points per month.",
     "Select Category preset to auto-set ON/OFF sections and baseline weights. You may still toggle sections if needed.",
     "Fill required fields (marked *) in each section, then click Calculate. Use Print for a B/W summary or Export for CSV/JSON.",
-    "Admin may unlock Settings to adjust baseline weights, caps and scoring parameters."
+    "Advanced settings can be unlocked locally to adjust baseline weights, caps and scoring parameters."
   ]);
   hr();
 
@@ -2874,11 +3017,11 @@ function manualPDF(){
     "Profile: Name, Staff ID, Category (Academic / Administrative / Laboratory), Unit/School/Department, Grade (or Other + text), Status (or Other + text), Reporting Period.",
     "Section toggles: Turn ON only relevant sections. Category presets update ON/OFF and baseline weights automatically.",
     "Teaching: Course code and name, enrolled students, lecture/tutorial/lab/field contact hours, start/end. Credit is auto-read from the last digit of the course code; contact hours auto-sum.",
-    "Supervision: Level (Undergraduate, Master, PhD), student/project title, role (Main/Co), status (Active/Completed/Applied), start/end.",
+    "Student Supervision: Level (Undergraduate, Master, PhD), student/project title, role (Main/Co), status (Active/Completed/Applied), start/end.",
     "Research (Grants/Projects): Grant code, title, level (University/National/International), status, role (PI/Co-I/Member), amount (RM), start/end.",
     "Publication: Year, title, type (Journal/Book-Chapter/Proceeding/Other), indexed? (Yes/No), role (First/Corresponding/Co-Author), start/end.",
     "Administration: Position, type (Official/Other), level (Programme to Industry), months in role, meetings, workload notes, start/end.",
-    "Services: Service type, activity, role (Lead/Member), hours, participants, start/end.",
+    "Service & Engagement: Service type, activity, role (Lead/Member), hours, participants, start/end.",
     "Laboratory Operations: Type, description, volume, complexity, urgency, hours, start/end. Turn ON for Laboratory staff or roles with lab duties.",
     "Professional & Scholarly Service: Activity type (Reviewer/Editor/Examiner/Committee), description, role, quantity, rounds, complexity, urgency, hours, start/end."
   ]);
@@ -2903,11 +3046,11 @@ final_index = clamp(index, 0, 100)`);
   headerBox("4. Section Formulas (Busyness-based)");
   formula(
 `Teaching = sum[(contact_hours * hourW) + ((students/100) * studW) + (credit * creditW)]
-Supervision = sum[base(level) * role_multiplier * status_multiplier]
+Student Supervision = sum[base(level) * role_multiplier * status_multiplier]
 Research = sum[base * level_multiplier * role_multiplier * status_multiplier]
 Publication = sum[base * type_multiplier * indexed_multiplier * role_multiplier]
 Administration = sum[(base(level) + meetings * meetW + months * monthW) * type_multiplier]
-Services = sum[(hours * hourW) + ((participants/10) * paxW) + role_bonus]
+Service & Engagement = sum[(hours * hourW) + ((participants/10) * paxW) + role_bonus]
 Lab Operations = sum[(volume * volW + hours * hourW) * complexity_multiplier * urgency_multiplier]
 Professional & Scholarly Service = sum[((base * quantity * rounds) + hours) * role_multiplier * complexity_multiplier * urgency_multiplier]`);
   hr();
@@ -2916,11 +3059,11 @@ Professional & Scholarly Service = sum[((base * quantity * rounds) + hours) * ro
   paragraph("Caps are applied per section with tail rates (diminishing returns beyond the cap).");
   formula(
 `Teaching cap=35, tail=0.40
-Supervision cap=25, tail=0.45
+Student Supervision cap=25, tail=0.45
 Research cap=30, tail=0.45
 Publication cap=20, tail=0.50
 Administration cap=35, tail=0.45
-Services cap=25, tail=0.50
+Service & Engagement cap=25, tail=0.50
 Laboratory Operations cap=35, tail=0.45
 Professional & Scholarly Service cap=25, tail=0.50`);
   hr();
@@ -2928,37 +3071,37 @@ Professional & Scholarly Service cap=25, tail=0.50`);
   headerBox("6. Worked Examples by Staff Category (using default presets)");
   paragraph("Examples use current default scoring parameters (version 2.0). Points shown are already normalized to the selected reporting period.");
 
-  subhead("Academic (period: Monthly; sections ON: Teaching, Supervision, Research, Publication, Administration, Services, ProSch)");
-  paragraph("Baseline weights: Teaching 0.28, Supervision 0.14, Research 0.20, Publication 0.10, Administration 0.12, Services 0.08, Professional & Scholarly Service 0.08.");
+  subhead("Academic (period: Monthly; sections ON: Teaching, Student Supervision, Research, Publication, Administration, Service & Engagement, ProSch)");
+  paragraph("Baseline weights: Teaching 0.28, Student Supervision 0.14, Research 0.20, Publication 0.10, Administration 0.12, Service & Engagement 0.08, Professional & Scholarly Service 0.08.");
   formula(
 `Data entered:
 - Teaching: 2 courses -> 10.12 pts (contact hours + students + credits)
-- Supervision: 2 Master (Main, Active) + 1 PhD (Main, Active) -> 10.50 pts
+- Student Supervision: 2 Master (Main, Active) + 1 PhD (Main, Active) -> 10.50 pts
 - Research: 1 National grant (PI, Active) -> 13.44 pts
 - Publication: 2 indexed journal papers (First/Corresponding) -> 20.16 raw -> 20.08 after cap (cap 20, tail 0.50)
 - Administration: Faculty appointment (12 months, 4 meetings) -> 14.60 pts
-- Services: Lead outreach (10 hours, 60 pax) -> 18.80 pts
+- Service & Engagement: Lead outreach (10 hours, 60 pax) -> 18.80 pts
 - Professional & Scholarly Service: Reviewer (3 manuscripts, 2 rounds, High complexity, Tight urgency, +5 hours) -> 46.00 raw -> 35.50 after cap (cap 25, tail 0.50)
  Index = (10.12*0.28)+(10.50*0.14)+(13.44*0.20)+(20.08*0.10)+(14.60*0.12)+(18.80*0.08)+(35.50*0.08)
  Index ≈ 15.10 points per month`);
 
-  subhead("Administrative (period: Quarterly = 3 months; sections ON: Administration, Services, ProSch)");
-  paragraph("Baseline weights: Administration 0.55, Services 0.30, Professional & Scholarly Service 0.15.");
+  subhead("Administrative (period: Quarterly = 3 months; sections ON: Administration, Service & Engagement, ProSch)");
+  paragraph("Baseline weights: Administration 0.55, Service & Engagement 0.30, Professional & Scholarly Service 0.15.");
   formula(
 `Data entered:
 - Administration: 2 roles (Faculty level: 3 months, 8 meetings; University level: 3 months, 4 meetings) -> 31.80 raw -> 10.60 per month
-- Services: Lead outreach (15 hours, 120 pax) + Member support (6 hours, 40 pax) -> 39.30 raw -> 13.10 per month
+- Service & Engagement: Lead outreach (15 hours, 120 pax) + Member support (6 hours, 40 pax) -> 39.30 raw -> 13.10 per month
 - Professional & Scholarly Service: External examiner (2 rounds, High complexity, Normal urgency, +6 hours, Lead) -> 24.96 raw -> 8.32 per month
  Index = (10.60*0.55) + (13.10*0.30) + (8.32*0.15)
  Index ≈ 11.00 points per month`);
 
-  subhead("Laboratory (period: Monthly; sections ON: Administration, Services, Lab Operations, ProSch)");
-  paragraph("Baseline weights: Administration 0.40, Services 0.20, Laboratory Operations 0.30, Professional & Scholarly Service 0.10.");
+  subhead("Laboratory (period: Monthly; sections ON: Administration, Service & Engagement, Laboratory Operations, ProSch)");
+  paragraph("Baseline weights: Administration 0.40, Service & Engagement 0.20, Laboratory Operations 0.30, Professional & Scholarly Service 0.10.");
   formula(
 `Data entered:
 - Laboratory Operations: Equipment maintenance (vol=25, hrs=14, Medium, Tight) + Sample processing (vol=40, hrs=20, High, Critical) -> 207.38 raw -> 112.57 after cap (cap 35, tail 0.45)
 - Administration: Lab safety officer (12 months, 4 meetings, Faculty level) -> 14.60 pts
-- Services: Training session (Lead, 8 hours, 30 participants) -> 14.40 pts
+- Service & Engagement: Training session (Lead, 8 hours, 30 participants) -> 14.40 pts
 - Professional & Scholarly Service: 2 reviews (1 round, Medium complexity, Normal urgency, +4 hours) -> 13.00 pts
  Index = (112.57*0.30) + (14.60*0.40) + (14.40*0.20) + (13.00*0.10)
  Index ≈ 43.79 points per month`);
@@ -3051,7 +3194,7 @@ function init(){
     });
   });
 
-  // Admin
+  // Advanced settings
   $("btnAdminUnlock").addEventListener("click",(e)=>{ e.preventDefault(); unlockAdmin(); });
   $("btnAdminLock").addEventListener("click",(e)=>{ e.preventDefault(); lockAdmin(); });
 
@@ -3092,9 +3235,29 @@ function init(){
 
   $("btnManual").onclick=(e)=>{e.preventDefault(); manualPDF();};
 
-  $("btnExportSummaryCSV").onclick=(e)=>{e.preventDefault(); exportSummaryCSV();};
-  $("btnExportDetailedCSV").onclick=(e)=>{e.preventDefault(); exportDetailedCSV();};
-  $("btnExportJSON").onclick=(e)=>{e.preventDefault(); exportJSON();};
+  const exportToggle = $("btnExportToggle");
+  const exportMenu = $("exportMenu");
+  const closeExportMenu = ()=>{
+    exportMenu.classList.remove("open");
+    exportToggle.setAttribute("aria-expanded","false");
+  };
+  exportToggle.onclick=(e)=>{
+    e.preventDefault();
+    const isOpen = exportMenu.classList.toggle("open");
+    exportToggle.setAttribute("aria-expanded", String(isOpen));
+  };
+  document.addEventListener("click",(e)=>{
+    if(!exportMenu.contains(e.target) && !exportToggle.contains(e.target)){
+      closeExportMenu();
+    }
+  });
+  document.addEventListener("keydown",(e)=>{
+    if(e.key==="Escape") closeExportMenu();
+  });
+
+  $("btnExportSummaryCSV").onclick=(e)=>{e.preventDefault(); exportSummaryCSV(); closeExportMenu();};
+  $("btnExportDetailedCSV").onclick=(e)=>{e.preventDefault(); exportDetailedCSV(); closeExportMenu();};
+  $("btnExportJSON").onclick=(e)=>{e.preventDefault(); exportJSON(); closeExportMenu();};
 
   // Save / Reset
   $("btnSaveLocal").onclick=(e)=>{e.preventDefault(); saveNow();};
