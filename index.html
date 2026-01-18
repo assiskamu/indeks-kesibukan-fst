@@ -1,4 +1,10 @@
 <!doctype html>
+<!--
+  Changes:
+  - Reworked layout into left-side tabs with a sticky action bar for Calculate/Print/Export.
+  - Switched to a flat, high-contrast palette and improved text wrapping/visibility.
+  - Reorganized Advanced Settings into per-section groups and ensured empty table placeholders.
+-->
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
@@ -21,21 +27,22 @@
 
   <style>
     :root{
-      /* Web theme (professional dark). Print will override to B/W + gray. */
-      --bg:#0b1220;
-      --surface:#101a2d;
-      --surface-2:#141f36;
+      /* Web theme (professional flat). Print will override to B/W + gray. */
+      --bg:#0f1218;
+      --surface:#1a2230;
+      --surface-2:#212b3b;
       --border:rgba(255,255,255,.12);
-      --shadow: 0 18px 60px rgba(0,0,0,.45);
-      --radius: 18px;
+      --shadow: 0 16px 40px rgba(0,0,0,.35);
+      --radius: 16px;
+      --action-bar-height: 72px;
 
-      --text:#eaf0ff;
-      --muted:#b8c3e6;
+      --text:#f1f5f9;
+      --muted:#cbd5e1;
 
-      --primary:#4cc7ff;
-      --accent:#2bd4bf;
-      --danger:#ff5b6e;
-      --warn:#ffb020;
+      --primary:#3b82f6;
+      --accent:#22c55e;
+      --danger:#ef4444;
+      --warn:#f59e0b;
 
       --t:#7c9dff;
       --sv:#3cc9ff;
@@ -55,17 +62,13 @@
     body{
       margin:0;
       font-family: var(--font);
-      background:
-        radial-gradient(1200px 700px at 20% 5%, rgba(96,165,250,.18), transparent 55%),
-        radial-gradient(1000px 650px at 80% 10%, rgba(244,114,182,.14), transparent 60%),
-        radial-gradient(900px 650px at 70% 80%, rgba(45,212,191,.12), transparent 55%),
-        linear-gradient(180deg, #070b15, #0b1220 45%, #070b15);
+      background: var(--bg);
       color:var(--text);
       -webkit-text-size-adjust: 100%;
       text-rendering: optimizeLegibility;
     }
 
-    .wrap{max-width:1180px;margin:0 auto;padding:22px 18px 80px}
+    .wrap{max-width:1280px;margin:0 auto;padding:22px 18px calc(var(--action-bar-height) + 28px)}
 
     /* =========================
        Top bar (mobile-friendly)
@@ -73,11 +76,11 @@
     .topbar{
       display:flex;align-items:center;justify-content:space-between;gap:14px;
       padding:14px 16px;border:1px solid var(--border);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      background: var(--surface);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       position:sticky;top:10px;z-index:20;
-      backdrop-filter: blur(10px);
+      backdrop-filter: none;
     }
     .brand{display:flex;align-items:center;gap:14px;min-width:0}
     .logoBox{
@@ -122,19 +125,19 @@
     .btn:hover{background:rgba(255,255,255,.10)}
     .btn:active{transform: translateY(1px)}
     .btn-primary{
-      background:linear-gradient(180deg, rgba(76,199,255,.45), rgba(76,199,255,.18));
-      border-color: rgba(76,199,255,.65);
-      color:#041521;
+      background:var(--primary);
+      border-color: rgba(59,130,246,.85);
+      color:#0b1220;
     }
     .btn-secondary{background:rgba(255,255,255,.08)}
     .btn-ghost{background:transparent}
     .btn-danger{
-      background:linear-gradient(180deg, rgba(255,91,110,.35), rgba(255,91,110,.14));
-      border-color: rgba(255,91,110,.55);
+      background:rgba(239,68,68,.2);
+      border-color: rgba(239,68,68,.6);
     }
     .btn-warn{
-      background:linear-gradient(180deg, rgba(255,176,32,.38), rgba(255,176,32,.16));
-      border-color: rgba(255,176,32,.55);
+      background:rgba(245,158,11,.2);
+      border-color: rgba(245,158,11,.6);
     }
     .btn-sm{padding:6px 10px;border-radius:10px;font-size:.82rem}
     .btn-md{padding:12px 18px;border-radius:14px;font-size:.95rem}
@@ -171,79 +174,74 @@
       border-radius: var(--radius);
       overflow:hidden;
       box-shadow: var(--shadow);
+      background: var(--surface);
     }
     .section header{
       display:flex;gap:10px;align-items:flex-start;justify-content:space-between;
       padding:16px 18px;
       border-bottom:1px solid rgba(255,255,255,.10);
     }
-    .section.collapsed header{border-bottom-color:transparent}
     .section h2{margin:0;font-size:15px;letter-spacing:.2px;font-family:var(--font)}
     .section .sub{margin-top:4px;color:var(--muted);font-size:12px;max-width:920px;font-family:var(--font)}
     .content{padding:16px 18px}
-    .section.collapsed .content{display:none}
 
-    /* Strong section backgrounds (web only) */
-    .profile{
-      background:
-        radial-gradient(900px 520px at 18% 10%, rgba(96,165,250,.46) 0%, rgba(96,165,250,0) 58%),
-        linear-gradient(180deg, rgba(96,165,250,.22), rgba(255,255,255,.03));
+    /* Flat section accents */
+    .profile{border-left:4px solid var(--t)}
+    .toggles{border-left:4px solid #a78bfa}
+    .settings{border-left:4px solid var(--set)}
+    .teaching{border-left:4px solid var(--t)}
+    .supervision{border-left:4px solid var(--sv)}
+    .research{border-left:4px solid var(--r)}
+    .publication{border-left:4px solid var(--p)}
+    .admin{border-left:4px solid var(--a)}
+    .service{border-left:4px solid var(--s)}
+    .labops{border-left:4px solid var(--l)}
+    .results{border-left:4px solid var(--accent)}
+    .prosch{border-left:4px solid #94a3b8}
+
+    .appShell{
+      display:grid;
+      grid-template-columns:240px minmax(0,1fr);
+      gap:18px;
+      margin-top:18px;
+      align-items:start;
     }
-    .toggles{
-      background:
-        radial-gradient(900px 520px at 18% 10%, rgba(167,139,250,.46) 0%, rgba(167,139,250,0) 58%),
-        linear-gradient(180deg, rgba(167,139,250,.22), rgba(255,255,255,.03));
+    #sidebar{
+      position:sticky;
+      top:110px;
+      align-self:start;
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:14px;
+      box-shadow: var(--shadow);
     }
-    .settings{
-      background:
-        radial-gradient(900px 520px at 18% 10%, rgba(96,165,250,.44) 0%, rgba(96,165,250,0) 58%),
-        linear-gradient(180deg, rgba(96,165,250,.20), rgba(255,255,255,.03));
+    .tablist{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
     }
-    .teaching{
-      background:
-        radial-gradient(900px 520px at 18% 10%, rgba(167,139,250,.48) 0%, rgba(167,139,250,0) 60%),
-        linear-gradient(180deg, rgba(167,139,250,.22), rgba(255,255,255,.03));
+    .tab-btn{
+      border:1px solid transparent;
+      background:transparent;
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      text-align:left;
+      cursor:pointer;
+      font-weight:600;
+      font-family:var(--font);
     }
-    .supervision{
-      background:
-        radial-gradient(900px 520px at 18% 10%, rgba(56,189,248,.48) 0%, rgba(56,189,248,0) 60%),
-        linear-gradient(180deg, rgba(56,189,248,.22), rgba(255,255,255,.03));
+    .tab-btn[aria-selected="true"]{
+      background:rgba(59,130,246,.18);
+      border-color:rgba(59,130,246,.6);
     }
-    .research{
-      background:
-        radial-gradient(900px 520px at 18% 10%, rgba(52,211,153,.46) 0%, rgba(52,211,153,0) 60%),
-        linear-gradient(180deg, rgba(52,211,153,.20), rgba(255,255,255,.03));
+    .tab-btn:focus-visible{
+      outline:3px solid rgba(59,130,246,.85);
+      outline-offset:2px;
     }
-    .publication{
-      background:
-        radial-gradient(900px 520px at 18% 10%, rgba(244,114,182,.46) 0%, rgba(244,114,182,0) 60%),
-        linear-gradient(180deg, rgba(244,114,182,.20), rgba(255,255,255,.03));
-    }
-    .admin{
-      background:
-        radial-gradient(900px 520px at 18% 10%, rgba(251,191,36,.48) 0%, rgba(251,191,36,0) 60%),
-        linear-gradient(180deg, rgba(251,191,36,.18), rgba(255,255,255,.03));
-    }
-    .service{
-      background:
-        radial-gradient(900px 520px at 18% 10%, rgba(251,113,133,.48) 0%, rgba(251,113,133,0) 60%),
-        linear-gradient(180deg, rgba(251,113,133,.18), rgba(255,255,255,.03));
-    }
-    .labops{
-      background:
-        radial-gradient(900px 520px at 18% 10%, rgba(34,197,94,.48) 0%, rgba(34,197,94,0) 60%),
-        linear-gradient(180deg, rgba(34,197,94,.18), rgba(255,255,255,.03));
-    }
-    .results{
-      background:
-        radial-gradient(900px 520px at 18% 10%, rgba(45,212,191,.48) 0%, rgba(45,212,191,0) 60%),
-        linear-gradient(180deg, rgba(45,212,191,.18), rgba(255,255,255,.03));
-    }
-    .prosch{
-      background:
-        radial-gradient(900px 520px at 18% 10%, rgba(160,160,160,.34) 0%, rgba(160,160,160,0) 60%),
-        linear-gradient(180deg, rgba(180,180,180,.12), rgba(255,255,255,.03));
-    }
+    #mainContent{min-width:0;padding-bottom:var(--action-bar-height)}
+    .tab-panel.is-hidden{display:none}
 
     /* =========================
        Layout grids
@@ -258,7 +256,7 @@
     label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;font-family:var(--font)}
     input,select,textarea{
       width:100%;
-      background:rgba(7,11,21,.55);
+      background:rgba(15,18,24,.6);
       border:1px solid rgba(255,255,255,.14);
       color:var(--text);
       border-radius:12px;
@@ -277,6 +275,9 @@
       min-height:70px;
       resize:vertical;
       overflow:hidden; /* enables auto-grow without scrollbars */
+      white-space: pre-wrap;
+      overflow-wrap:anywhere;
+      word-break:break-word;
     }
     input.err, select.err, textarea.err{border-color: rgba(255,91,110,.85) !important; box-shadow: 0 0 0 3px rgba(255,91,110,.18)}
     .hint{font-size:12px;color:var(--muted);margin-top:6px;font-family:var(--font)}
@@ -291,7 +292,7 @@
       -webkit-overflow-scrolling: touch;
       border-radius: 14px;
       border:1px solid rgba(255,255,255,.1);
-      background:rgba(8,14,28,.35);
+      background:var(--surface-2);
     }
     table{width:100%;border-collapse:collapse;min-width:0}
     th,td{
@@ -300,6 +301,9 @@
       vertical-align:top;
       font-family:var(--font);
       min-width:0;
+      white-space:normal;
+      overflow-wrap:anywhere;
+      word-break:break-word;
     }
     th{font-size:12px;color:var(--muted);text-align:left}
     td input, td select, td textarea{
@@ -390,6 +394,22 @@
     .notice.warn{border-color: rgba(255,176,32,.55); background: rgba(255,176,32,.10); color:#ffe9c2}
     .notice.ok{border-color: rgba(45,212,191,.55); background: rgba(45,212,191,.10); color:#d9fffb}
 
+    .settings-grid{
+      display:grid;
+      gap:16px;
+    }
+    .settings-card{
+      border:1px solid rgba(255,255,255,.12);
+      background:var(--surface-2);
+      border-radius:14px;
+      padding:14px;
+    }
+    .settings-card h3{
+      margin:0 0 8px;
+      font-size:14px;
+      letter-spacing:.2px;
+    }
+
     .kpi{
       display:grid;gap:10px;
       grid-template-columns:repeat(4, minmax(0,1fr));
@@ -430,8 +450,30 @@
       cursor:pointer;
     }
     .icon-btn svg{width:16px;height:16px;fill:currentColor}
-    .collapse-btn svg{transition: transform .18s ease}
-    .section.collapsed .collapse-btn svg{transform: rotate(-90deg)}
+
+    .action-bar{
+      position:fixed;
+      bottom:0;
+      left:0;
+      right:0;
+      z-index:40;
+      background:rgba(15,18,24,.98);
+      border-top:1px solid var(--border);
+      padding:10px 18px;
+      display:flex;
+      justify-content:center;
+    }
+    .action-bar .action-inner{
+      width:min(1280px, 100%);
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:10px;
+    }
+    .action-bar .dropdown-menu{
+      top:auto;
+      bottom:calc(100% + 8px);
+    }
 
     /* =========================
        Modal
@@ -503,7 +545,7 @@
     }
     .adminPanel input{
       width:220px;
-      background:rgba(7,11,21,.65);
+      background:rgba(15,18,24,.65);
     }
     .adminPanel .small{flex-basis:100%}
     .small{font-size:12px;color:var(--muted);font-family:var(--font)}
@@ -512,7 +554,7 @@
        RESPONSIVE (Phone/Tablet)
     ========================= */
     @media(max-width:980px){
-      .wrap{padding:14px 12px 70px}
+      .wrap{padding:14px 12px calc(var(--action-bar-height) + 20px)}
       .topbar{position:relative;top:auto;flex-direction:column;align-items:stretch;gap:12px}
       .brand{width:100%}
       .logoBox{width:110px;height:66px}
@@ -522,6 +564,15 @@
       .modal-grid{grid-template-columns:1fr}
       .kpi{grid-template-columns:repeat(2, minmax(0,1fr))}
       .btn{padding:12px 12px}
+      .appShell{grid-template-columns:1fr}
+      #sidebar{position:static}
+      .tablist{
+        flex-direction:row;
+        overflow-x:auto;
+        padding-bottom:6px;
+      }
+      .tab-btn{white-space:nowrap}
+      .action-bar{padding:10px 12px}
     }
     @media(max-width:520px){
       .kpi{grid-template-columns:1fr}
@@ -557,7 +608,8 @@
       }
 
       /* Hide web controls */
-      .topbar,.noPrint,#secSettings,#secToggles{display:none !important}
+      .topbar,.noPrint,#secSettings,#secToggles,#sidebar,#actionBar{display:none !important}
+      .appShell{grid-template-columns:1fr !important}
 
       .wrap{max-width: 100% !important; padding:0 !important}
 
@@ -659,8 +711,27 @@
     </div>
   </div>
 
+  <div class="appShell">
+    <aside id="sidebar">
+      <nav class="tablist" role="tablist" aria-label="Section navigation">
+        <button class="tab-btn" id="tabProfile" role="tab" aria-controls="secProfile" aria-selected="true" tabindex="0">Staff Profile</button>
+        <button class="tab-btn" id="tabToggles" role="tab" aria-controls="secToggles" aria-selected="false" tabindex="-1">Section Applicability (On/Off)</button>
+        <button class="tab-btn" id="tabSettings" role="tab" aria-controls="secSettings" aria-selected="false" tabindex="-1">Advanced Settings (Local)</button>
+        <button class="tab-btn" id="tabTeaching" role="tab" aria-controls="secTeaching" aria-selected="false" tabindex="-1">Teaching</button>
+        <button class="tab-btn" id="tabSupervision" role="tab" aria-controls="secSupervision" aria-selected="false" tabindex="-1">Student Supervision</button>
+        <button class="tab-btn" id="tabResearch" role="tab" aria-controls="secResearch" aria-selected="false" tabindex="-1">Research</button>
+        <button class="tab-btn" id="tabPublication" role="tab" aria-controls="secPublication" aria-selected="false" tabindex="-1">Publication</button>
+        <button class="tab-btn" id="tabAdministration" role="tab" aria-controls="secAdmin" aria-selected="false" tabindex="-1">Administration</button>
+        <button class="tab-btn" id="tabService" role="tab" aria-controls="secService" aria-selected="false" tabindex="-1">Service & Engagement</button>
+        <button class="tab-btn" id="tabLabOps" role="tab" aria-controls="secLabOps" aria-selected="false" tabindex="-1">Laboratory Operations</button>
+        <button class="tab-btn" id="tabProSch" role="tab" aria-controls="secProSch" aria-selected="false" tabindex="-1">Professional & Scholarly Service</button>
+        <button class="tab-btn" id="tabResults" role="tab" aria-controls="secResults" aria-selected="false" tabindex="-1">Results</button>
+      </nav>
+    </aside>
+    <main id="mainContent">
+
   <!-- PROFILE -->
-  <section class="section profile" id="secProfile">
+  <section class="section profile tab-panel" id="secProfile" role="tabpanel" aria-labelledby="tabProfile" tabindex="0">
     <header>
       <div>
         <h2>Staff Profile</h2>
@@ -746,7 +817,7 @@
   </section>
 
   <!-- TOGGLES -->
-  <section class="section toggles" id="secToggles">
+  <section class="section toggles tab-panel" id="secToggles" role="tabpanel" aria-labelledby="tabToggles" tabindex="0">
     <header>
       <div>
         <h2>Section Applicability (On/Off)</h2>
@@ -776,7 +847,7 @@
   </section>
 
   <!-- SETTINGS (ADMIN ONLY) -->
-  <section class="section settings" id="secSettings">
+  <section class="section settings tab-panel" id="secSettings" role="tabpanel" aria-labelledby="tabSettings" tabindex="0">
     <header>
       <div>
         <h2>Advanced Settings (Local Configuration)</h2>
@@ -788,106 +859,133 @@
     </header>
     <div class="content">
       <div id="msgSettings" class="notice warn" style="display:none;"></div>
+      <div class="settings-grid">
+        <div class="settings-card">
+          <h3>Weight Logic / Notes</h3>
+          <div class="notice">
+            <b>Important:</b> This tool measures <b>busyness (workload)</b>, not performance.
+            Scoring emphasizes workload indicators (time, volume, meetings, duration, responsibility) and excludes quality/outcome metrics (e.g., journal quartiles, impact factors).
+          </div>
+          <div class="spacer"></div>
+          <div class="row noPrint">
+            <button class="btn adminOnly" id="btnPresetAcademic"><span class="btn-label">Preset: Academic</span></button>
+            <button class="btn adminOnly" id="btnPresetAdmin"><span class="btn-label">Preset: Administrative</span></button>
+            <button class="btn adminOnly" id="btnPresetLab"><span class="btn-label">Preset: Laboratory</span></button>
+          </div>
+          <div class="spacer"></div>
+          <div class="notice">
+            <b>Weight logic:</b> Baseline weights must sum to <b>1.00</b>.
+            During calculation, the tool uses only ON sections and re-normalizes weights automatically.
+          </div>
+          <div class="spacer"></div>
+          <div class="notice">
+            <b>Passphrase location:</b> At the very top of this <code>index.html</code>, search for <code>ADMIN_PASSWORD</code>.
+          </div>
+        </div>
 
-      <div class="notice">
-        <b>Important:</b> This tool measures <b>busyness (workload)</b>, not performance.
-        Scoring emphasizes workload indicators (time, volume, meetings, duration, responsibility) and excludes quality/outcome metrics (e.g., journal quartiles, impact factors).
-      </div>
+        <div class="settings-card">
+          <h3>Teaching</h3>
+          <div class="grid three">
+            <div><label class="requiredMark">Weight: Teaching</label><input class="adminOnly" id="wTeaching" type="number" step="0.01" min="0" value="0.30"/></div>
+            <div><label>Teaching – points per contact hour</label><input class="adminOnly" id="tHourW" type="number" step="0.1" min="0" value="1.0"/></div>
+            <div><label>Teaching – points per student (scaled /100)</label><input class="adminOnly" id="tStudW" type="number" step="0.1" min="0" value="0.6"/></div>
+            <div><label>Teaching – multiplier per credit</label><input class="adminOnly" id="tCreditW" type="number" step="0.1" min="0" value="0.4"/></div>
+          </div>
+        </div>
 
-      <div class="spacer"></div>
+        <div class="settings-card">
+          <h3>Student Supervision</h3>
+          <div class="grid three">
+            <div><label class="requiredMark">Weight: Student Supervision</label><input class="adminOnly" id="wSupervision" type="number" step="0.01" min="0" value="0.15"/></div>
+            <div><label>Student Supervision – Undergraduate (per student)</label><input class="adminOnly" id="svUG" type="number" step="0.1" min="0" value="1.5"/></div>
+            <div><label>Student Supervision – Master (per student)</label><input class="adminOnly" id="svM" type="number" step="0.1" min="0" value="3.0"/></div>
+            <div><label>Student Supervision – PhD (per student)</label><input class="adminOnly" id="svPHD" type="number" step="0.1" min="0" value="4.5"/></div>
+          </div>
+        </div>
 
-      <div class="grid three">
-        <div><label class="requiredMark">Weight: Teaching</label><input class="adminOnly" id="wTeaching" type="number" step="0.01" min="0" value="0.30"/></div>
-        <div><label class="requiredMark">Weight: Student Supervision</label><input class="adminOnly" id="wSupervision" type="number" step="0.01" min="0" value="0.15"/></div>
-        <div><label class="requiredMark">Weight: Research</label><input class="adminOnly" id="wResearch" type="number" step="0.01" min="0" value="0.20"/></div>
-        <div><label class="requiredMark">Weight: Publication</label><input class="adminOnly" id="wPublication" type="number" step="0.01" min="0" value="0.10"/></div>
-        <div><label class="requiredMark">Weight: Administration</label><input class="adminOnly" id="wAdministration" type="number" step="0.01" min="0" value="0.15"/></div>
-        <div><label class="requiredMark">Weight: Service & Engagement</label><input class="adminOnly" id="wServices" type="number" step="0.01" min="0" value="0.10"/></div>
-        <div><label class="requiredMark">Weight: Laboratory Operations</label><input class="adminOnly" id="wLabOps" type="number" step="0.01" min="0" value="0.00"/></div>
-        <div><label class="requiredMark">Weight: Professional & Scholarly Service</label><input class="adminOnly" id="wProSch" type="number" step="0.01" min="0" value="0.00"/></div>
-      </div>
+        <div class="settings-card">
+          <h3>Research</h3>
+          <div class="grid three">
+            <div><label class="requiredMark">Weight: Research</label><input class="adminOnly" id="wResearch" type="number" step="0.01" min="0" value="0.20"/></div>
+            <div><label>Research – base points per grant</label><input class="adminOnly" id="rBase" type="number" step="0.1" min="0" value="6"/></div>
+            <div><label>Research – level multipliers (University,National,International)</label><input class="adminOnly" id="rUniNatIntl" type="text" value="1.0,1.4,1.8"/></div>
+            <div><label>Research – role multipliers (PI,Co-I,Member)</label><input class="adminOnly" id="rRole" type="text" value="1.6,1.2,1.0"/></div>
+          </div>
+        </div>
 
-      <div class="spacer"></div>
-      <div class="row noPrint">
-        <button class="btn adminOnly" id="btnPresetAcademic"><span class="btn-label">Preset: Academic</span></button>
-        <button class="btn adminOnly" id="btnPresetAdmin"><span class="btn-label">Preset: Administrative</span></button>
-        <button class="btn adminOnly" id="btnPresetLab"><span class="btn-label">Preset: Laboratory</span></button>
-      </div>
+        <div class="settings-card">
+          <h3>Publication</h3>
+          <div class="grid three">
+            <div><label class="requiredMark">Weight: Publication</label><input class="adminOnly" id="wPublication" type="number" step="0.01" min="0" value="0.10"/></div>
+            <div><label>Publication – base points per item</label><input class="adminOnly" id="pBase" type="number" step="0.1" min="0" value="4"/></div>
+            <div><label>Publication – type multipliers (Journal,Book/Chapter,Proceeding,Other)</label><input class="adminOnly" id="pType" type="text" value="1.5,1.8,1.0,0.8"/></div>
+            <div><label>Publication – indexed multipliers (Yes,No)</label><input class="adminOnly" id="pIdx" type="text" value="1.4,1.0"/></div>
+          </div>
+        </div>
 
-      <div class="spacer"></div>
-      <div class="notice">
-        <b>Weight logic:</b> Baseline weights must sum to <b>1.00</b>.
-        During calculation, the tool uses only ON sections and re-normalizes weights automatically.
-      </div>
+        <div class="settings-card">
+          <h3>Administration</h3>
+          <div class="grid three">
+            <div><label class="requiredMark">Weight: Administration</label><input class="adminOnly" id="wAdministration" type="number" step="0.01" min="0" value="0.15"/></div>
+            <div><label>Administration – base points by level (Programme,Faculty,University,State,National,International,Industry)</label><input class="adminOnly" id="aLevel" type="text" value="3,5,7,8,10,12,9"/></div>
+            <div><label>Administration – points per meeting</label><input class="adminOnly" id="aMeetW" type="number" step="0.1" min="0" value="1.5"/></div>
+            <div><label>Administration – points per month in role</label><input class="adminOnly" id="aMonthW" type="number" step="0.1" min="0" value="0.3"/></div>
+          </div>
+        </div>
 
-      <div class="spacer"></div>
-      <hr style="border:0;border-top:1px solid rgba(255,255,255,.10);margin:16px 0">
+        <div class="settings-card">
+          <h3>Service & Engagement</h3>
+          <div class="grid three">
+            <div><label class="requiredMark">Weight: Service & Engagement</label><input class="adminOnly" id="wServices" type="number" step="0.01" min="0" value="0.10"/></div>
+            <div><label>Service & Engagement – points per hour</label><input class="adminOnly" id="sHourW" type="number" step="0.1" min="0" value="1.0"/></div>
+            <div><label>Service & Engagement – points per participants (scaled /10)</label><input class="adminOnly" id="sPaxW" type="number" step="0.1" min="0" value="0.8"/></div>
+            <div><label>Service & Engagement – role bonus (Lead,Member)</label><input class="adminOnly" id="sRoleBonus" type="text" value="4,1.5"/></div>
+          </div>
+        </div>
 
-      <!-- Benchmarks (Admin input: A) -->
-      <div class="notice">
-        <b>Institutional Benchmarks (advanced settings input):</b>
-        These values are used for interpretation only (e.g., below/around/above faculty average; percentile band).
-        They do not change the score calculation.
-      </div>
+        <div class="settings-card">
+          <h3>Laboratory Operations</h3>
+          <div class="grid three">
+            <div><label class="requiredMark">Weight: Laboratory Operations</label><input class="adminOnly" id="wLabOps" type="number" step="0.01" min="0" value="0.00"/></div>
+            <div><label>Laboratory Operations – points per volume</label><input class="adminOnly" id="lVolW" type="number" step="0.1" min="0" value="1.0"/></div>
+            <div><label>Laboratory Operations – points per hour</label><input class="adminOnly" id="lHourW" type="number" step="0.1" min="0" value="1.0"/></div>
+            <div><label>Laboratory Operations – multipliers (Complexity Low,Medium,High)</label><input class="adminOnly" id="lCx" type="text" value="1.0,1.3,1.6"/></div>
+            <div><label>Laboratory Operations – multipliers (Urgency Normal,Tight,Critical)</label><input class="adminOnly" id="lUr" type="text" value="1.0,1.25,1.5"/></div>
+          </div>
+        </div>
 
-      <div class="spacer"></div>
-      <div class="grid three">
-        <div><label>Faculty average index (points per month)</label><input class="adminOnly" id="bmAvg" type="number" step="0.1" min="0" value="45.0"/></div>
-        <div><label>Percentile cut-off: 25th percentile (P25)</label><input class="adminOnly" id="bmP25" type="number" step="0.1" min="0" value="30.0"/></div>
-        <div><label>Percentile cut-off: 50th percentile (P50 / median)</label><input class="adminOnly" id="bmP50" type="number" step="0.1" min="0" value="45.0"/></div>
-        <div><label>Percentile cut-off: 75th percentile (P75)</label><input class="adminOnly" id="bmP75" type="number" step="0.1" min="0" value="60.0"/></div>
-      </div>
+        <div class="settings-card">
+          <h3>Professional & Scholarly Service</h3>
+          <div class="grid three">
+            <div><label class="requiredMark">Weight: Professional & Scholarly Service</label><input class="adminOnly" id="wProSch" type="number" step="0.01" min="0" value="0.00"/></div>
+            <div><label>Professional & Scholarly Service – base points per item</label><input class="adminOnly" id="psBase" type="number" step="0.1" min="0" value="3.0"/></div>
+            <div><label>Professional & Scholarly Service – role multipliers (Lead,Member)</label><input class="adminOnly" id="psRole" type="text" value="1.3,1.0"/></div>
+            <div><label>Professional & Scholarly Service – multipliers (Complexity Low,Medium,High)</label><input class="adminOnly" id="psCx" type="text" value="1.0,1.3,1.6"/></div>
+            <div><label>Professional & Scholarly Service – multipliers (Urgency Normal,Tight,Critical)</label><input class="adminOnly" id="psUr" type="text" value="1.0,1.25,1.5"/></div>
+          </div>
+        </div>
 
-      <div class="spacer"></div>
-      <hr style="border:0;border-top:1px solid rgba(255,255,255,.10);margin:16px 0">
-
-      <!-- Scoring parameters -->
-      <div class="grid three">
-        <div><label>Teaching – points per contact hour</label><input class="adminOnly" id="tHourW" type="number" step="0.1" min="0" value="1.0"/></div>
-        <div><label>Teaching – points per student (scaled /100)</label><input class="adminOnly" id="tStudW" type="number" step="0.1" min="0" value="0.6"/></div>
-        <div><label>Teaching – multiplier per credit</label><input class="adminOnly" id="tCreditW" type="number" step="0.1" min="0" value="0.4"/></div>
-
-        <div><label>Student Supervision – Undergraduate (per student)</label><input class="adminOnly" id="svUG" type="number" step="0.1" min="0" value="1.5"/></div>
-        <div><label>Student Supervision – Master (per student)</label><input class="adminOnly" id="svM" type="number" step="0.1" min="0" value="3.0"/></div>
-        <div><label>Student Supervision – PhD (per student)</label><input class="adminOnly" id="svPHD" type="number" step="0.1" min="0" value="4.5"/></div>
-
-        <div><label>Research – base points per grant</label><input class="adminOnly" id="rBase" type="number" step="0.1" min="0" value="6"/></div>
-        <div><label>Research – level multipliers (University,National,International)</label><input class="adminOnly" id="rUniNatIntl" type="text" value="1.0,1.4,1.8"/></div>
-        <div><label>Research – role multipliers (PI,Co-I,Member)</label><input class="adminOnly" id="rRole" type="text" value="1.6,1.2,1.0"/></div>
-
-        <div><label>Publication – base points per item</label><input class="adminOnly" id="pBase" type="number" step="0.1" min="0" value="4"/></div>
-        <div><label>Publication – type multipliers (Journal,Book/Chapter,Proceeding,Other)</label><input class="adminOnly" id="pType" type="text" value="1.5,1.8,1.0,0.8"/></div>
-        <div><label>Publication – indexed multipliers (Yes,No)</label><input class="adminOnly" id="pIdx" type="text" value="1.4,1.0"/></div>
-
-        <div><label>Administration – base points by level (Programme,Faculty,University,State,National,International,Industry)</label><input class="adminOnly" id="aLevel" type="text" value="3,5,7,8,10,12,9"/></div>
-        <div><label>Administration – points per meeting</label><input class="adminOnly" id="aMeetW" type="number" step="0.1" min="0" value="1.5"/></div>
-        <div><label>Administration – points per month in role</label><input class="adminOnly" id="aMonthW" type="number" step="0.1" min="0" value="0.3"/></div>
-
-        <div><label>Service & Engagement – points per hour</label><input class="adminOnly" id="sHourW" type="number" step="0.1" min="0" value="1.0"/></div>
-        <div><label>Service & Engagement – points per participants (scaled /10)</label><input class="adminOnly" id="sPaxW" type="number" step="0.1" min="0" value="0.8"/></div>
-        <div><label>Service & Engagement – role bonus (Lead,Member)</label><input class="adminOnly" id="sRoleBonus" type="text" value="4,1.5"/></div>
-
-        <div><label>Laboratory Operations – points per volume</label><input class="adminOnly" id="lVolW" type="number" step="0.1" min="0" value="1.0"/></div>
-        <div><label>Laboratory Operations – points per hour</label><input class="adminOnly" id="lHourW" type="number" step="0.1" min="0" value="1.0"/></div>
-        <div><label>Laboratory Operations – multipliers (Complexity Low,Medium,High)</label><input class="adminOnly" id="lCx" type="text" value="1.0,1.3,1.6"/></div>
-        <div><label>Laboratory Operations – multipliers (Urgency Normal,Tight,Critical)</label><input class="adminOnly" id="lUr" type="text" value="1.0,1.25,1.5"/></div>
-
-        <!-- Professional & Scholarly Service parameters (busyness-based) -->
-        <div><label>Professional & Scholarly Service – base points per item</label><input class="adminOnly" id="psBase" type="number" step="0.1" min="0" value="3.0"/></div>
-        <div><label>Professional & Scholarly Service – role multipliers (Lead,Member)</label><input class="adminOnly" id="psRole" type="text" value="1.3,1.0"/></div>
-        <div><label>Professional & Scholarly Service – multipliers (Complexity Low,Medium,High)</label><input class="adminOnly" id="psCx" type="text" value="1.0,1.3,1.6"/></div>
-        <div><label>Professional & Scholarly Service – multipliers (Urgency Normal,Tight,Critical)</label><input class="adminOnly" id="psUr" type="text" value="1.0,1.25,1.5"/></div>
-      </div>
-
-      <div class="spacer"></div>
-      <div class="notice">
-        <b>Passphrase location:</b> At the very top of this <code>index.html</code>, search for <code>ADMIN_PASSWORD</code>.
+        <div class="settings-card">
+          <h3>Benchmarks</h3>
+          <div class="notice">
+            <b>Institutional Benchmarks (advanced settings input):</b>
+            These values are used for interpretation only (e.g., below/around/above faculty average; percentile band).
+            They do not change the score calculation.
+          </div>
+          <div class="spacer"></div>
+          <div class="grid three">
+            <div><label>Faculty average index (points per month)</label><input class="adminOnly" id="bmAvg" type="number" step="0.1" min="0" value="45.0"/></div>
+            <div><label>Percentile cut-off: 25th percentile (P25)</label><input class="adminOnly" id="bmP25" type="number" step="0.1" min="0" value="30.0"/></div>
+            <div><label>Percentile cut-off: 50th percentile (P50 / median)</label><input class="adminOnly" id="bmP50" type="number" step="0.1" min="0" value="45.0"/></div>
+            <div><label>Percentile cut-off: 75th percentile (P75)</label><input class="adminOnly" id="bmP75" type="number" step="0.1" min="0" value="60.0"/></div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- TEACHING -->
-  <section class="section teaching" id="secTeaching">
+  <section class="section teaching tab-panel" id="secTeaching" role="tabpanel" aria-labelledby="tabTeaching" tabindex="0">
     <header>
       <div>
         <h2>Teaching</h2>
@@ -922,7 +1020,7 @@
   </section>
 
   <!-- SUPERVISION -->
-  <section class="section supervision" id="secSupervision">
+  <section class="section supervision tab-panel" id="secSupervision" role="tabpanel" aria-labelledby="tabSupervision" tabindex="0">
     <header>
       <div>
         <h2>Student Supervision</h2>
@@ -954,7 +1052,7 @@
   </section>
 
   <!-- RESEARCH -->
-  <section class="section research" id="secResearch">
+  <section class="section research tab-panel" id="secResearch" role="tabpanel" aria-labelledby="tabResearch" tabindex="0">
     <header>
       <div>
         <h2>Research (Grants / Projects)</h2>
@@ -988,7 +1086,7 @@
   </section>
 
   <!-- PUBLICATION -->
-  <section class="section publication" id="secPublication">
+  <section class="section publication tab-panel" id="secPublication" role="tabpanel" aria-labelledby="tabPublication" tabindex="0">
     <header>
       <div>
         <h2>Publication</h2>
@@ -1021,7 +1119,7 @@
   </section>
 
   <!-- ADMINISTRATION -->
-  <section class="section admin" id="secAdmin">
+  <section class="section admin tab-panel" id="secAdmin" role="tabpanel" aria-labelledby="tabAdministration" tabindex="0">
     <header>
       <div>
         <h2>Administration</h2>
@@ -1057,7 +1155,7 @@
   </section>
 
   <!-- SERVICES -->
-  <section class="section service" id="secService">
+  <section class="section service tab-panel" id="secService" role="tabpanel" aria-labelledby="tabService" tabindex="0">
     <header>
       <div>
         <h2>Service & Engagement</h2>
@@ -1090,7 +1188,7 @@
   </section>
 
   <!-- LAB OPERATIONS -->
-  <section class="section labops" id="secLabOps" style="display:none;">
+  <section class="section labops tab-panel" id="secLabOps" role="tabpanel" aria-labelledby="tabLabOps" tabindex="0">
     <header>
       <div>
         <h2>Laboratory Operations</h2>
@@ -1124,7 +1222,7 @@
   </section>
 
   <!-- PROFESSIONAL & SCHOLARLY SERVICE -->
-  <section class="section prosch" id="secProSch">
+  <section class="section prosch tab-panel" id="secProSch" role="tabpanel" aria-labelledby="tabProSch" tabindex="0">
     <header>
       <div>
         <h2>Professional & Scholarly Service</h2>
@@ -1168,7 +1266,7 @@
   </section>
 
   <!-- RESULTS -->
-  <section class="section results" id="secResults">
+  <section class="section results tab-panel" id="secResults" role="tabpanel" aria-labelledby="tabResults" tabindex="0">
     <header>
       <div>
         <h2>Results</h2>
@@ -1226,24 +1324,6 @@
         </ol>
       </div>
 
-      <div class="spacer"></div>
-
-      <div class="row noPrint" style="justify-content:flex-end">
-        <button class="btn btn-primary btn-md" id="btnCalc"><span class="btn-label">Calculate</span></button>
-        <button class="btn btn-secondary" id="btnPrint"><span class="btn-label">Print PDF</span></button>
-        <div class="dropdown">
-          <button class="btn btn-secondary" id="btnExportToggle" aria-haspopup="true" aria-expanded="false" aria-controls="exportMenu">
-            <span class="btn-label">Export</span>
-            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 7l5 6 5-6H5z"/></svg>
-          </button>
-          <div class="dropdown-menu" id="exportMenu" role="menu">
-            <button class="btn btn-ghost" id="btnExportSummaryCSV" role="menuitem">Summary CSV</button>
-            <button class="btn btn-ghost" id="btnExportDetailedCSV" role="menuitem">Detailed CSV</button>
-            <button class="btn btn-ghost" id="btnExportJSON" role="menuitem">Full JSON</button>
-          </div>
-        </div>
-      </div>
-
       <!-- PRINT-ONLY SIGNATURES -->
       <div class="printOnly" style="margin-top:16px">
         <hr style="border:0;border-top:1px solid #000;margin:12px 0">
@@ -1280,7 +1360,28 @@
     </div>
   </section>
 
+    </main>
+  </div>
+
   <div class="footer">© FST UMS</div>
+</div>
+
+<div id="actionBar" class="action-bar noPrint">
+  <div class="action-inner">
+    <button class="btn btn-primary btn-md" id="btnCalc"><span class="btn-label">Calculate</span></button>
+    <button class="btn btn-secondary" id="btnPrint"><span class="btn-label">Print PDF</span></button>
+    <div class="dropdown">
+      <button class="btn btn-secondary" id="btnExportToggle" aria-haspopup="true" aria-expanded="false" aria-controls="exportMenu">
+        <span class="btn-label">Export</span>
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 7l5 6 5-6H5z"/></svg>
+      </button>
+      <div class="dropdown-menu" id="exportMenu" role="menu">
+        <button class="btn btn-ghost" id="btnExportSummaryCSV" role="menuitem">Summary CSV</button>
+        <button class="btn btn-ghost" id="btnExportDetailedCSV" role="menuitem">Detailed CSV</button>
+        <button class="btn btn-ghost" id="btnExportJSON" role="menuitem">Full JSON</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div id="modalOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
@@ -1327,47 +1428,102 @@ function confirmDelete(message="Delete this record? This action cannot be undone
 function renderEmptyRow(tb, colspan, label){
   const tr = document.createElement("tr");
   tr.className = "emptyRow";
-  tr.innerHTML = `<td colspan="${colspan}">No records yet. Click “${label}” to create one.</td>`;
+  tr.innerHTML = `<td colspan="${colspan}">No records yet…</td>`;
   tb.appendChild(tr);
 }
 
 /* =========================================================
-   Collapsibles
+   Tabs
 ========================================================= */
-function setupCollapsibles(){
-  document.querySelectorAll("section.section").forEach(section=>{
-    const header = section.querySelector("header");
-    const content = section.querySelector(".content");
-    if(!header || !content) return;
-    if(header.querySelector(".collapse-btn")) return;
-    if(!section.id) return;
+const tabConfig = [
+  {tab:"tabProfile", panel:"secProfile"},
+  {tab:"tabToggles", panel:"secToggles"},
+  {tab:"tabSettings", panel:"secSettings"},
+  {tab:"tabTeaching", panel:"secTeaching"},
+  {tab:"tabSupervision", panel:"secSupervision"},
+  {tab:"tabResearch", panel:"secResearch"},
+  {tab:"tabPublication", panel:"secPublication"},
+  {tab:"tabAdministration", panel:"secAdmin"},
+  {tab:"tabService", panel:"secService"},
+  {tab:"tabLabOps", panel:"secLabOps"},
+  {tab:"tabProSch", panel:"secProSch"},
+  {tab:"tabResults", panel:"secResults"}
+];
 
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "icon-btn collapse-btn";
-    btn.setAttribute("aria-label", "Toggle section");
-    btn.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6H6z"/></svg>`;
+function setTabVisibility(tabId, visible){
+  const btn = $(tabId);
+  if(!btn) return;
+  btn.hidden = !visible;
+  btn.setAttribute("aria-hidden", String(!visible));
+}
 
-    const key = `collapsed:${section.id}`;
-    const stored = localStorage.getItem(key);
-    const isCollapsed = stored === null ? true : stored === "true";
-    if(isCollapsed) section.classList.add("collapsed");
-    btn.setAttribute("aria-expanded", String(!section.classList.contains("collapsed")));
+function getVisibleTabs(){
+  return tabConfig.map(cfg=>$(cfg.tab)).filter(btn=>btn && !btn.hidden);
+}
 
-    const actionRow = header.querySelector(".row.right");
-    if(actionRow){
-      actionRow.appendChild(btn);
-    }else{
-      header.appendChild(btn);
+function activateTab(tabId, persist=true){
+  const btn = $(tabId);
+  if(!btn || btn.hidden) return;
+  tabConfig.forEach(cfg=>{
+    const tabBtn = $(cfg.tab);
+    const panel = $(cfg.panel);
+    const isActive = cfg.tab === tabId;
+    if(tabBtn){
+      tabBtn.setAttribute("aria-selected", String(isActive));
+      tabBtn.tabIndex = isActive ? 0 : -1;
     }
+    if(panel){
+      const isEnabled = panel.dataset.enabled !== "false";
+      const showPanel = isActive && isEnabled;
+      panel.classList.toggle("is-hidden", !showPanel);
+      panel.hidden = !showPanel;
+    }
+  });
+  if(persist) localStorage.setItem("activeTabId", tabId);
+}
 
-    btn.addEventListener("click", ()=>{
-      section.classList.toggle("collapsed");
-      const collapsed = section.classList.contains("collapsed");
-      localStorage.setItem(key, String(collapsed));
-      btn.setAttribute("aria-expanded", String(!collapsed));
+function ensureActiveTab(){
+  const active = document.querySelector('[role="tab"][aria-selected="true"]');
+  if(active && !active.hidden){
+    activateTab(active.id, false);
+    return;
+  }
+  const visibleTabs = getVisibleTabs();
+  if(visibleTabs.length) activateTab(visibleTabs[0].id, true);
+}
+
+function setupTabs(){
+  tabConfig.forEach(cfg=>{
+    const btn = $(cfg.tab);
+    if(!btn) return;
+    btn.addEventListener("click", ()=>activateTab(cfg.tab, true));
+    btn.addEventListener("keydown", (e)=>{
+      const keys = ["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Home","End"];
+      if(!keys.includes(e.key)) return;
+      e.preventDefault();
+      const visible = getVisibleTabs();
+      const currentIndex = visible.indexOf(btn);
+      if(currentIndex === -1) return;
+      let nextIndex = currentIndex;
+      if(e.key === "Home") nextIndex = 0;
+      else if(e.key === "End") nextIndex = visible.length - 1;
+      else if(e.key === "ArrowUp" || e.key === "ArrowLeft"){
+        nextIndex = (currentIndex - 1 + visible.length) % visible.length;
+      }else if(e.key === "ArrowDown" || e.key === "ArrowRight"){
+        nextIndex = (currentIndex + 1) % visible.length;
+      }
+      const nextBtn = visible[nextIndex];
+      nextBtn.focus();
+      activateTab(nextBtn.id, true);
     });
   });
+  const stored = localStorage.getItem("activeTabId");
+  if(stored && $(stored) && !$(stored).hidden){
+    activateTab(stored, false);
+  }else{
+    const visibleTabs = getVisibleTabs();
+    if(visibleTabs.length) activateTab(visibleTabs[0].id, false);
+  }
 }
 
 /* =========================================================
@@ -1401,6 +1557,10 @@ function openModal({title, bodyHTML, saveLabel="Save", onSave}){
   $("modalBody").innerHTML = bodyHTML || "";
   $("modalSave").textContent = saveLabel || "Save";
   modalSaveHandler = onSave || null;
+  $("modalBody").querySelectorAll("textarea").forEach(area=>{
+    autoGrowTextarea(area);
+    area.addEventListener("input", ()=>autoGrowTextarea(area));
+  });
   $("modalOverlay").classList.add("open");
   $("modalOverlay").setAttribute("aria-hidden", "false");
   document.body.classList.add("modal-open");
@@ -2049,14 +2209,30 @@ function syncUIFromState(){
 }
 
 function applySectionVisibility(){
-  $("secTeaching").style.display = state.enabled.Teaching ? "block" : "none";
-  $("secSupervision").style.display = state.enabled.Supervision ? "block" : "none";
-  $("secResearch").style.display = state.enabled.Research ? "block" : "none";
-  $("secPublication").style.display = state.enabled.Publication ? "block" : "none";
-  $("secAdmin").style.display = state.enabled.Administration ? "block" : "none";
-  $("secService").style.display = state.enabled.Services ? "block" : "none";
-  $("secLabOps").style.display = state.enabled.LabOps ? "block" : "none";
-  $("secProSch").style.display = state.enabled.ProSch ? "block" : "none";
+  const sectionStates = [
+    {key:"Teaching", panel:"secTeaching", tab:"tabTeaching"},
+    {key:"Supervision", panel:"secSupervision", tab:"tabSupervision"},
+    {key:"Research", panel:"secResearch", tab:"tabResearch"},
+    {key:"Publication", panel:"secPublication", tab:"tabPublication"},
+    {key:"Administration", panel:"secAdmin", tab:"tabAdministration"},
+    {key:"Services", panel:"secService", tab:"tabService"},
+    {key:"LabOps", panel:"secLabOps", tab:"tabLabOps"},
+    {key:"ProSch", panel:"secProSch", tab:"tabProSch"}
+  ];
+
+  sectionStates.forEach(({key, panel, tab})=>{
+    const enabled = !!state.enabled[key];
+    const panelEl = $(panel);
+    if(panelEl){
+      panelEl.dataset.enabled = enabled ? "true" : "false";
+      if(!enabled){
+        panelEl.classList.add("is-hidden");
+        panelEl.hidden = true;
+      }
+    }
+    setTabVisibility(tab, enabled);
+  });
+  ensureActiveTab();
 }
 
 /* =========================================================
@@ -3688,7 +3864,7 @@ function init(){
   applySectionVisibility();
   renderAll();
   modalInit();
-  setupCollapsibles();
+  setupTabs();
   setAdminUI();
   updateBenchmarkUI(null);
 
