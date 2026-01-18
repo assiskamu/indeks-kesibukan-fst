@@ -335,6 +335,12 @@
       word-break:break-word;
       overflow-wrap:anywhere;
     }
+    td.cell-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
 
     @media (max-width:980px){
       .tableWrap{overflow:visible}
@@ -364,6 +370,9 @@
       table tbody tr td input,
       table tbody tr td select,
       table tbody tr td textarea{
+        width:58%;
+      }
+      table tbody tr td .cellText{
         width:58%;
       }
       table tbody tr td.cell-actions::before{display:none}
@@ -1408,6 +1417,16 @@ const $ = (id)=>document.getElementById(id);
 const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
 const n = (v)=>{ const x=parseFloat(v); return isNaN(x)?0:x; };
 const uid = ()=>Math.random().toString(16).slice(2)+Date.now().toString(16);
+const escapeHTML = (value)=>String(value ?? "").replace(/[&<>"']/g, (ch)=>({
+  "&":"&amp;",
+  "<":"&lt;",
+  ">":"&gt;",
+  "\"":"&quot;",
+  "'":"&#39;"
+}[ch]));
+const formatInt = (value)=>String(Math.max(0, Math.floor(n(value))));
+const formatHours = (value)=>n(value).toFixed(1);
+const cellTextHTML = (value)=>`<div class="cellText">${escapeHTML(value ?? "")}</div>`;
 const autoGrowTextarea = (el)=>{
   if(!el) return;
   el.style.height = "auto";
@@ -1423,13 +1442,6 @@ function showMsg(kind, html){
 function hideMsg(){ $("msgGlobal").style.display="none"; }
 function confirmDelete(message="Delete this record? This action cannot be undone."){
   return window.confirm(message);
-}
-
-function renderEmptyRow(tb, colspan, label){
-  const tr = document.createElement("tr");
-  tr.className = "emptyRow";
-  tr.innerHTML = `<td colspan="${colspan}">No records yet…</td>`;
-  tb.appendChild(tr);
 }
 
 /* =========================================================
@@ -1561,6 +1573,8 @@ function openModal({title, bodyHTML, saveLabel="Save", onSave}){
     autoGrowTextarea(area);
     area.addEventListener("input", ()=>autoGrowTextarea(area));
   });
+  const firstField = $("modalBody").querySelector("input, select, textarea");
+  if(firstField) firstField.focus();
   $("modalOverlay").classList.add("open");
   $("modalOverlay").setAttribute("aria-hidden", "false");
   document.body.classList.add("modal-open");
@@ -1574,132 +1588,140 @@ function closeModal(){
   document.body.classList.remove("modal-open");
 }
 
-function openAddModal(kind){
-  const modalConfig = {
-    teach:{
-      title:"Add Teaching Course",
-      saveLabel:"Add course",
-      fields:[
-        {name:"code", label:"Course Code", type:"text", required:true, placeholder:"e.g., SJ24102"},
-        {name:"name", label:"Course Title", type:"text", required:true, placeholder:"Course title"},
-        {name:"students", label:"Students", type:"number", required:true, min:0, step:1},
-        {name:"lecture", label:"Lecture", type:"number", required:true, min:0, step:0.5},
-        {name:"tutorial", label:"Tutorial", type:"number", required:true, min:0, step:0.5},
-        {name:"laboratory", label:"Lab", type:"number", required:true, min:0, step:0.5},
-        {name:"field", label:"Field", type:"number", required:true, min:0, step:0.5}
-      ]
-    },
-    sv:{
-      title:"Add Student Supervision",
-      saveLabel:"Add supervision",
-      fields:[
-        {name:"level", label:"Level", type:"select", required:true, options:["Undergraduate","Master","PhD"], value:"Undergraduate"},
-        {name:"title", label:"Student / Project", type:"text", required:true, placeholder:"Student name or project"},
-        {name:"role", label:"Role", type:"select", required:true, options:["Main","Co-supervisor"], value:"Main"},
-        {name:"status", label:"Status", type:"select", required:true, options:["Active","Completed"], value:"Active"},
-        {name:"start", label:"Start Date", type:"date", required:true},
-        {name:"end", label:"End Date", type:"date", required:true}
-      ]
-    },
-    res:{
-      title:"Add Research Grant / Project",
-      saveLabel:"Add grant",
-      fields:[
-        {name:"code", label:"Grant Code", type:"text", required:true, placeholder:"Grant code"},
-        {name:"title", label:"Title", type:"text", required:true, placeholder:"Grant title"},
-        {name:"level", label:"Level", type:"select", required:true, options:["University","National","International"], value:"University"},
-        {name:"status", label:"Status", type:"select", required:true, options:["Active","Applied","Ended"], value:"Active"},
-        {name:"role", label:"Role", type:"select", required:true, options:["PI","Co-I","Member"], value:"PI"},
-        {name:"amount", label:"Amount (RM)", type:"number", required:true, min:0, step:1},
-        {name:"start", label:"Start Date", type:"date", required:true},
-        {name:"end", label:"End Date", type:"date", required:true}
-      ]
-    },
-    pub:{
-      title:"Add Publication",
-      saveLabel:"Add publication",
-      fields:[
-        {name:"year", label:"Year", type:"number", required:true, min:1990, step:1, value:(new Date()).getFullYear()},
-        {name:"title", label:"Title", type:"text", required:true, placeholder:"Publication title"},
-        {name:"type", label:"Type", type:"select", required:true, options:["Journal","Book/Chapter","Proceeding","Other"], value:"Journal"},
-        {name:"indexed", label:"Indexed?", type:"select", required:true, options:["Yes","No"], value:"Yes"},
-        {name:"role", label:"Role", type:"select", required:true, options:["First/Corresponding","Co-author"], value:"First/Corresponding"},
-        {name:"start", label:"Start Date", type:"date", required:true},
-        {name:"end", label:"End Date", type:"date", required:true}
-      ]
-    },
-    admin:{
-      title:"Add Administration Role",
-      saveLabel:"Add admin role",
-      fields:[
-        {name:"position", label:"Position", type:"text", required:true, placeholder:"Position or appointment"},
-        {name:"type", label:"Type", type:"select", required:true, options:["Official","Ad-hoc"], value:"Official"},
-        {name:"level", label:"Level", type:"select", required:true, options:["Programme","Faculty","University","State","National","International","Industry"], value:"Faculty"},
-        {name:"months", label:"Months", type:"number", required:true, min:0, step:1},
-        {name:"meetings", label:"Meetings", type:"number", required:true, min:0, step:1},
-        {name:"notes", label:"Workload Notes", type:"textarea", required:true, placeholder:"Key workload notes"},
-        {name:"start", label:"Start Date", type:"date", required:true},
-        {name:"end", label:"End Date", type:"date", required:true}
-      ]
-    },
-    svc:{
-      title:"Add Service & Engagement",
-      saveLabel:"Add service",
-      fields:[
-        {name:"type", label:"Service Type", type:"select", required:true, options:["Service to University","Service to Industry","Service to Community","Other"], value:"Service to University"},
-        {name:"activity", label:"Activity", type:"textarea", required:true, placeholder:"Describe the activity"},
-        {name:"role", label:"Role", type:"select", required:true, options:["Lead","Member"], value:"Lead"},
-        {name:"hours", label:"Hours (optional)", type:"number", required:false, min:0, step:0.5},
-        {name:"participants", label:"Participants (optional)", type:"number", required:false, min:0, step:1},
-        {name:"start", label:"Start Date", type:"date", required:true},
-        {name:"end", label:"End Date", type:"date", required:true}
-      ]
-    },
-    lab:{
-      title:"Add Laboratory Operation",
-      saveLabel:"Add lab activity",
-      fields:[
-        {name:"type", label:"Type", type:"select", required:true, options:["Lab Sessions Support","Equipment/Maintenance","Safety/Compliance","Consumables/Procurement","Field/Site Work","Other"], value:"Equipment/Maintenance"},
-        {name:"desc", label:"Description", type:"textarea", required:true, placeholder:"Describe briefly"},
-        {name:"volume", label:"Volume", type:"number", required:true, min:0, step:1},
-        {name:"complexity", label:"Complexity", type:"select", required:true, options:["Low","Medium","High"], value:"Medium"},
-        {name:"urgency", label:"Urgency", type:"select", required:true, options:["Normal","Tight","Critical"], value:"Normal"},
-        {name:"hours", label:"Hours (optional)", type:"number", required:false, min:0, step:0.5},
-        {name:"start", label:"Start Date", type:"date", required:true},
-        {name:"end", label:"End Date", type:"date", required:true}
-      ]
-    },
-    ps:{
-      title:"Add Professional & Scholarly Service",
-      saveLabel:"Add item",
-      fields:[
-        {name:"activityType", label:"Activity Type", type:"select", required:true, options:["Reviewer","Editor","External Examiner","Internal Examiner","Conference Committee","Journal Editorial Board","Grant Panel / Assessor","Other"], value:"Reviewer"},
-        {name:"desc", label:"Description", type:"textarea", required:true, placeholder:"Describe task (journal/conference/thesis scope, key notes)"},
-        {name:"role", label:"Role", type:"select", required:true, options:["Lead","Member"], value:"Member"},
-        {name:"quantity", label:"Quantity", type:"number", required:true, min:0, step:1, value:1},
-        {name:"rounds", label:"Rounds", type:"number", required:true, min:1, step:1, value:1},
-        {name:"complexity", label:"Complexity", type:"select", required:true, options:["Low","Medium","High"], value:"Medium"},
-        {name:"urgency", label:"Urgency", type:"select", required:true, options:["Normal","Tight","Critical"], value:"Normal"},
-        {name:"hours", label:"Hours (optional)", type:"number", required:false, min:0, step:0.5},
-        {name:"start", label:"Start Date", type:"date", required:true},
-        {name:"end", label:"End Date", type:"date", required:true}
-      ]
-    }
-  };
+const modalConfig = {
+  teach:{
+    title:"Add Teaching Course",
+    editTitle:"Edit Teaching Course",
+    saveLabel:"Add course",
+    fields:[
+      {name:"code", label:"Course Code", type:"text", required:true, placeholder:"e.g., SJ24102"},
+      {name:"name", label:"Course Title", type:"text", required:true, placeholder:"Course title"},
+      {name:"students", label:"Students", type:"number", required:true, min:0, step:1},
+      {name:"lecture", label:"Lecture", type:"number", required:true, min:0, step:0.5},
+      {name:"tutorial", label:"Tutorial", type:"number", required:true, min:0, step:0.5},
+      {name:"laboratory", label:"Lab", type:"number", required:true, min:0, step:0.5},
+      {name:"field", label:"Field", type:"number", required:true, min:0, step:0.5}
+    ]
+  },
+  sv:{
+    title:"Add Student Supervision",
+    editTitle:"Edit Student Supervision",
+    saveLabel:"Add supervision",
+    fields:[
+      {name:"level", label:"Level", type:"select", required:true, options:["Undergraduate","Master","PhD"], value:"Undergraduate"},
+      {name:"title", label:"Student / Project", type:"text", required:true, placeholder:"Student name or project"},
+      {name:"role", label:"Role", type:"select", required:true, options:["Main","Co-supervisor"], value:"Main"},
+      {name:"status", label:"Status", type:"select", required:true, options:["Active","Completed"], value:"Active"},
+      {name:"start", label:"Start Date", type:"date", required:true},
+      {name:"end", label:"End Date", type:"date", required:true}
+    ]
+  },
+  res:{
+    title:"Add Research Grant / Project",
+    editTitle:"Edit Research Grant / Project",
+    saveLabel:"Add grant",
+    fields:[
+      {name:"code", label:"Grant Code", type:"text", required:true, placeholder:"Grant code"},
+      {name:"title", label:"Title", type:"text", required:true, placeholder:"Grant title"},
+      {name:"level", label:"Level", type:"select", required:true, options:["University","National","International"], value:"University"},
+      {name:"status", label:"Status", type:"select", required:true, options:["Active","Applied","Ended"], value:"Active"},
+      {name:"role", label:"Role", type:"select", required:true, options:["PI","Co-I","Member"], value:"PI"},
+      {name:"amount", label:"Amount (RM)", type:"number", required:true, min:0, step:1},
+      {name:"start", label:"Start Date", type:"date", required:true},
+      {name:"end", label:"End Date", type:"date", required:true}
+    ]
+  },
+  pub:{
+    title:"Add Publication",
+    editTitle:"Edit Publication",
+    saveLabel:"Add publication",
+    fields:[
+      {name:"year", label:"Year", type:"number", required:true, min:1990, step:1, value:(new Date()).getFullYear()},
+      {name:"title", label:"Title", type:"text", required:true, placeholder:"Publication title"},
+      {name:"type", label:"Type", type:"select", required:true, options:["Journal","Book/Chapter","Proceeding","Other"], value:"Journal"},
+      {name:"indexed", label:"Indexed?", type:"select", required:true, options:["Yes","No"], value:"Yes"},
+      {name:"role", label:"Role", type:"select", required:true, options:["First/Corresponding","Co-author"], value:"First/Corresponding"},
+      {name:"start", label:"Start Date", type:"date", required:true},
+      {name:"end", label:"End Date", type:"date", required:true}
+    ]
+  },
+  admin:{
+    title:"Add Administration Role",
+    editTitle:"Edit Administration Role",
+    saveLabel:"Add admin role",
+    fields:[
+      {name:"position", label:"Position", type:"text", required:true, placeholder:"Position or appointment"},
+      {name:"type", label:"Type", type:"select", required:true, options:["Official","Ad-hoc"], value:"Official"},
+      {name:"level", label:"Level", type:"select", required:true, options:["Programme","Faculty","University","State","National","International","Industry"], value:"Faculty"},
+      {name:"months", label:"Months", type:"number", required:true, min:0, step:1},
+      {name:"meetings", label:"Meetings", type:"number", required:true, min:0, step:1},
+      {name:"notes", label:"Workload Notes", type:"textarea", required:true, placeholder:"Key workload notes"},
+      {name:"start", label:"Start Date", type:"date", required:true},
+      {name:"end", label:"End Date", type:"date", required:true}
+    ]
+  },
+  svc:{
+    title:"Add Service & Engagement",
+    editTitle:"Edit Service & Engagement",
+    saveLabel:"Add service",
+    fields:[
+      {name:"type", label:"Service Type", type:"select", required:true, options:["Service to University","Service to Industry","Service to Community","Other"], value:"Service to University"},
+      {name:"activity", label:"Activity", type:"textarea", required:true, placeholder:"Describe the activity"},
+      {name:"role", label:"Role", type:"select", required:true, options:["Lead","Member"], value:"Lead"},
+      {name:"hours", label:"Hours (optional)", type:"number", required:false, min:0, step:0.5},
+      {name:"participants", label:"Participants (optional)", type:"number", required:false, min:0, step:1},
+      {name:"start", label:"Start Date", type:"date", required:true},
+      {name:"end", label:"End Date", type:"date", required:true}
+    ]
+  },
+  lab:{
+    title:"Add Laboratory Operation",
+    editTitle:"Edit Laboratory Operation",
+    saveLabel:"Add lab activity",
+    fields:[
+      {name:"type", label:"Type", type:"select", required:true, options:["Lab Sessions Support","Equipment/Maintenance","Safety/Compliance","Consumables/Procurement","Field/Site Work","Other"], value:"Equipment/Maintenance"},
+      {name:"desc", label:"Description", type:"textarea", required:true, placeholder:"Describe briefly"},
+      {name:"volume", label:"Volume", type:"number", required:true, min:0, step:1},
+      {name:"complexity", label:"Complexity", type:"select", required:true, options:["Low","Medium","High"], value:"Medium"},
+      {name:"urgency", label:"Urgency", type:"select", required:true, options:["Normal","Tight","Critical"], value:"Normal"},
+      {name:"hours", label:"Hours (optional)", type:"number", required:false, min:0, step:0.5},
+      {name:"start", label:"Start Date", type:"date", required:true},
+      {name:"end", label:"End Date", type:"date", required:true}
+    ]
+  },
+  ps:{
+    title:"Add Professional & Scholarly Service",
+    editTitle:"Edit Professional & Scholarly Service",
+    saveLabel:"Add item",
+    fields:[
+      {name:"activityType", label:"Activity Type", type:"select", required:true, options:["Reviewer","Editor","External Examiner","Internal Examiner","Conference Committee","Journal Editorial Board","Grant Panel / Assessor","Other"], value:"Reviewer"},
+      {name:"desc", label:"Description", type:"textarea", required:true, placeholder:"Describe task (journal/conference/thesis scope, key notes)"},
+      {name:"role", label:"Role", type:"select", required:true, options:["Lead","Member"], value:"Member"},
+      {name:"quantity", label:"Quantity", type:"number", required:true, min:0, step:1, value:1},
+      {name:"rounds", label:"Rounds", type:"number", required:true, min:1, step:1, value:1},
+      {name:"complexity", label:"Complexity", type:"select", required:true, options:["Low","Medium","High"], value:"Medium"},
+      {name:"urgency", label:"Urgency", type:"select", required:true, options:["Normal","Tight","Critical"], value:"Normal"},
+      {name:"hours", label:"Hours (optional)", type:"number", required:false, min:0, step:0.5},
+      {name:"start", label:"Start Date", type:"date", required:true},
+      {name:"end", label:"End Date", type:"date", required:true}
+    ]
+  }
+};
 
-  const cfg = modalConfig[kind];
-  if(!cfg) return;
-
+function buildModalBody(fields, initialValues = {}){
   const renderField = (field)=>{
     const labelClass = field.required ? "requiredMark" : "";
     const placeholder = field.placeholder ? ` placeholder="${field.placeholder}"` : "";
     const min = field.min !== undefined ? ` min="${field.min}"` : "";
     const step = field.step !== undefined ? ` step="${field.step}"` : "";
-    const value = field.value !== undefined ? ` value="${field.value}"` : "";
+    const hasInitial = Object.prototype.hasOwnProperty.call(initialValues, field.name);
+    const rawValue = hasInitial ? initialValues[field.name] : field.value;
+    const value = rawValue === null || rawValue === undefined ? "" : rawValue;
+    const valueAttr = value === "" ? "" : ` value="${escapeHTML(value)}"`;
     if(field.type === "select"){
       const opts = field.options.map(opt=>{
-        const selected = field.value === opt ? " selected" : "";
-        return `<option value="${opt}"${selected}>${opt}</option>`;
+        const selected = value === opt ? " selected" : "";
+        return `<option value="${escapeHTML(opt)}"${selected}>${opt}</option>`;
       }).join("");
       return `
         <div>
@@ -1708,7 +1730,7 @@ function openAddModal(kind){
         </div>`;
     }
     if(field.type === "textarea"){
-      const textValue = field.value ? field.value : "";
+      const textValue = escapeHTML(value);
       return `
         <div>
           <label class="${labelClass}">${field.label}</label>
@@ -1718,47 +1740,55 @@ function openAddModal(kind){
     return `
       <div>
         <label class="${labelClass}">${field.label}</label>
-        <input data-field="${field.name}" type="${field.type}"${placeholder}${min}${step}${value}/>
+        <input data-field="${field.name}" type="${field.type}"${placeholder}${min}${step}${valueAttr}/>
       </div>`;
   };
 
-  const bodyHTML = `
+  return `
     <div class="grid modal-grid">
-      ${cfg.fields.map(renderField).join("")}
+      ${fields.map(renderField).join("")}
     </div>`;
+}
 
+function readModalValues(fields){
+  const body = $("modalBody");
+  let ok = true;
+  const values = {};
+  fields.forEach(field=>{
+    const el = body.querySelector(`[data-field="${field.name}"]`);
+    if(!el) return;
+    el.classList.remove("err");
+    if(field.type === "number"){
+      const raw = el.value;
+      if(field.required && raw === ""){
+        ok = false;
+        el.classList.add("err");
+        return;
+      }
+      values[field.name] = raw === "" ? null : n(raw);
+    }else{
+      const raw = el.value || "";
+      if(field.required && !raw.trim()){
+        ok = false;
+        el.classList.add("err");
+      }
+      values[field.name] = raw;
+    }
+  });
+  return {ok, values};
+}
+
+function openAddModal(kind){
+  const cfg = modalConfig[kind];
+  if(!cfg) return;
+  const bodyHTML = buildModalBody(cfg.fields);
   openModal({
     title: cfg.title,
     bodyHTML,
     saveLabel: cfg.saveLabel,
     onSave: ()=>{
-      const body = $("modalBody");
-      let ok = true;
-      const values = {};
-      cfg.fields.forEach(field=>{
-        const el = body.querySelector(`[data-field="${field.name}"]`);
-        if(!el) return;
-        el.classList.remove("err");
-        if(field.type === "number"){
-          const raw = el.value;
-          if(field.required && raw === ""){
-            ok = false;
-            el.classList.add("err");
-            return;
-          }
-          values[field.name] = raw === "" ? null : n(raw);
-        }else{
-          const raw = el.value || "";
-          if(field.required && !raw.trim()){
-            ok = false;
-            el.classList.add("err");
-          }
-          values[field.name] = raw;
-        }
-      });
-
+      const {ok, values} = readModalValues(cfg.fields);
       if(!ok) return;
-
       if(kind==="teach"){
         const code = (values.code || "").toUpperCase();
         state.data.teaching.push({
@@ -1861,6 +1891,117 @@ function openAddModal(kind){
           start:values.start || "",
           end:values.end || ""
         });
+      }
+
+      renderAll();
+      autosave();
+      closeModal();
+    }
+  });
+}
+
+function openEditModal(kind, recordId){
+  const cfg = modalConfig[kind];
+  if(!cfg) return;
+  const dataMap = {
+    teach: state.data.teaching,
+    sv: state.data.supervision,
+    res: state.data.research,
+    pub: state.data.publication,
+    admin: state.data.admin,
+    svc: state.data.service,
+    lab: state.data.lab,
+    ps: state.data.prosch
+  };
+  const list = dataMap[kind];
+  if(!list) return;
+  const record = list.find(item=>item.id===recordId);
+  if(!record) return;
+  const bodyHTML = buildModalBody(cfg.fields, record);
+  openModal({
+    title: cfg.editTitle || cfg.title.replace(/^Add /, "Edit "),
+    bodyHTML,
+    saveLabel: "Save changes",
+    onSave: ()=>{
+      const {ok, values} = readModalValues(cfg.fields);
+      if(!ok) return;
+      if(kind==="teach"){
+        record.code = (values.code || "").toUpperCase();
+        record.name = values.name || "";
+        record.credit = creditFromCode(record.code);
+        record.students = Math.max(0, n(values.students));
+        record.lecture = Math.max(0, n(values.lecture));
+        record.tutorial = Math.max(0, n(values.tutorial));
+        record.laboratory = Math.max(0, n(values.laboratory));
+        record.field = Math.max(0, n(values.field));
+      }
+      if(kind==="sv"){
+        record.level = values.level || "Undergraduate";
+        record.title = values.title || "";
+        record.role = values.role || "Main";
+        record.status = values.status || "Active";
+        record.start = values.start || "";
+        record.end = values.end || "";
+      }
+      if(kind==="res"){
+        record.code = values.code || "";
+        record.title = values.title || "";
+        record.level = values.level || "University";
+        record.status = values.status || "Active";
+        record.role = values.role || "PI";
+        record.amount = Math.max(0, n(values.amount));
+        record.start = values.start || "";
+        record.end = values.end || "";
+      }
+      if(kind==="pub"){
+        record.year = Math.max(1990, Math.floor(n(values.year) || (new Date()).getFullYear()));
+        record.title = values.title || "";
+        record.type = values.type || "Journal";
+        record.indexed = values.indexed || "Yes";
+        record.role = values.role || "First/Corresponding";
+        record.start = values.start || "";
+        record.end = values.end || "";
+      }
+      if(kind==="admin"){
+        record.position = values.position || "";
+        record.type = values.type || "Official";
+        record.level = values.level || "Faculty";
+        record.months = Math.max(0, Math.floor(n(values.months)));
+        record.meetings = Math.max(0, Math.floor(n(values.meetings)));
+        record.notes = values.notes || "";
+        record.start = values.start || "";
+        record.end = values.end || "";
+      }
+      if(kind==="svc"){
+        record.type = values.type || "Service to University";
+        record.activity = values.activity || "";
+        record.role = values.role || "Lead";
+        record.hours = values.hours === null ? 0 : Math.max(0, n(values.hours));
+        record.participants = values.participants === null ? 0 : Math.max(0, Math.floor(n(values.participants)));
+        record.start = values.start || "";
+        record.end = values.end || "";
+      }
+      if(kind==="lab"){
+        record.type = values.type || "Equipment/Maintenance";
+        record.desc = values.desc || "";
+        record.volume = Math.max(0, Math.floor(n(values.volume)));
+        record.complexity = values.complexity || "Medium";
+        record.urgency = values.urgency || "Normal";
+        record.hours = values.hours === null ? 0 : Math.max(0, n(values.hours));
+        record.start = values.start || "";
+        record.end = values.end || "";
+      }
+      if(kind==="ps"){
+        record.activityType = values.activityType || "Reviewer";
+        record.desc = values.desc || "";
+        record.role = values.role || "Member";
+        record.quantity = Math.max(0, Math.floor(n(values.quantity)));
+        record.rounds = Math.max(1, Math.floor(n(values.rounds) || 1));
+        record.complexity = values.complexity || "Medium";
+        record.urgency = values.urgency || "Normal";
+        record.hours = values.hours === null ? 0 : Math.max(0, n(values.hours));
+        record.start = values.start || "";
+        record.end = values.end || "";
       }
 
       renderAll();
@@ -2490,10 +2631,10 @@ function benchmarkText(index){
 ========================================================= */
 let chart=null;
 
+const editButtonHTML = (label="Edit record") => `
+  <button class="btn btn-secondary btn-sm" data-act="edit" aria-label="${label}">Edit</button>`;
 const deleteButtonHTML = (label="Delete record") => `
-  <button class="btn btn-danger btn-sm btn-icon" data-act="del" aria-label="${label}">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l1 2h5v2H3V5h5l1-2Zm1 6h2v9h-2V9Zm4 0h2v9h-2V9ZM6 9h2v9H6V9Zm1 12h10a2 2 0 0 0 2-2V9H5v10a2 2 0 0 0 2 2Z"/></svg>
-  </button>`;
+  <button class="btn btn-danger btn-sm" data-act="del" aria-label="${label}">Delete</button>`;
 
 function renderAll(){
   renderTeaching();
@@ -2512,58 +2653,29 @@ function renderAll(){
 function renderTeaching(){
   const tb = $("tblTeach").querySelector("tbody");
   tb.innerHTML="";
-  if(state.data.teaching.length===0){
-    renderEmptyRow(tb, 10, "Add course");
-    return;
-  }
+  if(state.data.teaching.length===0) return;
   state.data.teaching.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
-      <td data-label="Course Code *"><input data-k="code" placeholder="e.g., SJ24102"/></td>
-      <td data-label="Course Title *"><textarea data-k="name" rows="2" placeholder="Course title"></textarea></td>
-      <td data-label="Credit"><input data-k="credit" disabled/></td>
-      <td data-label="Students *"><input data-k="students" type="number" min="0" step="1"/></td>
-      <td data-label="Lecture *"><input data-k="lecture" type="number" min="0" step="0.5"/></td>
-      <td data-label="Tutorial *"><input data-k="tutorial" type="number" min="0" step="0.5"/></td>
-      <td data-label="Lab *"><input data-k="laboratory" type="number" min="0" step="0.5"/></td>
-      <td data-label="Field *"><input data-k="field" type="number" min="0" step="0.5"/></td>
-      <td data-label="Contact Hours"><input data-k="contact" disabled/></td>
-      <td class="cell-actions" data-label="Action">${deleteButtonHTML("Delete course")}</td>
+      <td data-label="Course Code *">${cellTextHTML(r.code || "")}</td>
+      <td data-label="Course Title *">${cellTextHTML(r.name || "")}</td>
+      <td data-label="Credit">${cellTextHTML(formatInt(r.credit || 0))}</td>
+      <td data-label="Students *">${cellTextHTML(formatInt(r.students || 0))}</td>
+      <td data-label="Lecture *">${cellTextHTML(formatHours(r.lecture || 0))}</td>
+      <td data-label="Tutorial *">${cellTextHTML(formatHours(r.tutorial || 0))}</td>
+      <td data-label="Lab *">${cellTextHTML(formatHours(r.laboratory || 0))}</td>
+      <td data-label="Field *">${cellTextHTML(formatHours(r.field || 0))}</td>
+      <td data-label="Contact Hours">${cellTextHTML(formatHours(contactHoursRow(r)))}</td>
+      <td class="cell-actions" data-label="Action">${editButtonHTML("Edit course")}${deleteButtonHTML("Delete course")}</td>
     `;
     tb.appendChild(tr);
 
-    tr.querySelector('[data-k="code"]').value=r.code || "";
-    tr.querySelector('[data-k="name"]').value=r.name || "";
-    tr.querySelector('[data-k="credit"]').value=r.credit || 0;
-    tr.querySelector('[data-k="students"]').value=n(r.students)||0;
-    tr.querySelector('[data-k="lecture"]').value=n(r.lecture)||0;
-    tr.querySelector('[data-k="tutorial"]').value=n(r.tutorial)||0;
-    tr.querySelector('[data-k="laboratory"]').value=n(r.laboratory)||0;
-    tr.querySelector('[data-k="field"]').value=n(r.field)||0;
-    tr.querySelector('[data-k="contact"]').value=contactHoursRow(r).toFixed(1);
-    autoGrowTextarea(tr.querySelector('[data-k="name"]'));
-
-    tr.addEventListener("input",(e)=>{
-      const k=e.target.getAttribute("data-k"); if(!k) return;
-      const obj=state.data.teaching.find(x=>x.id===tr.dataset.id); if(!obj) return;
-
-      if(k==="code"){
-        obj.code = (e.target.value||"").toUpperCase();
-        obj.credit = creditFromCode(obj.code);
-        tr.querySelector('[data-k="credit"]').value=obj.credit;
-      } else if(k==="name"){
-        obj.name = e.target.value || "";
-        autoGrowTextarea(e.target);
-      } else if(["students","lecture","tutorial","laboratory","field"].includes(k)){
-        obj[k] = Math.max(0, n(e.target.value));
-        e.target.value = obj[k];
-        tr.querySelector('[data-k="contact"]').value = contactHoursRow(obj).toFixed(1);
-      }
-      autosave();
-    });
-
     tr.addEventListener("click",(e)=>{
-      if(e.target?.getAttribute("data-act")==="del"){
+      const action = e.target.closest("[data-act]")?.getAttribute("data-act");
+      if(action === "edit"){
+        openEditModal("teach", tr.dataset.id);
+      }
+      if(action === "del"){
         if(!confirmDelete("Delete this course record?")) return;
         state.data.teaching = state.data.teaching.filter(x=>x.id!==tr.dataset.id);
         renderAll(); autosave();
@@ -2578,55 +2690,26 @@ function renderTeaching(){
 function renderSupervision(){
   const tb=$("tblSv").querySelector("tbody");
   tb.innerHTML="";
-  if(state.data.supervision.length===0){
-    renderEmptyRow(tb, 7, "Add supervision");
-    return;
-  }
+  if(state.data.supervision.length===0) return;
   state.data.supervision.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
-      <td data-label="Level *">
-        <select data-k="level">
-          <option>Undergraduate</option>
-          <option>Master</option>
-          <option>PhD</option>
-        </select>
-      </td>
-      <td data-label="Student / Project *"><input data-k="title" placeholder="Student name or project"/></td>
-      <td data-label="Role *">
-        <select data-k="role">
-          <option>Main</option>
-          <option>Co-supervisor</option>
-        </select>
-      </td>
-      <td data-label="Status *">
-        <select data-k="status">
-          <option>Active</option>
-          <option>Completed</option>
-        </select>
-      </td>
-      <td data-label="Start Date *"><input data-k="start" type="date"/></td>
-      <td data-label="End Date *"><input data-k="end" type="date"/></td>
-      <td class="cell-actions" data-label="Action">${deleteButtonHTML("Delete supervision record")}</td>
+      <td data-label="Level *">${cellTextHTML(r.level || "Undergraduate")}</td>
+      <td data-label="Student / Project *">${cellTextHTML(r.title || "")}</td>
+      <td data-label="Role *">${cellTextHTML(r.role || "Main")}</td>
+      <td data-label="Status *">${cellTextHTML(r.status || "Active")}</td>
+      <td data-label="Start Date *">${cellTextHTML(r.start || "")}</td>
+      <td data-label="End Date *">${cellTextHTML(r.end || "")}</td>
+      <td class="cell-actions" data-label="Action">${editButtonHTML("Edit supervision record")}${deleteButtonHTML("Delete supervision record")}</td>
     `;
     tb.appendChild(tr);
 
-    tr.querySelector('[data-k="level"]').value=r.level || "Undergraduate";
-    tr.querySelector('[data-k="title"]').value=r.title || "";
-    tr.querySelector('[data-k="role"]').value=r.role || "Main";
-    tr.querySelector('[data-k="status"]').value=r.status || "Active";
-    tr.querySelector('[data-k="start"]').value=r.start || "";
-    tr.querySelector('[data-k="end"]').value=r.end || "";
-
-    tr.addEventListener("input",(e)=>{
-      const k=e.target.getAttribute("data-k"); if(!k) return;
-      const obj=state.data.supervision.find(x=>x.id===tr.dataset.id); if(!obj) return;
-      obj[k]=e.target.value;
-      autosave();
-    });
-
     tr.addEventListener("click",(e)=>{
-      if(e.target?.getAttribute("data-act")==="del"){
+      const action = e.target.closest("[data-act]")?.getAttribute("data-act");
+      if(action === "edit"){
+        openEditModal("sv", tr.dataset.id);
+      }
+      if(action === "del"){
         if(!confirmDelete("Delete this supervision record?")) return;
         state.data.supervision = state.data.supervision.filter(x=>x.id!==tr.dataset.id);
         renderAll(); autosave();
@@ -2641,70 +2724,28 @@ function renderSupervision(){
 function renderResearch(){
   const tb=$("tblRes").querySelector("tbody");
   tb.innerHTML="";
-  if(state.data.research.length===0){
-    renderEmptyRow(tb, 9, "Add grant");
-    return;
-  }
+  if(state.data.research.length===0) return;
   state.data.research.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
-      <td data-label="Grant Code *"><input data-k="code" placeholder="Grant code"/></td>
-      <td data-label="Title *"><textarea data-k="title" rows="2" placeholder="Grant title"></textarea></td>
-      <td data-label="Level *">
-        <select data-k="level">
-          <option>University</option>
-          <option>National</option>
-          <option>International</option>
-        </select>
-      </td>
-      <td data-label="Status *">
-        <select data-k="status">
-          <option>Active</option>
-          <option>Applied</option>
-          <option>Ended</option>
-        </select>
-      </td>
-      <td data-label="Role *">
-        <select data-k="role">
-          <option>PI</option>
-          <option>Co-I</option>
-          <option>Member</option>
-        </select>
-      </td>
-      <td data-label="Amount (RM) *"><input data-k="amount" type="number" min="0" step="1" placeholder="RM"/></td>
-      <td data-label="Start Date *"><input data-k="start" type="date"/></td>
-      <td data-label="End Date *"><input data-k="end" type="date"/></td>
-      <td class="cell-actions" data-label="Action">${deleteButtonHTML("Delete research record")}</td>
+      <td data-label="Grant Code *">${cellTextHTML(r.code || "")}</td>
+      <td data-label="Title *">${cellTextHTML(r.title || "")}</td>
+      <td data-label="Level *">${cellTextHTML(r.level || "University")}</td>
+      <td data-label="Status *">${cellTextHTML(r.status || "Active")}</td>
+      <td data-label="Role *">${cellTextHTML(r.role || "PI")}</td>
+      <td data-label="Amount (RM) *">${cellTextHTML(formatInt(r.amount || 0))}</td>
+      <td data-label="Start Date *">${cellTextHTML(r.start || "")}</td>
+      <td data-label="End Date *">${cellTextHTML(r.end || "")}</td>
+      <td class="cell-actions" data-label="Action">${editButtonHTML("Edit research record")}${deleteButtonHTML("Delete research record")}</td>
     `;
     tb.appendChild(tr);
 
-    tr.querySelector('[data-k="code"]').value=r.code || "";
-    tr.querySelector('[data-k="title"]').value=r.title || "";
-    tr.querySelector('[data-k="level"]').value=r.level || "University";
-    tr.querySelector('[data-k="status"]').value=r.status || "Active";
-    tr.querySelector('[data-k="role"]').value=r.role || "PI";
-    tr.querySelector('[data-k="amount"]').value=n(r.amount)||0;
-    tr.querySelector('[data-k="start"]').value=r.start || "";
-    tr.querySelector('[data-k="end"]').value=r.end || "";
-    autoGrowTextarea(tr.querySelector('[data-k="title"]'));
-
-    tr.addEventListener("input",(e)=>{
-      const k=e.target.getAttribute("data-k"); if(!k) return;
-      const obj=state.data.research.find(x=>x.id===tr.dataset.id); if(!obj) return;
-      if(k==="amount"){
-        obj.amount = Math.max(0, n(e.target.value));
-        e.target.value = obj.amount;
-      }else if(k==="title"){
-        obj.title = e.target.value || "";
-        autoGrowTextarea(e.target);
-      }else{
-        obj[k] = e.target.value;
-      }
-      autosave();
-    });
-
     tr.addEventListener("click",(e)=>{
-      if(e.target?.getAttribute("data-act")==="del"){
+      const action = e.target.closest("[data-act]")?.getAttribute("data-act");
+      if(action === "edit"){
+        openEditModal("res", tr.dataset.id);
+      }
+      if(action === "del"){
         if(!confirmDelete("Delete this research record?")) return;
         state.data.research = state.data.research.filter(x=>x.id!==tr.dataset.id);
         renderAll(); autosave();
@@ -2719,68 +2760,27 @@ function renderResearch(){
 function renderPublication(){
   const tb=$("tblPub").querySelector("tbody");
   tb.innerHTML="";
-  if(state.data.publication.length===0){
-    renderEmptyRow(tb, 8, "Add publication");
-    return;
-  }
+  if(state.data.publication.length===0) return;
   state.data.publication.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
-      <td data-label="Year *"><input data-k="year" type="number" min="1990" step="1"/></td>
-      <td data-label="Title *"><textarea data-k="title" rows="2" placeholder="Publication title"></textarea></td>
-      <td data-label="Type *">
-        <select data-k="type">
-          <option>Journal</option>
-          <option>Book/Chapter</option>
-          <option>Proceeding</option>
-          <option>Other</option>
-        </select>
-      </td>
-      <td data-label="Indexed? *">
-        <select data-k="indexed">
-          <option>Yes</option>
-          <option>No</option>
-        </select>
-      </td>
-      <td data-label="Role *">
-        <select data-k="role">
-          <option>First/Corresponding</option>
-          <option>Co-author</option>
-        </select>
-      </td>
-      <td data-label="Start Date *"><input data-k="start" type="date"/></td>
-      <td data-label="End Date *"><input data-k="end" type="date"/></td>
-      <td class="cell-actions" data-label="Action">${deleteButtonHTML("Delete publication record")}</td>
+      <td data-label="Year *">${cellTextHTML(formatInt(r.year || (new Date()).getFullYear()))}</td>
+      <td data-label="Title *">${cellTextHTML(r.title || "")}</td>
+      <td data-label="Type *">${cellTextHTML(r.type || "Journal")}</td>
+      <td data-label="Indexed? *">${cellTextHTML(r.indexed || "Yes")}</td>
+      <td data-label="Role *">${cellTextHTML(r.role || "First/Corresponding")}</td>
+      <td data-label="Start Date *">${cellTextHTML(r.start || "")}</td>
+      <td data-label="End Date *">${cellTextHTML(r.end || "")}</td>
+      <td class="cell-actions" data-label="Action">${editButtonHTML("Edit publication record")}${deleteButtonHTML("Delete publication record")}</td>
     `;
     tb.appendChild(tr);
 
-    tr.querySelector('[data-k="year"]').value = r.year || (new Date()).getFullYear();
-    tr.querySelector('[data-k="title"]').value = r.title || "";
-    tr.querySelector('[data-k="type"]').value = r.type || "Journal";
-    tr.querySelector('[data-k="indexed"]').value = r.indexed || "Yes";
-    tr.querySelector('[data-k="role"]').value = r.role || "First/Corresponding";
-    tr.querySelector('[data-k="start"]').value = r.start || "";
-    tr.querySelector('[data-k="end"]').value = r.end || "";
-    autoGrowTextarea(tr.querySelector('[data-k="title"]'));
-
-    tr.addEventListener("input",(e)=>{
-      const k=e.target.getAttribute("data-k"); if(!k) return;
-      const obj=state.data.publication.find(x=>x.id===tr.dataset.id); if(!obj) return;
-
-      if(k==="year"){
-        obj.year = Math.max(1990, Math.floor(n(e.target.value) || (new Date()).getFullYear()));
-        e.target.value = obj.year;
-      }else if(k==="title"){
-        obj.title = e.target.value || "";
-        autoGrowTextarea(e.target);
-      }else{
-        obj[k] = e.target.value;
-      }
-      autosave();
-    });
-
     tr.addEventListener("click",(e)=>{
-      if(e.target?.getAttribute("data-act")==="del"){
+      const action = e.target.closest("[data-act]")?.getAttribute("data-act");
+      if(action === "edit"){
+        openEditModal("pub", tr.dataset.id);
+      }
+      if(action === "del"){
         if(!confirmDelete("Delete this publication record?")) return;
         state.data.publication = state.data.publication.filter(x=>x.id!==tr.dataset.id);
         renderAll(); autosave();
@@ -2795,68 +2795,28 @@ function renderPublication(){
 function renderAdministration(){
   const tb=$("tblAdmin").querySelector("tbody");
   tb.innerHTML="";
-  if(state.data.admin.length===0){
-    renderEmptyRow(tb, 9, "Add admin role");
-    return;
-  }
+  if(state.data.admin.length===0) return;
   state.data.admin.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
-      <td data-label="Position *"><input data-k="position" placeholder="Position or appointment"/></td>
-      <td data-label="Type *">
-        <select data-k="type">
-          <option>Official</option>
-          <option>Ad-hoc</option>
-        </select>
-      </td>
-      <td data-label="Level *">
-        <select data-k="level">
-          <option>Programme</option>
-          <option>Faculty</option>
-          <option>University</option>
-          <option>State</option>
-          <option>National</option>
-          <option>International</option>
-          <option>Industry</option>
-        </select>
-      </td>
-      <td data-label="Months *"><input data-k="months" type="number" min="0" step="1"/></td>
-      <td data-label="Meetings *"><input data-k="meetings" type="number" min="0" step="1"/></td>
-      <td data-label="Workload Notes *"><textarea data-k="notes" rows="2" placeholder="Key workload notes"></textarea></td>
-      <td data-label="Start Date *"><input data-k="start" type="date"/></td>
-      <td data-label="End Date *"><input data-k="end" type="date"/></td>
-      <td class="cell-actions" data-label="Action">${deleteButtonHTML("Delete administration record")}</td>
+      <td data-label="Position *">${cellTextHTML(r.position || "")}</td>
+      <td data-label="Type *">${cellTextHTML(r.type || "Official")}</td>
+      <td data-label="Level *">${cellTextHTML(r.level || "Faculty")}</td>
+      <td data-label="Months *">${cellTextHTML(formatInt(r.months || 0))}</td>
+      <td data-label="Meetings *">${cellTextHTML(formatInt(r.meetings || 0))}</td>
+      <td data-label="Workload Notes *">${cellTextHTML(r.notes || "")}</td>
+      <td data-label="Start Date *">${cellTextHTML(r.start || "")}</td>
+      <td data-label="End Date *">${cellTextHTML(r.end || "")}</td>
+      <td class="cell-actions" data-label="Action">${editButtonHTML("Edit administration record")}${deleteButtonHTML("Delete administration record")}</td>
     `;
     tb.appendChild(tr);
 
-    tr.querySelector('[data-k="position"]').value = r.position || "";
-    tr.querySelector('[data-k="type"]').value = r.type || "Official";
-    tr.querySelector('[data-k="level"]').value = r.level || "Faculty";
-    tr.querySelector('[data-k="months"]').value = Math.max(0, Math.floor(n(r.months)));
-    tr.querySelector('[data-k="meetings"]').value = Math.max(0, Math.floor(n(r.meetings)));
-    tr.querySelector('[data-k="notes"]').value = r.notes || "";
-    tr.querySelector('[data-k="start"]').value = r.start || "";
-    tr.querySelector('[data-k="end"]').value = r.end || "";
-    autoGrowTextarea(tr.querySelector('[data-k="notes"]'));
-
-    tr.addEventListener("input",(e)=>{
-      const k=e.target.getAttribute("data-k"); if(!k) return;
-      const obj=state.data.admin.find(x=>x.id===tr.dataset.id); if(!obj) return;
-
-      if(k==="months" || k==="meetings"){
-        obj[k] = Math.max(0, Math.floor(n(e.target.value)));
-        e.target.value = obj[k];
-      }else if(k==="notes"){
-        obj.notes = e.target.value || "";
-        autoGrowTextarea(e.target);
-      }else{
-        obj[k] = e.target.value;
-      }
-      autosave();
-    });
-
     tr.addEventListener("click",(e)=>{
-      if(e.target?.getAttribute("data-act")==="del"){
+      const action = e.target.closest("[data-act]")?.getAttribute("data-act");
+      if(action === "edit"){
+        openEditModal("admin", tr.dataset.id);
+      }
+      if(action === "del"){
         if(!confirmDelete("Delete this administration record?")) return;
         state.data.admin = state.data.admin.filter(x=>x.id!==tr.dataset.id);
         renderAll(); autosave();
@@ -2871,66 +2831,27 @@ function renderAdministration(){
 function renderServices(){
   const tb=$("tblSvc").querySelector("tbody");
   tb.innerHTML="";
-  if(state.data.service.length===0){
-    renderEmptyRow(tb, 8, "Add service");
-    return;
-  }
+  if(state.data.service.length===0) return;
   state.data.service.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
-      <td data-label="Service Type *">
-        <select data-k="type">
-          <option>Service to University</option>
-          <option>Service to Industry</option>
-          <option>Service to Community</option>
-          <option>Other</option>
-        </select>
-      </td>
-      <td data-label="Activity *"><textarea data-k="activity" rows="2" placeholder="Describe the activity"></textarea></td>
-      <td data-label="Role *">
-        <select data-k="role">
-          <option>Lead</option>
-          <option>Member</option>
-        </select>
-      </td>
-      <td data-label="Hours *"><input data-k="hours" type="number" min="0" step="0.5"/></td>
-      <td data-label="Participants *"><input data-k="participants" type="number" min="0" step="1"/></td>
-      <td data-label="Start Date *"><input data-k="start" type="date"/></td>
-      <td data-label="End Date *"><input data-k="end" type="date"/></td>
-      <td class="cell-actions" data-label="Action">${deleteButtonHTML("Delete service record")}</td>
+      <td data-label="Service Type *">${cellTextHTML(r.type || "Service to University")}</td>
+      <td data-label="Activity *">${cellTextHTML(r.activity || "")}</td>
+      <td data-label="Role *">${cellTextHTML(r.role || "Lead")}</td>
+      <td data-label="Hours *">${cellTextHTML(formatHours(r.hours || 0))}</td>
+      <td data-label="Participants *">${cellTextHTML(formatInt(r.participants || 0))}</td>
+      <td data-label="Start Date *">${cellTextHTML(r.start || "")}</td>
+      <td data-label="End Date *">${cellTextHTML(r.end || "")}</td>
+      <td class="cell-actions" data-label="Action">${editButtonHTML("Edit service record")}${deleteButtonHTML("Delete service record")}</td>
     `;
     tb.appendChild(tr);
 
-    tr.querySelector('[data-k="type"]').value = r.type || "Service to University";
-    tr.querySelector('[data-k="activity"]').value = r.activity || "";
-    tr.querySelector('[data-k="role"]').value = r.role || "Lead";
-    tr.querySelector('[data-k="hours"]').value = Math.max(0, n(r.hours));
-    tr.querySelector('[data-k="participants"]').value = Math.max(0, Math.floor(n(r.participants)));
-    tr.querySelector('[data-k="start"]').value = r.start || "";
-    tr.querySelector('[data-k="end"]').value = r.end || "";
-    autoGrowTextarea(tr.querySelector('[data-k="activity"]'));
-
-    tr.addEventListener("input",(e)=>{
-      const k=e.target.getAttribute("data-k"); if(!k) return;
-      const obj=state.data.service.find(x=>x.id===tr.dataset.id); if(!obj) return;
-
-      if(k==="hours"){
-        obj.hours = Math.max(0, n(e.target.value));
-        e.target.value = obj.hours;
-      } else if(k==="participants"){
-        obj.participants = Math.max(0, Math.floor(n(e.target.value)));
-        e.target.value = obj.participants;
-      } else if(k==="activity"){
-        obj.activity = e.target.value || "";
-        autoGrowTextarea(e.target);
-      } else {
-        obj[k] = e.target.value;
-      }
-      autosave();
-    });
-
     tr.addEventListener("click",(e)=>{
-      if(e.target?.getAttribute("data-act")==="del"){
+      const action = e.target.closest("[data-act]")?.getAttribute("data-act");
+      if(action === "edit"){
+        openEditModal("svc", tr.dataset.id);
+      }
+      if(action === "del"){
         if(!confirmDelete("Delete this service record?")) return;
         state.data.service = state.data.service.filter(x=>x.id!==tr.dataset.id);
         renderAll(); autosave();
@@ -2945,73 +2866,28 @@ function renderServices(){
 function renderLabOps(){
   const tb=$("tblLab").querySelector("tbody");
   tb.innerHTML="";
-  if(state.data.lab.length===0){
-    renderEmptyRow(tb, 9, "Add lab activity");
-    return;
-  }
+  if(state.data.lab.length===0) return;
   state.data.lab.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
-      <td data-label="Activity Type *">
-        <select data-k="type">
-          <option>Lab Sessions Support</option>
-          <option>Equipment/Maintenance</option>
-          <option>Safety/Compliance</option>
-          <option>Consumables/Procurement</option>
-          <option>Field/Site Work</option>
-          <option>Other</option>
-        </select>
-      </td>
-      <td data-label="Description *"><textarea data-k="desc" rows="2" placeholder="Describe briefly"></textarea></td>
-      <td data-label="Volume *"><input data-k="volume" type="number" min="0" step="1"/></td>
-      <td data-label="Complexity *">
-        <select data-k="complexity">
-          <option>Low</option><option>Medium</option><option>High</option>
-        </select>
-      </td>
-      <td data-label="Urgency *">
-        <select data-k="urgency">
-          <option>Normal</option><option>Tight</option><option>Critical</option>
-        </select>
-      </td>
-      <td data-label="Hours *"><input data-k="hours" type="number" min="0" step="0.5"/></td>
-      <td data-label="Start Date *"><input data-k="start" type="date"/></td>
-      <td data-label="End Date *"><input data-k="end" type="date"/></td>
-      <td class="cell-actions" data-label="Action">${deleteButtonHTML("Delete lab operations record")}</td>
+      <td data-label="Activity Type *">${cellTextHTML(r.type || "Equipment/Maintenance")}</td>
+      <td data-label="Description *">${cellTextHTML(r.desc || "")}</td>
+      <td data-label="Volume *">${cellTextHTML(formatInt(r.volume || 0))}</td>
+      <td data-label="Complexity *">${cellTextHTML(r.complexity || "Medium")}</td>
+      <td data-label="Urgency *">${cellTextHTML(r.urgency || "Normal")}</td>
+      <td data-label="Hours *">${cellTextHTML(formatHours(r.hours || 0))}</td>
+      <td data-label="Start Date *">${cellTextHTML(r.start || "")}</td>
+      <td data-label="End Date *">${cellTextHTML(r.end || "")}</td>
+      <td class="cell-actions" data-label="Action">${editButtonHTML("Edit lab operations record")}${deleteButtonHTML("Delete lab operations record")}</td>
     `;
     tb.appendChild(tr);
 
-    tr.querySelector('[data-k="type"]').value = r.type || "Equipment/Maintenance";
-    tr.querySelector('[data-k="desc"]').value = r.desc || "";
-    tr.querySelector('[data-k="volume"]').value = Math.max(0, Math.floor(n(r.volume)));
-    tr.querySelector('[data-k="complexity"]').value = r.complexity || "Medium";
-    tr.querySelector('[data-k="urgency"]').value = r.urgency || "Normal";
-    tr.querySelector('[data-k="hours"]').value = Math.max(0, n(r.hours));
-    tr.querySelector('[data-k="start"]').value = r.start || "";
-    tr.querySelector('[data-k="end"]').value = r.end || "";
-    autoGrowTextarea(tr.querySelector('[data-k="desc"]'));
-
-    tr.addEventListener("input",(e)=>{
-      const k=e.target.getAttribute("data-k"); if(!k) return;
-      const obj=state.data.lab.find(x=>x.id===tr.dataset.id); if(!obj) return;
-
-      if(k==="volume"){
-        obj.volume = Math.max(0, Math.floor(n(e.target.value)));
-        e.target.value = obj.volume;
-      } else if(k==="hours"){
-        obj.hours = Math.max(0, n(e.target.value));
-        e.target.value = obj.hours;
-      } else if(k==="desc"){
-        obj.desc = e.target.value || "";
-        autoGrowTextarea(e.target);
-      } else {
-        obj[k] = e.target.value;
-      }
-      autosave();
-    });
-
     tr.addEventListener("click",(e)=>{
-      if(e.target?.getAttribute("data-act")==="del"){
+      const action = e.target.closest("[data-act]")?.getAttribute("data-act");
+      if(action === "edit"){
+        openEditModal("lab", tr.dataset.id);
+      }
+      if(action === "del"){
         if(!confirmDelete("Delete this lab operations record?")) return;
         state.data.lab = state.data.lab.filter(x=>x.id!==tr.dataset.id);
         renderAll(); autosave();
@@ -3026,87 +2902,30 @@ function renderLabOps(){
 function renderProSch(){
   const tb=$("tblProSch").querySelector("tbody");
   tb.innerHTML="";
-  if(state.data.prosch.length===0){
-    renderEmptyRow(tb, 11, "Add item");
-    return;
-  }
+  if(state.data.prosch.length===0) return;
   state.data.prosch.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
-      <td data-label="Activity Type *">
-        <select data-k="activityType">
-          <option>Reviewer</option>
-          <option>Editor</option>
-          <option>External Examiner</option>
-          <option>Internal Examiner</option>
-          <option>Conference Committee</option>
-          <option>Journal Editorial Board</option>
-          <option>Grant Panel / Assessor</option>
-          <option>Other</option>
-        </select>
-      </td>
-      <td data-label="Description *"><textarea data-k="desc" rows="2" placeholder="Describe task (journal/conference/thesis scope, key notes)"></textarea></td>
-      <td data-label="Role *">
-        <select data-k="role">
-          <option>Lead</option>
-          <option>Member</option>
-        </select>
-      </td>
-      <td data-label="Quantity *"><input data-k="quantity" type="number" min="0" step="1" placeholder="e.g., 3"/></td>
-      <td data-label="Rounds *"><input data-k="rounds" type="number" min="1" step="1" placeholder="e.g., 2"/></td>
-      <td data-label="Complexity *">
-        <select data-k="complexity">
-          <option>Low</option><option>Medium</option><option>High</option>
-        </select>
-      </td>
-      <td data-label="Urgency *">
-        <select data-k="urgency">
-          <option>Normal</option><option>Tight</option><option>Critical</option>
-        </select>
-      </td>
-      <td data-label="Hours (optional)"><input data-k="hours" type="number" min="0" step="0.5" placeholder="optional"/></td>
-      <td data-label="Start Date *"><input data-k="start" type="date"/></td>
-      <td data-label="End Date *"><input data-k="end" type="date"/></td>
-      <td class="cell-actions" data-label="Action">${deleteButtonHTML("Delete professional service record")}</td>
+      <td data-label="Activity Type *">${cellTextHTML(r.activityType || "Reviewer")}</td>
+      <td data-label="Description *">${cellTextHTML(r.desc || "")}</td>
+      <td data-label="Role *">${cellTextHTML(r.role || "Member")}</td>
+      <td data-label="Quantity *">${cellTextHTML(formatInt(r.quantity || 0))}</td>
+      <td data-label="Rounds *">${cellTextHTML(formatInt(r.rounds || 1))}</td>
+      <td data-label="Complexity *">${cellTextHTML(r.complexity || "Medium")}</td>
+      <td data-label="Urgency *">${cellTextHTML(r.urgency || "Normal")}</td>
+      <td data-label="Hours (optional)">${cellTextHTML(formatHours(r.hours || 0))}</td>
+      <td data-label="Start Date *">${cellTextHTML(r.start || "")}</td>
+      <td data-label="End Date *">${cellTextHTML(r.end || "")}</td>
+      <td class="cell-actions" data-label="Action">${editButtonHTML("Edit professional service record")}${deleteButtonHTML("Delete professional service record")}</td>
     `;
     tb.appendChild(tr);
 
-    tr.querySelector('[data-k="activityType"]').value = r.activityType || "Reviewer";
-    tr.querySelector('[data-k="desc"]').value = r.desc || "";
-    tr.querySelector('[data-k="role"]').value = r.role || "Member";
-    tr.querySelector('[data-k="quantity"]').value = Math.max(0, Math.floor(n(r.quantity) || 0));
-    tr.querySelector('[data-k="rounds"]').value = Math.max(1, Math.floor(n(r.rounds) || 1));
-    tr.querySelector('[data-k="complexity"]').value = r.complexity || "Medium";
-    tr.querySelector('[data-k="urgency"]').value = r.urgency || "Normal";
-    tr.querySelector('[data-k="hours"]').value = Math.max(0, n(r.hours) || 0);
-    tr.querySelector('[data-k="start"]').value = r.start || "";
-    tr.querySelector('[data-k="end"]').value = r.end || "";
-    autoGrowTextarea(tr.querySelector('[data-k="desc"]'));
-
-    tr.addEventListener("input",(e)=>{
-      const k=e.target.getAttribute("data-k"); if(!k) return;
-      const obj=state.data.prosch.find(x=>x.id===tr.dataset.id); if(!obj) return;
-
-      if(k==="quantity"){
-        obj.quantity = Math.max(0, Math.floor(n(e.target.value)));
-        e.target.value = obj.quantity;
-      } else if(k==="rounds"){
-        obj.rounds = Math.max(1, Math.floor(n(e.target.value) || 1));
-        e.target.value = obj.rounds;
-      } else if(k==="hours"){
-        obj.hours = Math.max(0, n(e.target.value));
-        e.target.value = obj.hours;
-      } else if(k==="desc"){
-        obj.desc = e.target.value || "";
-        autoGrowTextarea(e.target);
-      } else {
-        obj[k] = e.target.value;
-      }
-      autosave();
-    });
-
     tr.addEventListener("click",(e)=>{
-      if(e.target?.getAttribute("data-act")==="del"){
+      const action = e.target.closest("[data-act]")?.getAttribute("data-act");
+      if(action === "edit"){
+        openEditModal("ps", tr.dataset.id);
+      }
+      if(action === "del"){
         if(!confirmDelete("Delete this professional service record?")) return;
         state.data.prosch = state.data.prosch.filter(x=>x.id!==tr.dataset.id);
         renderAll(); autosave();
@@ -3168,96 +2987,93 @@ function clearKind(kind){
    Validation (activity tables)
 ========================================================= */
 function validateActivityTables(){
-  document.querySelectorAll("input.err,select.err,textarea.err").forEach(el=>el.classList.remove("err"));
   let ok=true;
-  const dataRows = (id)=>Array.from($(id).querySelectorAll("tbody tr")).filter(tr=>!tr.classList.contains("emptyRow"));
-
-  const requireText = (el)=>{ if(!el || !String(el.value||"").trim()){ el?.classList.add("err"); ok=false; } };
-  const requireNonNeg = (el, strictPositive=false)=>{
-    const v=n(el?.value);
-    if(v<0 || (strictPositive && v<=0)){ el?.classList.add("err"); ok=false; }
+  const requireText = (value)=>{ if(!String(value||"").trim()){ ok=false; } };
+  const requireNonNeg = (value, strictPositive=false)=>{
+    const v=n(value);
+    if(v<0 || (strictPositive && v<=0)){ ok=false; }
   };
-  const requireDate = (el)=>{ if(!el || !el.value){ el?.classList.add("err"); ok=false; } };
+  const requireDate = (value)=>{ if(!value){ ok=false; } };
 
   if(state.enabled.Teaching){
-    dataRows("tblTeach").forEach(tr=>{
-      requireText(tr.querySelector('[data-k="code"]'));
-      requireText(tr.querySelector('[data-k="name"]'));
-      requireNonNeg(tr.querySelector('[data-k="students"]'), true);
-      ["lecture","tutorial","laboratory","field"].forEach(k=>requireNonNeg(tr.querySelector(`[data-k="${k}"]`), false));
+    state.data.teaching.forEach(item=>{
+      requireText(item.code);
+      requireText(item.name);
+      requireNonNeg(item.students, true);
+      ["lecture","tutorial","laboratory","field"].forEach(k=>requireNonNeg(item[k], false));
     });
   }
 
   if(state.enabled.Supervision){
-    dataRows("tblSv").forEach(tr=>{
-      requireText(tr.querySelector('[data-k="title"]'));
-      requireDate(tr.querySelector('[data-k="start"]'));
-      requireDate(tr.querySelector('[data-k="end"]'));
+    state.data.supervision.forEach(item=>{
+      requireText(item.title);
+      requireDate(item.start);
+      requireDate(item.end);
     });
   }
 
   if(state.enabled.Research){
-    dataRows("tblRes").forEach(tr=>{
-      requireText(tr.querySelector('[data-k="code"]'));
-      requireText(tr.querySelector('[data-k="title"]'));
-      requireNonNeg(tr.querySelector('[data-k="amount"]'), true);
-      requireDate(tr.querySelector('[data-k="start"]'));
-      requireDate(tr.querySelector('[data-k="end"]'));
+    state.data.research.forEach(item=>{
+      requireText(item.code);
+      requireText(item.title);
+      requireNonNeg(item.amount, true);
+      requireDate(item.start);
+      requireDate(item.end);
     });
   }
 
   if(state.enabled.Publication){
-    dataRows("tblPub").forEach(tr=>{
-      requireNonNeg(tr.querySelector('[data-k="year"]'), true);
-      requireText(tr.querySelector('[data-k="title"]'));
-      requireDate(tr.querySelector('[data-k="start"]'));
-      requireDate(tr.querySelector('[data-k="end"]'));
+    state.data.publication.forEach(item=>{
+      requireNonNeg(item.year, true);
+      requireText(item.title);
+      requireDate(item.start);
+      requireDate(item.end);
     });
   }
 
   if(state.enabled.Administration){
-    dataRows("tblAdmin").forEach(tr=>{
-      requireText(tr.querySelector('[data-k="position"]'));
-      requireNonNeg(tr.querySelector('[data-k="months"]'), true);
-      requireNonNeg(tr.querySelector('[data-k="meetings"]'), false);
-      requireText(tr.querySelector('[data-k="notes"]'));
-      requireDate(tr.querySelector('[data-k="start"]'));
-      requireDate(tr.querySelector('[data-k="end"]'));
+    state.data.admin.forEach(item=>{
+      requireText(item.position);
+      requireNonNeg(item.months, true);
+      requireNonNeg(item.meetings, false);
+      requireText(item.notes);
+      requireDate(item.start);
+      requireDate(item.end);
     });
   }
 
   if(state.enabled.Services){
-    dataRows("tblSvc").forEach(tr=>{
-      requireText(tr.querySelector('[data-k="activity"]'));
-      requireNonNeg(tr.querySelector('[data-k="hours"]'), true);
-      requireNonNeg(tr.querySelector('[data-k="participants"]'), true);
-      requireDate(tr.querySelector('[data-k="start"]'));
-      requireDate(tr.querySelector('[data-k="end"]'));
+    state.data.service.forEach(item=>{
+      requireText(item.activity);
+      requireNonNeg(item.hours, true);
+      requireNonNeg(item.participants, true);
+      requireDate(item.start);
+      requireDate(item.end);
     });
   }
 
   if(state.enabled.LabOps){
-    dataRows("tblLab").forEach(tr=>{
-      requireText(tr.querySelector('[data-k="desc"]'));
-      requireNonNeg(tr.querySelector('[data-k="volume"]'), true);
-      requireNonNeg(tr.querySelector('[data-k="hours"]'), true);
-      requireDate(tr.querySelector('[data-k="start"]'));
-      requireDate(tr.querySelector('[data-k="end"]'));
+    state.data.lab.forEach(item=>{
+      requireText(item.desc);
+      requireNonNeg(item.volume, true);
+      requireNonNeg(item.hours, true);
+      requireDate(item.start);
+      requireDate(item.end);
     });
   }
 
   if(state.enabled.ProSch){
-    dataRows("tblProSch").forEach(tr=>{
-      requireText(tr.querySelector('[data-k="desc"]'));
-      requireNonNeg(tr.querySelector('[data-k="quantity"]'), true);
-      requireNonNeg(tr.querySelector('[data-k="rounds"]'), true);
-      requireDate(tr.querySelector('[data-k="start"]'));
-      requireDate(tr.querySelector('[data-k="end"]'));
+    state.data.prosch.forEach(item=>{
+      requireText(item.desc);
+      requireNonNeg(item.quantity, true);
+      requireNonNeg(item.rounds, true);
+      requireDate(item.start);
+      requireDate(item.end);
     });
   }
 
   if(!ok){
-    showMsg("warn","<b>Validation:</b> Please fill all required fields (no empty/negative values). Highlighted boxes require attention.");
+    showMsg("warn","<b>Validation:</b> Please fill all required fields (no empty/negative values). Use Edit on any row that needs correction.");
   }
   return ok;
 }
