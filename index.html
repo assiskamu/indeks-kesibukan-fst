@@ -308,6 +308,22 @@
       width:100%;
       max-width:100%;
     }
+    td textarea{
+      min-height:44px;
+      line-height:1.25;
+      resize:vertical;
+      white-space:pre-wrap;
+      overflow-wrap:anywhere;
+      word-break:break-word;
+    }
+    .tableWrap textarea{overflow:hidden}
+    .emptyRow td{
+      text-align:center;
+      color:var(--muted);
+      font-style:italic;
+      border:1px dashed rgba(255,255,255,.16);
+      padding:16px 12px;
+    }
 
     /* allow long text inside table cells */
     td .cellText{
@@ -347,6 +363,16 @@
         width:58%;
       }
       table tbody tr td.cell-actions::before{display:none}
+      table tbody tr.emptyRow{
+        margin:12px;
+        padding:0;
+        border:none;
+        background:transparent;
+      }
+      table tbody tr.emptyRow td{
+        width:100%;
+      }
+      table tbody tr.emptyRow td::before{display:none}
     }
 
     .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -422,7 +448,7 @@
     }
     .modal-overlay.open{display:flex}
     .modal{
-      width:min(760px, 100%);
+      width:min(920px, 100%);
       max-height:90vh;
       background:var(--surface);
       border:1px solid var(--border);
@@ -1281,6 +1307,11 @@ const $ = (id)=>document.getElementById(id);
 const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
 const n = (v)=>{ const x=parseFloat(v); return isNaN(x)?0:x; };
 const uid = ()=>Math.random().toString(16).slice(2)+Date.now().toString(16);
+const autoGrowTextarea = (el)=>{
+  if(!el) return;
+  el.style.height = "auto";
+  el.style.height = `${el.scrollHeight}px`;
+};
 
 function showMsg(kind, html){
   const el = $("msgGlobal");
@@ -1291,6 +1322,13 @@ function showMsg(kind, html){
 function hideMsg(){ $("msgGlobal").style.display="none"; }
 function confirmDelete(message="Delete this record? This action cannot be undone."){
   return window.confirm(message);
+}
+
+function renderEmptyRow(tb, colspan, label){
+  const tr = document.createElement("tr");
+  tr.className = "emptyRow";
+  tr.innerHTML = `<td colspan="${colspan}">No records yet. Click “${label}” to create one.</td>`;
+  tb.appendChild(tr);
 }
 
 /* =========================================================
@@ -1311,7 +1349,8 @@ function setupCollapsibles(){
     btn.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6H6z"/></svg>`;
 
     const key = `collapsed:${section.id}`;
-    const isCollapsed = localStorage.getItem(key) === "true";
+    const stored = localStorage.getItem(key);
+    const isCollapsed = stored === null ? true : stored === "true";
     if(isCollapsed) section.classList.add("collapsed");
     btn.setAttribute("aria-expanded", String(!section.classList.contains("collapsed")));
 
@@ -2099,28 +2138,6 @@ function getActiveWeights(){
 }
 
 /* =========================================================
-   Activity data seeding
-========================================================= */
-function ensureSeed(){
-  if(state.data.teaching.length===0)
-    state.data.teaching.push({id:uid(), code:"", name:"", credit:0, students:0, lecture:0, tutorial:0, laboratory:0, field:0});
-  if(state.data.supervision.length===0)
-    state.data.supervision.push({id:uid(), level:"Undergraduate", title:"", role:"Main", status:"Active", start:"", end:""});
-  if(state.data.research.length===0)
-    state.data.research.push({id:uid(), code:"", title:"", level:"University", status:"Active", role:"PI", amount:0, start:"", end:""});
-  if(state.data.publication.length===0)
-    state.data.publication.push({id:uid(), year:(new Date()).getFullYear(), title:"", type:"Journal", indexed:"Yes", role:"First/Corresponding", start:"", end:""});
-  if(state.data.admin.length===0)
-    state.data.admin.push({id:uid(), position:"", type:"Official", level:"Faculty", months:0, meetings:0, notes:"", start:"", end:""});
-  if(state.data.service.length===0)
-    state.data.service.push({id:uid(), type:"Service to University", activity:"", role:"Lead", hours:0, participants:0, start:"", end:""});
-  if(state.data.lab.length===0)
-    state.data.lab.push({id:uid(), type:"Equipment/Maintenance", desc:"", volume:0, complexity:"Medium", urgency:"Normal", hours:0, start:"", end:""});
-  if(state.data.prosch.length===0)
-    state.data.prosch.push({id:uid(), activityType:"Reviewer", desc:"", role:"Member", quantity:1, rounds:1, complexity:"Medium", urgency:"Normal", hours:0, start:"", end:""});
-}
-
-/* =========================================================
    Teaching helpers
 ========================================================= */
 function creditFromCode(code){
@@ -2319,11 +2336,15 @@ function renderAll(){
 function renderTeaching(){
   const tb = $("tblTeach").querySelector("tbody");
   tb.innerHTML="";
+  if(state.data.teaching.length===0){
+    renderEmptyRow(tb, 10, "Add course");
+    return;
+  }
   state.data.teaching.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
       <td data-label="Course Code *"><input data-k="code" placeholder="e.g., SJ24102"/></td>
-      <td data-label="Course Title *"><input data-k="name" placeholder="Course title"/></td>
+      <td data-label="Course Title *"><textarea data-k="name" rows="2" placeholder="Course title"></textarea></td>
       <td data-label="Credit"><input data-k="credit" disabled/></td>
       <td data-label="Students *"><input data-k="students" type="number" min="0" step="1"/></td>
       <td data-label="Lecture *"><input data-k="lecture" type="number" min="0" step="0.5"/></td>
@@ -2344,6 +2365,7 @@ function renderTeaching(){
     tr.querySelector('[data-k="laboratory"]').value=n(r.laboratory)||0;
     tr.querySelector('[data-k="field"]').value=n(r.field)||0;
     tr.querySelector('[data-k="contact"]').value=contactHoursRow(r).toFixed(1);
+    autoGrowTextarea(tr.querySelector('[data-k="name"]'));
 
     tr.addEventListener("input",(e)=>{
       const k=e.target.getAttribute("data-k"); if(!k) return;
@@ -2355,6 +2377,7 @@ function renderTeaching(){
         tr.querySelector('[data-k="credit"]').value=obj.credit;
       } else if(k==="name"){
         obj.name = e.target.value || "";
+        autoGrowTextarea(e.target);
       } else if(["students","lecture","tutorial","laboratory","field"].includes(k)){
         obj[k] = Math.max(0, n(e.target.value));
         e.target.value = obj[k];
@@ -2367,7 +2390,7 @@ function renderTeaching(){
       if(e.target?.getAttribute("data-act")==="del"){
         if(!confirmDelete("Delete this course record?")) return;
         state.data.teaching = state.data.teaching.filter(x=>x.id!==tr.dataset.id);
-        ensureSeed(); renderAll(); autosave();
+        renderAll(); autosave();
       }
     });
   });
@@ -2379,6 +2402,10 @@ function renderTeaching(){
 function renderSupervision(){
   const tb=$("tblSv").querySelector("tbody");
   tb.innerHTML="";
+  if(state.data.supervision.length===0){
+    renderEmptyRow(tb, 7, "Add supervision");
+    return;
+  }
   state.data.supervision.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
@@ -2426,7 +2453,7 @@ function renderSupervision(){
       if(e.target?.getAttribute("data-act")==="del"){
         if(!confirmDelete("Delete this supervision record?")) return;
         state.data.supervision = state.data.supervision.filter(x=>x.id!==tr.dataset.id);
-        ensureSeed(); renderAll(); autosave();
+        renderAll(); autosave();
       }
     });
   });
@@ -2438,11 +2465,15 @@ function renderSupervision(){
 function renderResearch(){
   const tb=$("tblRes").querySelector("tbody");
   tb.innerHTML="";
+  if(state.data.research.length===0){
+    renderEmptyRow(tb, 9, "Add grant");
+    return;
+  }
   state.data.research.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
       <td data-label="Grant Code *"><input data-k="code" placeholder="Grant code"/></td>
-      <td data-label="Title *"><input data-k="title" placeholder="Grant title"/></td>
+      <td data-label="Title *"><textarea data-k="title" rows="2" placeholder="Grant title"></textarea></td>
       <td data-label="Level *">
         <select data-k="level">
           <option>University</option>
@@ -2479,6 +2510,7 @@ function renderResearch(){
     tr.querySelector('[data-k="amount"]').value=n(r.amount)||0;
     tr.querySelector('[data-k="start"]').value=r.start || "";
     tr.querySelector('[data-k="end"]').value=r.end || "";
+    autoGrowTextarea(tr.querySelector('[data-k="title"]'));
 
     tr.addEventListener("input",(e)=>{
       const k=e.target.getAttribute("data-k"); if(!k) return;
@@ -2486,6 +2518,9 @@ function renderResearch(){
       if(k==="amount"){
         obj.amount = Math.max(0, n(e.target.value));
         e.target.value = obj.amount;
+      }else if(k==="title"){
+        obj.title = e.target.value || "";
+        autoGrowTextarea(e.target);
       }else{
         obj[k] = e.target.value;
       }
@@ -2496,7 +2531,7 @@ function renderResearch(){
       if(e.target?.getAttribute("data-act")==="del"){
         if(!confirmDelete("Delete this research record?")) return;
         state.data.research = state.data.research.filter(x=>x.id!==tr.dataset.id);
-        ensureSeed(); renderAll(); autosave();
+        renderAll(); autosave();
       }
     });
   });
@@ -2508,11 +2543,15 @@ function renderResearch(){
 function renderPublication(){
   const tb=$("tblPub").querySelector("tbody");
   tb.innerHTML="";
+  if(state.data.publication.length===0){
+    renderEmptyRow(tb, 8, "Add publication");
+    return;
+  }
   state.data.publication.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
       <td data-label="Year *"><input data-k="year" type="number" min="1990" step="1"/></td>
-      <td data-label="Title *"><input data-k="title" placeholder="Publication title"/></td>
+      <td data-label="Title *"><textarea data-k="title" rows="2" placeholder="Publication title"></textarea></td>
       <td data-label="Type *">
         <select data-k="type">
           <option>Journal</option>
@@ -2546,6 +2585,7 @@ function renderPublication(){
     tr.querySelector('[data-k="role"]').value = r.role || "First/Corresponding";
     tr.querySelector('[data-k="start"]').value = r.start || "";
     tr.querySelector('[data-k="end"]').value = r.end || "";
+    autoGrowTextarea(tr.querySelector('[data-k="title"]'));
 
     tr.addEventListener("input",(e)=>{
       const k=e.target.getAttribute("data-k"); if(!k) return;
@@ -2554,6 +2594,9 @@ function renderPublication(){
       if(k==="year"){
         obj.year = Math.max(1990, Math.floor(n(e.target.value) || (new Date()).getFullYear()));
         e.target.value = obj.year;
+      }else if(k==="title"){
+        obj.title = e.target.value || "";
+        autoGrowTextarea(e.target);
       }else{
         obj[k] = e.target.value;
       }
@@ -2564,7 +2607,7 @@ function renderPublication(){
       if(e.target?.getAttribute("data-act")==="del"){
         if(!confirmDelete("Delete this publication record?")) return;
         state.data.publication = state.data.publication.filter(x=>x.id!==tr.dataset.id);
-        ensureSeed(); renderAll(); autosave();
+        renderAll(); autosave();
       }
     });
   });
@@ -2576,6 +2619,10 @@ function renderPublication(){
 function renderAdministration(){
   const tb=$("tblAdmin").querySelector("tbody");
   tb.innerHTML="";
+  if(state.data.admin.length===0){
+    renderEmptyRow(tb, 9, "Add admin role");
+    return;
+  }
   state.data.admin.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
@@ -2614,6 +2661,7 @@ function renderAdministration(){
     tr.querySelector('[data-k="notes"]').value = r.notes || "";
     tr.querySelector('[data-k="start"]').value = r.start || "";
     tr.querySelector('[data-k="end"]').value = r.end || "";
+    autoGrowTextarea(tr.querySelector('[data-k="notes"]'));
 
     tr.addEventListener("input",(e)=>{
       const k=e.target.getAttribute("data-k"); if(!k) return;
@@ -2622,6 +2670,9 @@ function renderAdministration(){
       if(k==="months" || k==="meetings"){
         obj[k] = Math.max(0, Math.floor(n(e.target.value)));
         e.target.value = obj[k];
+      }else if(k==="notes"){
+        obj.notes = e.target.value || "";
+        autoGrowTextarea(e.target);
       }else{
         obj[k] = e.target.value;
       }
@@ -2632,7 +2683,7 @@ function renderAdministration(){
       if(e.target?.getAttribute("data-act")==="del"){
         if(!confirmDelete("Delete this administration record?")) return;
         state.data.admin = state.data.admin.filter(x=>x.id!==tr.dataset.id);
-        ensureSeed(); renderAll(); autosave();
+        renderAll(); autosave();
       }
     });
   });
@@ -2644,6 +2695,10 @@ function renderAdministration(){
 function renderServices(){
   const tb=$("tblSvc").querySelector("tbody");
   tb.innerHTML="";
+  if(state.data.service.length===0){
+    renderEmptyRow(tb, 8, "Add service");
+    return;
+  }
   state.data.service.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
@@ -2677,6 +2732,7 @@ function renderServices(){
     tr.querySelector('[data-k="participants"]').value = Math.max(0, Math.floor(n(r.participants)));
     tr.querySelector('[data-k="start"]').value = r.start || "";
     tr.querySelector('[data-k="end"]').value = r.end || "";
+    autoGrowTextarea(tr.querySelector('[data-k="activity"]'));
 
     tr.addEventListener("input",(e)=>{
       const k=e.target.getAttribute("data-k"); if(!k) return;
@@ -2688,6 +2744,9 @@ function renderServices(){
       } else if(k==="participants"){
         obj.participants = Math.max(0, Math.floor(n(e.target.value)));
         e.target.value = obj.participants;
+      } else if(k==="activity"){
+        obj.activity = e.target.value || "";
+        autoGrowTextarea(e.target);
       } else {
         obj[k] = e.target.value;
       }
@@ -2698,7 +2757,7 @@ function renderServices(){
       if(e.target?.getAttribute("data-act")==="del"){
         if(!confirmDelete("Delete this service record?")) return;
         state.data.service = state.data.service.filter(x=>x.id!==tr.dataset.id);
-        ensureSeed(); renderAll(); autosave();
+        renderAll(); autosave();
       }
     });
   });
@@ -2710,6 +2769,10 @@ function renderServices(){
 function renderLabOps(){
   const tb=$("tblLab").querySelector("tbody");
   tb.innerHTML="";
+  if(state.data.lab.length===0){
+    renderEmptyRow(tb, 9, "Add lab activity");
+    return;
+  }
   state.data.lab.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
@@ -2750,6 +2813,7 @@ function renderLabOps(){
     tr.querySelector('[data-k="hours"]').value = Math.max(0, n(r.hours));
     tr.querySelector('[data-k="start"]').value = r.start || "";
     tr.querySelector('[data-k="end"]').value = r.end || "";
+    autoGrowTextarea(tr.querySelector('[data-k="desc"]'));
 
     tr.addEventListener("input",(e)=>{
       const k=e.target.getAttribute("data-k"); if(!k) return;
@@ -2761,6 +2825,9 @@ function renderLabOps(){
       } else if(k==="hours"){
         obj.hours = Math.max(0, n(e.target.value));
         e.target.value = obj.hours;
+      } else if(k==="desc"){
+        obj.desc = e.target.value || "";
+        autoGrowTextarea(e.target);
       } else {
         obj[k] = e.target.value;
       }
@@ -2771,7 +2838,7 @@ function renderLabOps(){
       if(e.target?.getAttribute("data-act")==="del"){
         if(!confirmDelete("Delete this lab operations record?")) return;
         state.data.lab = state.data.lab.filter(x=>x.id!==tr.dataset.id);
-        ensureSeed(); renderAll(); autosave();
+        renderAll(); autosave();
       }
     });
   });
@@ -2783,6 +2850,10 @@ function renderLabOps(){
 function renderProSch(){
   const tb=$("tblProSch").querySelector("tbody");
   tb.innerHTML="";
+  if(state.data.prosch.length===0){
+    renderEmptyRow(tb, 11, "Add item");
+    return;
+  }
   state.data.prosch.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
@@ -2834,6 +2905,7 @@ function renderProSch(){
     tr.querySelector('[data-k="hours"]').value = Math.max(0, n(r.hours) || 0);
     tr.querySelector('[data-k="start"]').value = r.start || "";
     tr.querySelector('[data-k="end"]').value = r.end || "";
+    autoGrowTextarea(tr.querySelector('[data-k="desc"]'));
 
     tr.addEventListener("input",(e)=>{
       const k=e.target.getAttribute("data-k"); if(!k) return;
@@ -2848,6 +2920,9 @@ function renderProSch(){
       } else if(k==="hours"){
         obj.hours = Math.max(0, n(e.target.value));
         e.target.value = obj.hours;
+      } else if(k==="desc"){
+        obj.desc = e.target.value || "";
+        autoGrowTextarea(e.target);
       } else {
         obj[k] = e.target.value;
       }
@@ -2858,7 +2933,7 @@ function renderProSch(){
       if(e.target?.getAttribute("data-act")==="del"){
         if(!confirmDelete("Delete this professional service record?")) return;
         state.data.prosch = state.data.prosch.filter(x=>x.id!==tr.dataset.id);
-        ensureSeed(); renderAll(); autosave();
+        renderAll(); autosave();
       }
     });
   });
@@ -2910,7 +2985,7 @@ function clearKind(kind){
   if(kind==="svc") state.data.service=[];
   if(kind==="lab") state.data.lab=[];
   if(kind==="ps") state.data.prosch=[];
-  ensureSeed(); renderAll(); autosave();
+  renderAll(); autosave();
 }
 
 /* =========================================================
@@ -2919,6 +2994,7 @@ function clearKind(kind){
 function validateActivityTables(){
   document.querySelectorAll("input.err,select.err,textarea.err").forEach(el=>el.classList.remove("err"));
   let ok=true;
+  const dataRows = (id)=>Array.from($(id).querySelectorAll("tbody tr")).filter(tr=>!tr.classList.contains("emptyRow"));
 
   const requireText = (el)=>{ if(!el || !String(el.value||"").trim()){ el?.classList.add("err"); ok=false; } };
   const requireNonNeg = (el, strictPositive=false)=>{
@@ -2928,7 +3004,7 @@ function validateActivityTables(){
   const requireDate = (el)=>{ if(!el || !el.value){ el?.classList.add("err"); ok=false; } };
 
   if(state.enabled.Teaching){
-    $("tblTeach").querySelectorAll("tbody tr").forEach(tr=>{
+    dataRows("tblTeach").forEach(tr=>{
       requireText(tr.querySelector('[data-k="code"]'));
       requireText(tr.querySelector('[data-k="name"]'));
       requireNonNeg(tr.querySelector('[data-k="students"]'), true);
@@ -2937,7 +3013,7 @@ function validateActivityTables(){
   }
 
   if(state.enabled.Supervision){
-    $("tblSv").querySelectorAll("tbody tr").forEach(tr=>{
+    dataRows("tblSv").forEach(tr=>{
       requireText(tr.querySelector('[data-k="title"]'));
       requireDate(tr.querySelector('[data-k="start"]'));
       requireDate(tr.querySelector('[data-k="end"]'));
@@ -2945,7 +3021,7 @@ function validateActivityTables(){
   }
 
   if(state.enabled.Research){
-    $("tblRes").querySelectorAll("tbody tr").forEach(tr=>{
+    dataRows("tblRes").forEach(tr=>{
       requireText(tr.querySelector('[data-k="code"]'));
       requireText(tr.querySelector('[data-k="title"]'));
       requireNonNeg(tr.querySelector('[data-k="amount"]'), true);
@@ -2955,7 +3031,7 @@ function validateActivityTables(){
   }
 
   if(state.enabled.Publication){
-    $("tblPub").querySelectorAll("tbody tr").forEach(tr=>{
+    dataRows("tblPub").forEach(tr=>{
       requireNonNeg(tr.querySelector('[data-k="year"]'), true);
       requireText(tr.querySelector('[data-k="title"]'));
       requireDate(tr.querySelector('[data-k="start"]'));
@@ -2964,7 +3040,7 @@ function validateActivityTables(){
   }
 
   if(state.enabled.Administration){
-    $("tblAdmin").querySelectorAll("tbody tr").forEach(tr=>{
+    dataRows("tblAdmin").forEach(tr=>{
       requireText(tr.querySelector('[data-k="position"]'));
       requireNonNeg(tr.querySelector('[data-k="months"]'), true);
       requireNonNeg(tr.querySelector('[data-k="meetings"]'), false);
@@ -2975,7 +3051,7 @@ function validateActivityTables(){
   }
 
   if(state.enabled.Services){
-    $("tblSvc").querySelectorAll("tbody tr").forEach(tr=>{
+    dataRows("tblSvc").forEach(tr=>{
       requireText(tr.querySelector('[data-k="activity"]'));
       requireNonNeg(tr.querySelector('[data-k="hours"]'), true);
       requireNonNeg(tr.querySelector('[data-k="participants"]'), true);
@@ -2985,7 +3061,7 @@ function validateActivityTables(){
   }
 
   if(state.enabled.LabOps){
-    $("tblLab").querySelectorAll("tbody tr").forEach(tr=>{
+    dataRows("tblLab").forEach(tr=>{
       requireText(tr.querySelector('[data-k="desc"]'));
       requireNonNeg(tr.querySelector('[data-k="volume"]'), true);
       requireNonNeg(tr.querySelector('[data-k="hours"]'), true);
@@ -2995,7 +3071,7 @@ function validateActivityTables(){
   }
 
   if(state.enabled.ProSch){
-    $("tblProSch").querySelectorAll("tbody tr").forEach(tr=>{
+    dataRows("tblProSch").forEach(tr=>{
       requireText(tr.querySelector('[data-k="desc"]'));
       requireNonNeg(tr.querySelector('[data-k="quantity"]'), true);
       requireNonNeg(tr.querySelector('[data-k="rounds"]'), true);
@@ -3155,7 +3231,6 @@ function calculate(){
   if(!validateProfile()) return;
   if(!validateToggles()) return;
   applySectionVisibility();
-  ensureSeed();
   renderAll();
 
   if(!validateWeightsBaseline_ifAdmin()){
@@ -3609,7 +3684,6 @@ function resetAll(){
 ========================================================= */
 function init(){
   loadLocal();
-  ensureSeed();
   syncUIFromState();
   applySectionVisibility();
   renderAll();
