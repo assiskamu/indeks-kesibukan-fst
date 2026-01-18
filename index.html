@@ -177,9 +177,11 @@
       padding:16px 18px;
       border-bottom:1px solid rgba(255,255,255,.10);
     }
+    .section.collapsed header{border-bottom-color:transparent}
     .section h2{margin:0;font-size:15px;letter-spacing:.2px;font-family:var(--font)}
     .section .sub{margin-top:4px;color:var(--muted);font-size:12px;max-width:920px;font-family:var(--font)}
     .content{padding:16px 18px}
+    .section.collapsed .content{display:none}
 
     /* Strong section backgrounds (web only) */
     .profile{
@@ -402,6 +404,55 @@
       cursor:pointer;
     }
     .icon-btn svg{width:16px;height:16px;fill:currentColor}
+    .collapse-btn svg{transition: transform .18s ease}
+    .section.collapsed .collapse-btn svg{transform: rotate(-90deg)}
+
+    /* =========================
+       Modal
+    ========================= */
+    .modal-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(3,7,16,.6);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:60;
+      padding:18px;
+    }
+    .modal-overlay.open{display:flex}
+    .modal{
+      width:min(760px, 100%);
+      max-height:90vh;
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      display:flex;
+      flex-direction:column;
+    }
+    .modal-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:16px 18px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .modal-header h3{margin:0;font-size:16px}
+    .modal-body{
+      padding:16px 18px;
+      overflow:auto;
+    }
+    .modal-actions{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      padding:14px 18px;
+      border-top:1px solid rgba(255,255,255,.10);
+    }
+    .modal-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
+    body.modal-open{overflow:hidden}
 
     .dropdown{position:relative;display:inline-flex}
     .dropdown-menu{
@@ -442,6 +493,7 @@
       .title h1,.title .sub{max-width: 100%}
       .top-actions{justify-content:flex-start}
       .grid.two,.grid.three{grid-template-columns:1fr}
+      .modal-grid{grid-template-columns:1fr}
       .kpi{grid-template-columns:repeat(2, minmax(0,1fr))}
       .btn{padding:12px 12px}
     }
@@ -1205,6 +1257,22 @@
   <div class="footer">© FST UMS</div>
 </div>
 
+<div id="modalOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Modal</h3>
+      <button class="icon-btn" id="modalClose" type="button" aria-label="Close modal">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.4 4.29 19.71 2.88 18.3 9.17 12 2.88 5.71 4.29 4.3l6.3 6.3 6.29-6.3Z"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="modalCancel" type="button">Cancel</button>
+      <button class="btn btn-primary" id="modalSave" type="button">Save</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* =========================================================
    Helpers
@@ -1223,6 +1291,384 @@ function showMsg(kind, html){
 function hideMsg(){ $("msgGlobal").style.display="none"; }
 function confirmDelete(message="Delete this record? This action cannot be undone."){
   return window.confirm(message);
+}
+
+/* =========================================================
+   Collapsibles
+========================================================= */
+function setupCollapsibles(){
+  document.querySelectorAll("section.section").forEach(section=>{
+    const header = section.querySelector("header");
+    const content = section.querySelector(".content");
+    if(!header || !content) return;
+    if(header.querySelector(".collapse-btn")) return;
+    if(!section.id) return;
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "icon-btn collapse-btn";
+    btn.setAttribute("aria-label", "Toggle section");
+    btn.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6H6z"/></svg>`;
+
+    const key = `collapsed:${section.id}`;
+    const isCollapsed = localStorage.getItem(key) === "true";
+    if(isCollapsed) section.classList.add("collapsed");
+    btn.setAttribute("aria-expanded", String(!section.classList.contains("collapsed")));
+
+    const actionRow = header.querySelector(".row.right");
+    if(actionRow){
+      actionRow.appendChild(btn);
+    }else{
+      header.appendChild(btn);
+    }
+
+    btn.addEventListener("click", ()=>{
+      section.classList.toggle("collapsed");
+      const collapsed = section.classList.contains("collapsed");
+      localStorage.setItem(key, String(collapsed));
+      btn.setAttribute("aria-expanded", String(!collapsed));
+    });
+  });
+}
+
+/* =========================================================
+   Modal
+========================================================= */
+let modalSaveHandler = null;
+
+function modalInit(){
+  const overlay = $("modalOverlay");
+  const closeBtns = [$("modalClose"), $("modalCancel")];
+  closeBtns.forEach(btn=>{
+    btn.addEventListener("click", (e)=>{
+      e.preventDefault();
+      closeModal();
+    });
+  });
+  $("modalSave").addEventListener("click", (e)=>{
+    e.preventDefault();
+    if(modalSaveHandler) modalSaveHandler();
+  });
+  overlay.addEventListener("click", (e)=>{
+    if(e.target === overlay) closeModal();
+  });
+  document.addEventListener("keydown", (e)=>{
+    if(e.key === "Escape" && overlay.classList.contains("open")) closeModal();
+  });
+}
+
+function openModal({title, bodyHTML, saveLabel="Save", onSave}){
+  $("modalTitle").textContent = title || "Modal";
+  $("modalBody").innerHTML = bodyHTML || "";
+  $("modalSave").textContent = saveLabel || "Save";
+  modalSaveHandler = onSave || null;
+  $("modalOverlay").classList.add("open");
+  $("modalOverlay").setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
+}
+
+function closeModal(){
+  $("modalOverlay").classList.remove("open");
+  $("modalOverlay").setAttribute("aria-hidden", "true");
+  $("modalBody").innerHTML = "";
+  modalSaveHandler = null;
+  document.body.classList.remove("modal-open");
+}
+
+function openAddModal(kind){
+  const modalConfig = {
+    teach:{
+      title:"Add Teaching Course",
+      saveLabel:"Add course",
+      fields:[
+        {name:"code", label:"Course Code", type:"text", required:true, placeholder:"e.g., SJ24102"},
+        {name:"name", label:"Course Title", type:"text", required:true, placeholder:"Course title"},
+        {name:"students", label:"Students", type:"number", required:true, min:0, step:1},
+        {name:"lecture", label:"Lecture", type:"number", required:true, min:0, step:0.5},
+        {name:"tutorial", label:"Tutorial", type:"number", required:true, min:0, step:0.5},
+        {name:"laboratory", label:"Lab", type:"number", required:true, min:0, step:0.5},
+        {name:"field", label:"Field", type:"number", required:true, min:0, step:0.5}
+      ]
+    },
+    sv:{
+      title:"Add Student Supervision",
+      saveLabel:"Add supervision",
+      fields:[
+        {name:"level", label:"Level", type:"select", required:true, options:["Undergraduate","Master","PhD"], value:"Undergraduate"},
+        {name:"title", label:"Student / Project", type:"text", required:true, placeholder:"Student name or project"},
+        {name:"role", label:"Role", type:"select", required:true, options:["Main","Co-supervisor"], value:"Main"},
+        {name:"status", label:"Status", type:"select", required:true, options:["Active","Completed"], value:"Active"},
+        {name:"start", label:"Start Date", type:"date", required:true},
+        {name:"end", label:"End Date", type:"date", required:true}
+      ]
+    },
+    res:{
+      title:"Add Research Grant / Project",
+      saveLabel:"Add grant",
+      fields:[
+        {name:"code", label:"Grant Code", type:"text", required:true, placeholder:"Grant code"},
+        {name:"title", label:"Title", type:"text", required:true, placeholder:"Grant title"},
+        {name:"level", label:"Level", type:"select", required:true, options:["University","National","International"], value:"University"},
+        {name:"status", label:"Status", type:"select", required:true, options:["Active","Applied","Ended"], value:"Active"},
+        {name:"role", label:"Role", type:"select", required:true, options:["PI","Co-I","Member"], value:"PI"},
+        {name:"amount", label:"Amount (RM)", type:"number", required:true, min:0, step:1},
+        {name:"start", label:"Start Date", type:"date", required:true},
+        {name:"end", label:"End Date", type:"date", required:true}
+      ]
+    },
+    pub:{
+      title:"Add Publication",
+      saveLabel:"Add publication",
+      fields:[
+        {name:"year", label:"Year", type:"number", required:true, min:1990, step:1, value:(new Date()).getFullYear()},
+        {name:"title", label:"Title", type:"text", required:true, placeholder:"Publication title"},
+        {name:"type", label:"Type", type:"select", required:true, options:["Journal","Book/Chapter","Proceeding","Other"], value:"Journal"},
+        {name:"indexed", label:"Indexed?", type:"select", required:true, options:["Yes","No"], value:"Yes"},
+        {name:"role", label:"Role", type:"select", required:true, options:["First/Corresponding","Co-author"], value:"First/Corresponding"},
+        {name:"start", label:"Start Date", type:"date", required:true},
+        {name:"end", label:"End Date", type:"date", required:true}
+      ]
+    },
+    admin:{
+      title:"Add Administration Role",
+      saveLabel:"Add admin role",
+      fields:[
+        {name:"position", label:"Position", type:"text", required:true, placeholder:"Position or appointment"},
+        {name:"type", label:"Type", type:"select", required:true, options:["Official","Ad-hoc"], value:"Official"},
+        {name:"level", label:"Level", type:"select", required:true, options:["Programme","Faculty","University","State","National","International","Industry"], value:"Faculty"},
+        {name:"months", label:"Months", type:"number", required:true, min:0, step:1},
+        {name:"meetings", label:"Meetings", type:"number", required:true, min:0, step:1},
+        {name:"notes", label:"Workload Notes", type:"textarea", required:true, placeholder:"Key workload notes"},
+        {name:"start", label:"Start Date", type:"date", required:true},
+        {name:"end", label:"End Date", type:"date", required:true}
+      ]
+    },
+    svc:{
+      title:"Add Service & Engagement",
+      saveLabel:"Add service",
+      fields:[
+        {name:"type", label:"Service Type", type:"select", required:true, options:["Service to University","Service to Industry","Service to Community","Other"], value:"Service to University"},
+        {name:"activity", label:"Activity", type:"textarea", required:true, placeholder:"Describe the activity"},
+        {name:"role", label:"Role", type:"select", required:true, options:["Lead","Member"], value:"Lead"},
+        {name:"hours", label:"Hours (optional)", type:"number", required:false, min:0, step:0.5},
+        {name:"participants", label:"Participants (optional)", type:"number", required:false, min:0, step:1},
+        {name:"start", label:"Start Date", type:"date", required:true},
+        {name:"end", label:"End Date", type:"date", required:true}
+      ]
+    },
+    lab:{
+      title:"Add Laboratory Operation",
+      saveLabel:"Add lab activity",
+      fields:[
+        {name:"type", label:"Type", type:"select", required:true, options:["Lab Sessions Support","Equipment/Maintenance","Safety/Compliance","Consumables/Procurement","Field/Site Work","Other"], value:"Equipment/Maintenance"},
+        {name:"desc", label:"Description", type:"textarea", required:true, placeholder:"Describe briefly"},
+        {name:"volume", label:"Volume", type:"number", required:true, min:0, step:1},
+        {name:"complexity", label:"Complexity", type:"select", required:true, options:["Low","Medium","High"], value:"Medium"},
+        {name:"urgency", label:"Urgency", type:"select", required:true, options:["Normal","Tight","Critical"], value:"Normal"},
+        {name:"hours", label:"Hours (optional)", type:"number", required:false, min:0, step:0.5},
+        {name:"start", label:"Start Date", type:"date", required:true},
+        {name:"end", label:"End Date", type:"date", required:true}
+      ]
+    },
+    ps:{
+      title:"Add Professional & Scholarly Service",
+      saveLabel:"Add item",
+      fields:[
+        {name:"activityType", label:"Activity Type", type:"select", required:true, options:["Reviewer","Editor","External Examiner","Internal Examiner","Conference Committee","Journal Editorial Board","Grant Panel / Assessor","Other"], value:"Reviewer"},
+        {name:"desc", label:"Description", type:"textarea", required:true, placeholder:"Describe task (journal/conference/thesis scope, key notes)"},
+        {name:"role", label:"Role", type:"select", required:true, options:["Lead","Member"], value:"Member"},
+        {name:"quantity", label:"Quantity", type:"number", required:true, min:0, step:1, value:1},
+        {name:"rounds", label:"Rounds", type:"number", required:true, min:1, step:1, value:1},
+        {name:"complexity", label:"Complexity", type:"select", required:true, options:["Low","Medium","High"], value:"Medium"},
+        {name:"urgency", label:"Urgency", type:"select", required:true, options:["Normal","Tight","Critical"], value:"Normal"},
+        {name:"hours", label:"Hours (optional)", type:"number", required:false, min:0, step:0.5},
+        {name:"start", label:"Start Date", type:"date", required:true},
+        {name:"end", label:"End Date", type:"date", required:true}
+      ]
+    }
+  };
+
+  const cfg = modalConfig[kind];
+  if(!cfg) return;
+
+  const renderField = (field)=>{
+    const labelClass = field.required ? "requiredMark" : "";
+    const placeholder = field.placeholder ? ` placeholder="${field.placeholder}"` : "";
+    const min = field.min !== undefined ? ` min="${field.min}"` : "";
+    const step = field.step !== undefined ? ` step="${field.step}"` : "";
+    const value = field.value !== undefined ? ` value="${field.value}"` : "";
+    if(field.type === "select"){
+      const opts = field.options.map(opt=>{
+        const selected = field.value === opt ? " selected" : "";
+        return `<option value="${opt}"${selected}>${opt}</option>`;
+      }).join("");
+      return `
+        <div>
+          <label class="${labelClass}">${field.label}</label>
+          <select data-field="${field.name}">${opts}</select>
+        </div>`;
+    }
+    if(field.type === "textarea"){
+      const textValue = field.value ? field.value : "";
+      return `
+        <div>
+          <label class="${labelClass}">${field.label}</label>
+          <textarea data-field="${field.name}" rows="2"${placeholder}>${textValue}</textarea>
+        </div>`;
+    }
+    return `
+      <div>
+        <label class="${labelClass}">${field.label}</label>
+        <input data-field="${field.name}" type="${field.type}"${placeholder}${min}${step}${value}/>
+      </div>`;
+  };
+
+  const bodyHTML = `
+    <div class="grid modal-grid">
+      ${cfg.fields.map(renderField).join("")}
+    </div>`;
+
+  openModal({
+    title: cfg.title,
+    bodyHTML,
+    saveLabel: cfg.saveLabel,
+    onSave: ()=>{
+      const body = $("modalBody");
+      let ok = true;
+      const values = {};
+      cfg.fields.forEach(field=>{
+        const el = body.querySelector(`[data-field="${field.name}"]`);
+        if(!el) return;
+        el.classList.remove("err");
+        if(field.type === "number"){
+          const raw = el.value;
+          if(field.required && raw === ""){
+            ok = false;
+            el.classList.add("err");
+            return;
+          }
+          values[field.name] = raw === "" ? null : n(raw);
+        }else{
+          const raw = el.value || "";
+          if(field.required && !raw.trim()){
+            ok = false;
+            el.classList.add("err");
+          }
+          values[field.name] = raw;
+        }
+      });
+
+      if(!ok) return;
+
+      if(kind==="teach"){
+        const code = (values.code || "").toUpperCase();
+        state.data.teaching.push({
+          id:uid(),
+          code,
+          name:values.name || "",
+          credit:creditFromCode(code),
+          students:Math.max(0, n(values.students)),
+          lecture:Math.max(0, n(values.lecture)),
+          tutorial:Math.max(0, n(values.tutorial)),
+          laboratory:Math.max(0, n(values.laboratory)),
+          field:Math.max(0, n(values.field))
+        });
+      }
+      if(kind==="sv"){
+        state.data.supervision.push({
+          id:uid(),
+          level:values.level || "Undergraduate",
+          title:values.title || "",
+          role:values.role || "Main",
+          status:values.status || "Active",
+          start:values.start || "",
+          end:values.end || ""
+        });
+      }
+      if(kind==="res"){
+        state.data.research.push({
+          id:uid(),
+          code:values.code || "",
+          title:values.title || "",
+          level:values.level || "University",
+          status:values.status || "Active",
+          role:values.role || "PI",
+          amount:Math.max(0, n(values.amount)),
+          start:values.start || "",
+          end:values.end || ""
+        });
+      }
+      if(kind==="pub"){
+        state.data.publication.push({
+          id:uid(),
+          year:Math.max(1990, Math.floor(n(values.year) || (new Date()).getFullYear())),
+          title:values.title || "",
+          type:values.type || "Journal",
+          indexed:values.indexed || "Yes",
+          role:values.role || "First/Corresponding",
+          start:values.start || "",
+          end:values.end || ""
+        });
+      }
+      if(kind==="admin"){
+        state.data.admin.push({
+          id:uid(),
+          position:values.position || "",
+          type:values.type || "Official",
+          level:values.level || "Faculty",
+          months:Math.max(0, Math.floor(n(values.months))),
+          meetings:Math.max(0, Math.floor(n(values.meetings))),
+          notes:values.notes || "",
+          start:values.start || "",
+          end:values.end || ""
+        });
+      }
+      if(kind==="svc"){
+        state.data.service.push({
+          id:uid(),
+          type:values.type || "Service to University",
+          activity:values.activity || "",
+          role:values.role || "Lead",
+          hours:values.hours === null ? 0 : Math.max(0, n(values.hours)),
+          participants:values.participants === null ? 0 : Math.max(0, Math.floor(n(values.participants))),
+          start:values.start || "",
+          end:values.end || ""
+        });
+      }
+      if(kind==="lab"){
+        state.data.lab.push({
+          id:uid(),
+          type:values.type || "Equipment/Maintenance",
+          desc:values.desc || "",
+          volume:Math.max(0, Math.floor(n(values.volume))),
+          complexity:values.complexity || "Medium",
+          urgency:values.urgency || "Normal",
+          hours:values.hours === null ? 0 : Math.max(0, n(values.hours)),
+          start:values.start || "",
+          end:values.end || ""
+        });
+      }
+      if(kind==="ps"){
+        state.data.prosch.push({
+          id:uid(),
+          activityType:values.activityType || "Reviewer",
+          desc:values.desc || "",
+          role:values.role || "Member",
+          quantity:Math.max(0, Math.floor(n(values.quantity))),
+          rounds:Math.max(1, Math.floor(n(values.rounds) || 1)),
+          complexity:values.complexity || "Medium",
+          urgency:values.urgency || "Normal",
+          hours:values.hours === null ? 0 : Math.max(0, n(values.hours)),
+          start:values.start || "",
+          end:values.end || ""
+        });
+      }
+
+      renderAll();
+      autosave();
+      closeModal();
+    }
+  });
 }
 
 /* =========================================================
@@ -3167,6 +3613,8 @@ function init(){
   syncUIFromState();
   applySectionVisibility();
   renderAll();
+  modalInit();
+  setupCollapsibles();
   setAdminUI();
   updateBenchmarkUI(null);
 
@@ -3199,28 +3647,28 @@ function init(){
   $("btnAdminLock").addEventListener("click",(e)=>{ e.preventDefault(); lockAdmin(); });
 
   // Add/Clear
-  $("addTeach").onclick=(e)=>{e.preventDefault(); addRow("teach");};
+  $("addTeach").onclick=(e)=>{e.preventDefault(); openAddModal("teach");};
   $("clearTeach").onclick=(e)=>{e.preventDefault(); clearKind("teach");};
 
-  $("addSv").onclick=(e)=>{e.preventDefault(); addRow("sv");};
+  $("addSv").onclick=(e)=>{e.preventDefault(); openAddModal("sv");};
   $("clearSv").onclick=(e)=>{e.preventDefault(); clearKind("sv");};
 
-  $("addRes").onclick=(e)=>{e.preventDefault(); syncProfileFromUI(); addRow("res");};
+  $("addRes").onclick=(e)=>{e.preventDefault(); syncProfileFromUI(); openAddModal("res");};
   $("clearRes").onclick=(e)=>{e.preventDefault(); clearKind("res");};
 
-  $("addPub").onclick=(e)=>{e.preventDefault(); syncProfileFromUI(); addRow("pub");};
+  $("addPub").onclick=(e)=>{e.preventDefault(); syncProfileFromUI(); openAddModal("pub");};
   $("clearPub").onclick=(e)=>{e.preventDefault(); clearKind("pub");};
 
-  $("addAdmin").onclick=(e)=>{e.preventDefault(); addRow("admin");};
+  $("addAdmin").onclick=(e)=>{e.preventDefault(); openAddModal("admin");};
   $("clearAdmin").onclick=(e)=>{e.preventDefault(); clearKind("admin");};
 
-  $("addSvc").onclick=(e)=>{e.preventDefault(); addRow("svc");};
+  $("addSvc").onclick=(e)=>{e.preventDefault(); openAddModal("svc");};
   $("clearSvc").onclick=(e)=>{e.preventDefault(); clearKind("svc");};
 
-  $("addLab").onclick=(e)=>{e.preventDefault(); addRow("lab");};
+  $("addLab").onclick=(e)=>{e.preventDefault(); openAddModal("lab");};
   $("clearLab").onclick=(e)=>{e.preventDefault(); clearKind("lab");};
 
-  $("addProSch").onclick=(e)=>{e.preventDefault(); addRow("ps");};
+  $("addProSch").onclick=(e)=>{e.preventDefault(); openAddModal("ps");};
   $("clearProSch").onclick=(e)=>{e.preventDefault(); clearKind("ps");};
 
   // Calculate / Print / Manual / Export
