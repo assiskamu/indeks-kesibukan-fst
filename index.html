@@ -767,6 +767,14 @@
           </select>
           <div class="hint">Selecting a category auto-applies section ON/OFF states and default weights.</div>
         </div>
+        <div>
+          <label>Academic Staff Category</label>
+          <select id="pStaffCategory">
+            <option value="nonadmin">Non-admin Academic Staff</option>
+            <option value="admin">Admin Academic Staff</option>
+          </select>
+          <div class="hint">Used for Tutor/Demonstrator eligibility (Teaching + Supervision only).</div>
+        </div>
 
         <div>
           <label class="requiredMark">School/Unit</label>
@@ -910,6 +918,21 @@
             <div><label>Student Supervision – Master (per student)</label><input class="adminOnly" id="svM" type="number" step="0.1" min="0" value="3.0"/></div>
             <div><label>Student Supervision – PhD (per student)</label><input class="adminOnly" id="svPHD" type="number" step="0.1" min="0" value="4.5"/></div>
           </div>
+        </div>
+
+        <div class="settings-card">
+          <h3>Tutor/Demonstrator Eligibility (Teaching + Supervision)</h3>
+          <div class="grid three">
+            <div><label><input class="adminOnly" id="eligEnabled" type="checkbox" checked> Enable eligibility assessment</label></div>
+            <div><label>Non-admin threshold (points)</label><input class="adminOnly" id="eligNonAdminThresh" type="number" step="0.1" min="0" value="10.0"/></div>
+            <div><label>Admin ratio (0–1)</label><input class="adminOnly" id="eligAdminRatio" type="number" step="0.01" min="0" max="1" value="0.50"/></div>
+            <div><label>Eligibility metric</label>
+              <select class="adminOnly" id="eligMetric">
+                <option value="sum">Teaching + Supervision (sum)</option>
+              </select>
+            </div>
+          </div>
+          <div class="hint">Admin threshold = Non-admin threshold × Admin ratio. Eligibility uses Teaching + Supervision burden only.</div>
         </div>
 
         <div class="settings-card">
@@ -1333,6 +1356,46 @@
         </ol>
       </div>
 
+      <div class="spacer"></div>
+
+      <div class="box" id="eligibilityCard">
+        <div class="k">Tutor/Demonstrator Eligibility (Teaching + Supervision)</div>
+        <div class="spacer"></div>
+        <div id="eligibilityDisabled" class="notice warn" style="display:none;">Eligibility assessment is disabled in settings.</div>
+        <div id="eligibilityDetails">
+          <div class="grid two">
+            <div>
+              <div class="k">Staff category</div>
+              <div class="v" id="eligStaffCategory">—</div>
+            </div>
+            <div>
+              <div class="k">Threshold used</div>
+              <div class="v" id="eligThreshold">—</div>
+            </div>
+            <div>
+              <div class="k">Teaching burden</div>
+              <div class="v" id="eligTeaching">—</div>
+            </div>
+            <div>
+              <div class="k">Supervision burden</div>
+              <div class="v" id="eligSupervision">—</div>
+            </div>
+            <div>
+              <div class="k">Eligibility score (ES)</div>
+              <div class="v" id="eligScore">—</div>
+            </div>
+            <div>
+              <div class="k">Delta</div>
+              <div class="v" id="eligDelta">—</div>
+            </div>
+          </div>
+          <div class="spacer"></div>
+          <div class="notice" id="eligStatus">—</div>
+          <div class="spacer"></div>
+          <div class="notice">Eligibility is assessed using Teaching + Supervision burden only (separate from overall index).</div>
+        </div>
+      </div>
+
       <!-- PRINT-ONLY SIGNATURES -->
       <div class="printOnly" style="margin-top:16px">
         <hr style="border:0;border-top:1px solid #000;margin:12px 0">
@@ -1342,6 +1405,7 @@
             <div>Full name: <span id="printName"></span></div>
             <div>Staff ID: <span id="printId"></span></div>
             <div>Date printed: <span id="printDate"></span></div>
+            <div>Tutor/Demonstrator eligibility: <span id="printEligibility"></span></div>
             <div style="height:110px;border:1px solid #000;margin-top:10px;padding:10px">Staff Signature:</div>
           </div>
           <div>
@@ -2044,7 +2108,8 @@ const state = {
     name:"", staffId:"", category:"", unit:"",
     grade:"", gradeOther:"",
     status:"", statusOther:"",
-    period:""
+    period:"",
+    staffCategory:"nonadmin"
   },
 
   enabled:{
@@ -2096,6 +2161,13 @@ const state = {
 
   // Benchmarks (interpretation only)
   benchmarks:{ avg:45.0, p25:30.0, p50:45.0, p75:60.0 },
+
+  eligibility:{
+    enabled:true,
+    nonAdminThreshold:10.0,
+    adminRatio:0.50,
+    metric:"sum"
+  },
 
   data:{
     teaching:[],
@@ -2203,6 +2275,7 @@ function syncProfileFromUI(){
   state.profile.status = $("pStatus").value;
   state.profile.statusOther = $("pStatusOther").value.trim();
   state.profile.period = $("pPeriod").value;
+  state.profile.staffCategory = $("pStaffCategory").value || "nonadmin";
 }
 
 function syncEnabledFromUI(){
@@ -2234,6 +2307,12 @@ function syncSettingsFromUI_ifAdmin(){
   state.benchmarks.p25 = n($("bmP25").value);
   state.benchmarks.p50 = n($("bmP50").value);
   state.benchmarks.p75 = n($("bmP75").value);
+
+  // eligibility
+  state.eligibility.enabled = $("eligEnabled").checked;
+  state.eligibility.nonAdminThreshold = n($("eligNonAdminThresh").value);
+  state.eligibility.adminRatio = n($("eligAdminRatio").value);
+  state.eligibility.metric = $("eligMetric").value || "sum";
 
   // scheme
   state.scheme.teaching.hourW = n($("tHourW").value);
@@ -2283,6 +2362,7 @@ function syncUIFromState(){
   $("pStatus").value = state.profile.status || "";
   $("pStatusOther").value = state.profile.statusOther || "";
   $("pPeriod").value = state.profile.period || "";
+  $("pStaffCategory").value = state.profile.staffCategory || "nonadmin";
 
   $("pGradeOtherWrap").style.display = (state.profile.grade==="Others") ? "block" : "none";
   $("pStatusOtherWrap").style.display = (state.profile.status==="Others") ? "block" : "none";
@@ -2312,6 +2392,12 @@ function syncUIFromState(){
   $("bmP25").value = state.benchmarks.p25;
   $("bmP50").value = state.benchmarks.p50;
   $("bmP75").value = state.benchmarks.p75;
+
+  // eligibility
+  $("eligEnabled").checked = !!state.eligibility.enabled;
+  $("eligNonAdminThresh").value = state.eligibility.nonAdminThreshold;
+  $("eligAdminRatio").value = state.eligibility.adminRatio;
+  $("eligMetric").value = state.eligibility.metric || "sum";
 
   // scheme
   $("tHourW").value = state.scheme.teaching.hourW;
@@ -2431,9 +2517,23 @@ function validateWeightsBaseline_ifAdmin(){
     state.weights.LabOps +
     state.weights.ProSch;
 
-  const ok = Math.abs(sum-1.00) <= 0.005;
+  const errors = [];
+  if(Math.abs(sum-1.00) > 0.005){
+    errors.push(`Baseline weights must sum to 1.00. Current sum = <b>${sum.toFixed(2)}</b>.`);
+  }
+
+  const nonAdmin = n(state.eligibility.nonAdminThreshold);
+  if(nonAdmin < 0){
+    errors.push("Eligibility non-admin threshold must be ≥ 0.");
+  }
+  const ratio = n(state.eligibility.adminRatio);
+  if(ratio <= 0 || ratio > 1){
+    errors.push("Eligibility admin ratio must be within (0, 1].");
+  }
+
+  const ok = errors.length === 0;
   $("msgSettings").style.display = ok ? "none" : "block";
-  if(!ok) $("msgSettings").innerHTML = `<b>Settings validation:</b> Baseline weights must sum to 1.00. Current sum = <b>${sum.toFixed(2)}</b>.`;
+  if(!ok) $("msgSettings").innerHTML = `<b>Settings validation:</b> ${errors.join(" ")}`;
   return ok;
 }
 
@@ -2595,6 +2695,77 @@ function normalizeAndCap(sectionName, rawScore){
   const perMonth = (months>0) ? (Math.max(0,n(rawScore)) / months) : Math.max(0,n(rawScore));
   const capCfg = state.scheme.caps[sectionName] || {cap:0, rate:1};
   return applySoftCap(perMonth, capCfg.cap, capCfg.rate);
+}
+
+/* =========================================================
+   Tutor/Demonstrator Eligibility (Teaching + Supervision)
+========================================================= */
+function getRawTeachingBurden(){
+  if(!state.enabled.Teaching) return 0;
+  return normalizeAndCap("Teaching", scoreTeaching_raw());
+}
+
+function getRawSupervisionBurden(){
+  if(!state.enabled.Supervision) return 0;
+  return normalizeAndCap("Supervision", scoreSupervision_raw());
+}
+
+function computeTutorDemoEligibility(){
+  if(!state.eligibility.enabled){
+    return {enabled:false};
+  }
+  const teaching = getRawTeachingBurden();
+  const supervision = getRawSupervisionBurden();
+  const ES = teaching + supervision;
+  const staffCategory = state.profile.staffCategory || "nonadmin";
+  const nonAdminThresh = n(state.eligibility.nonAdminThreshold);
+  const adminRatio = n(state.eligibility.adminRatio);
+  const thresholdUsed = (staffCategory === "admin") ? nonAdminThresh * adminRatio : nonAdminThresh;
+  const eligible = ES >= thresholdUsed;
+  const delta = ES - thresholdUsed;
+  return {enabled:true, ES, teaching, supervision, thresholdUsed, eligible, delta, staffCategory};
+}
+
+function renderEligibilityCard(){
+  const disabledNote = $("eligibilityDisabled");
+  const details = $("eligibilityDetails");
+  if(!disabledNote || !details) return;
+
+  const result = computeTutorDemoEligibility();
+  if(!result.enabled){
+    disabledNote.style.display = "block";
+    details.style.display = "none";
+    return;
+  }
+
+  disabledNote.style.display = "none";
+  details.style.display = "block";
+
+  const staffLabel = result.staffCategory === "admin" ? "Admin Academic Staff" : "Non-admin Academic Staff";
+  $("eligStaffCategory").textContent = staffLabel;
+  $("eligTeaching").textContent = result.teaching.toFixed(2);
+  $("eligSupervision").textContent = result.supervision.toFixed(2);
+  $("eligScore").textContent = result.ES.toFixed(2);
+  $("eligThreshold").textContent = result.thresholdUsed.toFixed(2);
+
+  const deltaText = result.eligible
+    ? `Exceeds threshold by +${result.delta.toFixed(2)}`
+    : `Short by ${Math.abs(result.delta).toFixed(2)}`;
+  $("eligDelta").textContent = deltaText;
+
+  const statusEl = $("eligStatus");
+  statusEl.className = "notice " + (result.eligible ? "ok" : "bad");
+  statusEl.textContent = result.eligible ? "Eligible to apply" : "Not eligible";
+}
+
+function eligibilityPrintText(){
+  const result = computeTutorDemoEligibility();
+  if(!result.enabled){
+    return "Eligibility assessment disabled.";
+  }
+  const staffLabel = result.staffCategory === "admin" ? "Admin" : "Non-admin";
+  const status = result.eligible ? "Eligible" : "Not eligible";
+  return `${status} (ES ${result.ES.toFixed(2)} vs Threshold ${result.thresholdUsed.toFixed(2)}; ${staffLabel}).`;
 }
 
 /* =========================================================
@@ -3290,6 +3461,7 @@ function calculate(){
 
   updateBenchmarkUI(index);
   drawChart(scores, aw);
+  renderEligibilityCard();
 
   state.audit.last_calc_at = new Date().toISOString();
   autosave();
@@ -3307,6 +3479,7 @@ function syncPrintFields(){
   $("printId").textContent = id;
   $("printDate").textContent = new Date().toLocaleString();
   $("printFooterDate").textContent = new Date().toLocaleDateString();
+  $("printEligibility").textContent = eligibilityPrintText();
 }
 </script>
 
@@ -3392,6 +3565,31 @@ function exportJSON(){
     benchmarks: state.benchmarks,
     period_months: periodMonths(state.profile.period),
     data: state.data,
+    eligibility: (()=> {
+      const result = computeTutorDemoEligibility();
+      if(!result.enabled){
+        return {
+          enabled:false,
+          staffCategory: state.profile.staffCategory || "nonadmin",
+          teaching:null,
+          supervision:null,
+          ES:null,
+          thresholdUsed:null,
+          eligible:null,
+          delta:null
+        };
+      }
+      return {
+        enabled:true,
+        staffCategory: result.staffCategory,
+        teaching: result.teaching,
+        supervision: result.supervision,
+        ES: result.ES,
+        thresholdUsed: result.thresholdUsed,
+        eligible: result.eligible,
+        delta: result.delta
+      };
+    })(),
     results:{
       Teaching_points_per_month: $("outTeaching").textContent,
       Supervision_points_per_month: $("outSupervision").textContent,
@@ -3657,6 +3855,7 @@ function loadLocal(){
     if(obj.weights) state.weights = {...state.weights, ...obj.weights};
     if(obj.scheme) state.scheme = {...state.scheme, ...obj.scheme};
     if(obj.benchmarks) state.benchmarks = {...state.benchmarks, ...obj.benchmarks};
+    if(obj.eligibility) state.eligibility = {...state.eligibility, ...obj.eligibility};
     if(obj.data) state.data = {...state.data, ...obj.data};
     if(obj.audit) state.audit = {...state.audit, ...obj.audit};
   }catch(e){}
@@ -3683,6 +3882,7 @@ function init(){
   setupTabs();
   setAdminUI();
   updateBenchmarkUI(null);
+  renderEligibilityCard();
 
   $("pGrade").addEventListener("change", ()=>{
     $("pGradeOtherWrap").style.display = ($("pGrade").value==="Others") ? "block" : "none";
@@ -3690,6 +3890,11 @@ function init(){
   });
   $("pStatus").addEventListener("change", ()=>{
     $("pStatusOtherWrap").style.display = ($("pStatus").value==="Others") ? "block" : "none";
+    autosave();
+  });
+  $("pStaffCategory").addEventListener("change", ()=>{
+    syncProfileFromUI();
+    renderEligibilityCard();
     autosave();
   });
 
