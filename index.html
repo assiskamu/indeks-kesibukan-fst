@@ -1,9 +1,9 @@
 <!doctype html>
 <!--
   Changes:
-  - Reworked layout into left-side tabs with a sticky action bar for Calculate/Print/Export.
-  - Switched to a flat, high-contrast palette and improved text wrapping/visibility.
-  - Reorganized Advanced Settings into per-section groups and ensured empty table placeholders.
+  - Applied a flat palette/surface system with reduced shadows and updated intent colors.
+  - Added tab summaries plus empty-state notes while keeping tables read-only and modal-driven.
+  - Refined sidebar/tab layout, sticky actions, and Tutor/Demonstrator eligibility wiring.
 -->
 <html lang="en">
 <head>
@@ -28,21 +28,21 @@
   <style>
     :root{
       /* Web theme (professional flat). Print will override to B/W + gray. */
-      --bg:#0f1218;
-      --surface:#1a2230;
-      --surface-2:#212b3b;
-      --border:rgba(255,255,255,.12);
-      --shadow: 0 16px 40px rgba(0,0,0,.35);
+      --bg:#11141a;
+      --surface:#171c24;
+      --surface2:#1e2531;
+      --border:#2a3444;
+      --shadow: 0 8px 20px rgba(0,0,0,.22);
       --radius: 16px;
       --action-bar-height: 72px;
 
       --text:#f1f5f9;
       --muted:#cbd5e1;
 
-      --primary:#3b82f6;
-      --accent:#22c55e;
-      --danger:#ef4444;
-      --warn:#f59e0b;
+      --primary:#2563eb;
+      --danger:#dc2626;
+      --warn:#d97706;
+      --success:#16a34a;
 
       --t:#7c9dff;
       --sv:#3cc9ff;
@@ -126,18 +126,18 @@
     .btn:active{transform: translateY(1px)}
     .btn-primary{
       background:var(--primary);
-      border-color: rgba(59,130,246,.85);
-      color:#0b1220;
+      border-color: rgba(37,99,235,.9);
+      color:#fff;
     }
     .btn-secondary{background:rgba(255,255,255,.08)}
     .btn-ghost{background:transparent}
     .btn-danger{
-      background:rgba(239,68,68,.2);
-      border-color: rgba(239,68,68,.6);
+      background:rgba(220,38,38,.2);
+      border-color: rgba(220,38,38,.6);
     }
     .btn-warn{
-      background:rgba(245,158,11,.2);
-      border-color: rgba(245,158,11,.6);
+      background:rgba(217,119,6,.2);
+      border-color: rgba(217,119,6,.6);
     }
     .btn-sm{padding:6px 10px;border-radius:10px;font-size:.82rem}
     .btn-md{padding:12px 18px;border-radius:14px;font-size:.95rem}
@@ -162,15 +162,15 @@
       font-size:12px;color:var(--muted);
       font-family: var(--font);
     }
-    .dot{width:9px;height:9px;border-radius:99px;background:var(--accent);box-shadow:0 0 0 4px rgba(45,212,191,.15)}
-    .dot.lock{background:var(--warn);box-shadow:0 0 0 4px rgba(255,176,32,.15)}
+    .dot{width:9px;height:9px;border-radius:99px;background:var(--success);box-shadow:0 0 0 4px rgba(22,163,74,.2)}
+    .dot.lock{background:var(--warn);box-shadow:0 0 0 4px rgba(217,119,6,.2)}
 
     /* =========================
        Sections
     ========================= */
     .section{
       margin-top:16px;
-      border:1px solid rgba(255,255,255,.10);
+      border:1px solid var(--border);
       border-radius: var(--radius);
       overflow:hidden;
       box-shadow: var(--shadow);
@@ -179,7 +179,7 @@
     .section header{
       display:flex;gap:10px;align-items:flex-start;justify-content:space-between;
       padding:16px 18px;
-      border-bottom:1px solid rgba(255,255,255,.10);
+      border-bottom:1px solid var(--border);
     }
     .section h2{margin:0;font-size:15px;letter-spacing:.2px;font-family:var(--font)}
     .section .sub{margin-top:4px;color:var(--muted);font-size:12px;max-width:920px;font-family:var(--font)}
@@ -196,7 +196,7 @@
     .admin{border-left:4px solid var(--a)}
     .service{border-left:4px solid var(--s)}
     .labops{border-left:4px solid var(--l)}
-    .results{border-left:4px solid var(--accent)}
+    .results{border-left:4px solid var(--success)}
     .prosch{border-left:4px solid #94a3b8}
 
     .appShell{
@@ -233,14 +233,14 @@
       font-family:var(--font);
     }
     .tab-btn[aria-selected="true"]{
-      background:rgba(59,130,246,.18);
-      border-color:rgba(59,130,246,.6);
+      background:rgba(37,99,235,.18);
+      border-color:rgba(37,99,235,.6);
     }
     .tab-btn:focus-visible{
-      outline:3px solid rgba(59,130,246,.85);
+      outline:3px solid rgba(37,99,235,.85);
       outline-offset:2px;
     }
-    #mainContent{min-width:0;padding-bottom:var(--action-bar-height)}
+    #main{min-width:0;padding-bottom:var(--action-bar-height)}
     .tab-panel.is-hidden{display:none}
 
     /* =========================
@@ -256,8 +256,8 @@
     label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;font-family:var(--font)}
     input,select,textarea{
       width:100%;
-      background:rgba(15,18,24,.6);
-      border:1px solid rgba(255,255,255,.14);
+      background:var(--surface2);
+      border:1px solid var(--border);
       color:var(--text);
       border-radius:12px;
       padding:10px 10px;
@@ -266,9 +266,9 @@
       font-size: 14px;
       line-height: 1.25;
     }
-    input:focus,select:focus,textarea:focus{border-color:rgba(76,199,255,.8);box-shadow:0 0 0 3px rgba(76,199,255,.2)}
+    input:focus,select:focus,textarea:focus{border-color:rgba(37,99,235,.8);box-shadow:0 0 0 3px rgba(37,99,235,.2)}
     input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{
-      outline:3px solid rgba(76,199,255,.85);
+      outline:3px solid rgba(37,99,235,.85);
       outline-offset:2px;
     }
     textarea{
@@ -291,8 +291,8 @@
       overflow-x:auto;
       -webkit-overflow-scrolling: touch;
       border-radius: 14px;
-      border:1px solid rgba(255,255,255,.1);
-      background:var(--surface-2);
+      border:1px solid var(--border);
+      background:var(--surface2);
     }
     table{width:100%;border-collapse:collapse;min-width:0}
     th,td{
@@ -351,7 +351,7 @@
         border:1px solid rgba(255,255,255,.12);
         border-radius:14px;
         padding:8px 12px;
-        background:rgba(12,18,35,.8);
+        background:var(--surface2);
       }
       table tbody tr td{
         display:flex;
@@ -393,23 +393,48 @@
 
     .notice{
       padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.06);color:var(--muted);font-size:12px;
+      background:rgba(255,255,255,.04);color:var(--muted);font-size:12px;
       font-family:var(--font);
       white-space: normal;
       overflow-wrap:anywhere;
       word-break:break-word;
     }
-    .notice.bad{border-color: rgba(255,91,110,.55); background: rgba(255,91,110,.10); color:#ffd9de}
-    .notice.warn{border-color: rgba(255,176,32,.55); background: rgba(255,176,32,.10); color:#ffe9c2}
-    .notice.ok{border-color: rgba(45,212,191,.55); background: rgba(45,212,191,.10); color:#d9fffb}
+    .notice.bad{border-color: rgba(220,38,38,.6); background: rgba(220,38,38,.12); color:#fee2e2}
+    .notice.warn{border-color: rgba(217,119,6,.6); background: rgba(217,119,6,.12); color:#ffedd5}
+    .notice.ok{border-color: rgba(22,163,74,.6); background: rgba(22,163,74,.12); color:#dcfce7}
+
+    .panelSummary{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:center;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      background:var(--surface2);
+      border-radius:12px;
+      margin-bottom:12px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .panelSummary .summaryItem{display:flex;gap:6px;align-items:center}
+    .panelSummary strong{color:var(--text);font-weight:700}
+    .emptyNote{
+      margin:0 0 10px;
+      padding:8px 10px;
+      border:1px dashed var(--border);
+      border-radius:10px;
+      font-size:12px;
+      color:var(--muted);
+      background:rgba(255,255,255,.03);
+    }
 
     .settings-grid{
       display:grid;
       gap:16px;
     }
     .settings-card{
-      border:1px solid rgba(255,255,255,.12);
-      background:var(--surface-2);
+      border:1px solid var(--border);
+      background:var(--surface2);
       border-radius:14px;
       padding:14px;
     }
@@ -424,8 +449,8 @@
       grid-template-columns:repeat(4, minmax(0,1fr));
     }
     .box{
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(7,11,21,.40);
+      border:1px solid var(--border);
+      background:var(--surface2);
       border-radius:14px;
       padding:12px;
       font-family:var(--font);
@@ -466,7 +491,7 @@
       left:0;
       right:0;
       z-index:40;
-      background:rgba(15,18,24,.98);
+      background:var(--surface);
       border-top:1px solid var(--border);
       padding:10px 18px;
       display:flex;
@@ -534,8 +559,8 @@
     .dropdown{position:relative;display:inline-flex}
     .dropdown-menu{
       position:absolute;right:0;top:calc(100% + 8px);
-      background:var(--surface-2);
-      border:1px solid rgba(255,255,255,.14);
+      background:var(--surface2);
+      border:1px solid var(--border);
       border-radius:12px;
       padding:8px;
       min-width:220px;
@@ -737,7 +762,7 @@
         <button class="tab-btn" id="tabResults" role="tab" aria-controls="secResults" aria-selected="false" tabindex="-1">Results</button>
       </nav>
     </aside>
-    <main id="mainContent">
+    <main id="main">
 
   <!-- PROFILE -->
   <section class="section profile tab-panel" id="secProfile" role="tabpanel" aria-labelledby="tabProfile" tabindex="0">
@@ -748,6 +773,11 @@
       </div>
     </header>
     <div class="content">
+      <div class="panelSummary" data-kind="profile">
+        <div class="summaryItem">Records: <strong data-summary="count">—</strong></div>
+        <div class="summaryItem">Section score: <strong data-summary="score">—</strong></div>
+        <div class="summaryItem">Last saved: <strong data-summary="saved">—</strong></div>
+      </div>
       <div class="grid three">
         <div>
           <label class="requiredMark">Full Name</label>
@@ -848,6 +878,11 @@
       </div>
     </header>
     <div class="content">
+      <div class="panelSummary" data-kind="toggles">
+        <div class="summaryItem">Records: <strong data-summary="count">—</strong></div>
+        <div class="summaryItem">Section score: <strong data-summary="score">—</strong></div>
+        <div class="summaryItem">Last saved: <strong data-summary="saved">—</strong></div>
+      </div>
       <div class="grid three">
         <div><label><input type="checkbox" id="enTeaching" checked> Teaching</label></div>
         <div><label><input type="checkbox" id="enSupervision" checked> Student Supervision</label></div>
@@ -875,6 +910,11 @@
       </div>
     </header>
     <div class="content">
+      <div class="panelSummary" data-kind="settings">
+        <div class="summaryItem">Records: <strong data-summary="count">—</strong></div>
+        <div class="summaryItem">Section score: <strong data-summary="score">—</strong></div>
+        <div class="summaryItem">Last saved: <strong data-summary="saved">—</strong></div>
+      </div>
       <div id="msgSettings" class="notice warn" style="display:none;"></div>
       <div class="settings-grid">
         <div class="settings-card">
@@ -1037,6 +1077,12 @@
       </div>
     </header>
     <div class="content">
+      <div class="panelSummary" data-kind="teaching">
+        <div class="summaryItem">Records: <strong data-summary="count">—</strong></div>
+        <div class="summaryItem">Section score: <strong data-summary="score">—</strong></div>
+        <div class="summaryItem">Last saved: <strong data-summary="saved">—</strong></div>
+      </div>
+      <div class="emptyNote" id="noteTeach" style="display:none;">No records yet. Click Add to create one.</div>
       <div class="tableWrap">
         <table id="tblTeach">
           <thead>
@@ -1072,6 +1118,12 @@
       </div>
     </header>
     <div class="content">
+      <div class="panelSummary" data-kind="supervision">
+        <div class="summaryItem">Records: <strong data-summary="count">—</strong></div>
+        <div class="summaryItem">Section score: <strong data-summary="score">—</strong></div>
+        <div class="summaryItem">Last saved: <strong data-summary="saved">—</strong></div>
+      </div>
+      <div class="emptyNote" id="noteSv" style="display:none;">No records yet. Click Add to create one.</div>
       <div class="tableWrap">
         <table id="tblSv">
           <thead>
@@ -1107,6 +1159,12 @@
       </div>
     </header>
     <div class="content">
+      <div class="panelSummary" data-kind="research">
+        <div class="summaryItem">Records: <strong data-summary="count">—</strong></div>
+        <div class="summaryItem">Section score: <strong data-summary="score">—</strong></div>
+        <div class="summaryItem">Last saved: <strong data-summary="saved">—</strong></div>
+      </div>
+      <div class="emptyNote" id="noteRes" style="display:none;">No records yet. Click Add to create one.</div>
       <div class="tableWrap">
         <table id="tblRes">
           <thead>
@@ -1141,6 +1199,12 @@
       </div>
     </header>
     <div class="content">
+      <div class="panelSummary" data-kind="publication">
+        <div class="summaryItem">Records: <strong data-summary="count">—</strong></div>
+        <div class="summaryItem">Section score: <strong data-summary="score">—</strong></div>
+        <div class="summaryItem">Last saved: <strong data-summary="saved">—</strong></div>
+      </div>
+      <div class="emptyNote" id="notePub" style="display:none;">No records yet. Click Add to create one.</div>
       <div class="tableWrap">
         <table id="tblPub">
           <thead>
@@ -1174,6 +1238,12 @@
       </div>
     </header>
     <div class="content">
+      <div class="panelSummary" data-kind="administration">
+        <div class="summaryItem">Records: <strong data-summary="count">—</strong></div>
+        <div class="summaryItem">Section score: <strong data-summary="score">—</strong></div>
+        <div class="summaryItem">Last saved: <strong data-summary="saved">—</strong></div>
+      </div>
+      <div class="emptyNote" id="noteAdmin" style="display:none;">No records yet. Click Add to create one.</div>
       <div class="tableWrap">
         <table id="tblAdmin">
           <thead>
@@ -1210,6 +1280,12 @@
       </div>
     </header>
     <div class="content">
+      <div class="panelSummary" data-kind="service">
+        <div class="summaryItem">Records: <strong data-summary="count">—</strong></div>
+        <div class="summaryItem">Section score: <strong data-summary="score">—</strong></div>
+        <div class="summaryItem">Last saved: <strong data-summary="saved">—</strong></div>
+      </div>
+      <div class="emptyNote" id="noteSvc" style="display:none;">No records yet. Click Add to create one.</div>
       <div class="tableWrap">
         <table id="tblSvc">
           <thead>
@@ -1243,6 +1319,12 @@
       </div>
     </header>
     <div class="content">
+      <div class="panelSummary" data-kind="labops">
+        <div class="summaryItem">Records: <strong data-summary="count">—</strong></div>
+        <div class="summaryItem">Section score: <strong data-summary="score">—</strong></div>
+        <div class="summaryItem">Last saved: <strong data-summary="saved">—</strong></div>
+      </div>
+      <div class="emptyNote" id="noteLab" style="display:none;">No records yet. Click Add to create one.</div>
       <div class="tableWrap">
         <table id="tblLab">
           <thead>
@@ -1280,6 +1362,12 @@
       </div>
     </header>
     <div class="content">
+      <div class="panelSummary" data-kind="prosch">
+        <div class="summaryItem">Records: <strong data-summary="count">—</strong></div>
+        <div class="summaryItem">Section score: <strong data-summary="score">—</strong></div>
+        <div class="summaryItem">Last saved: <strong data-summary="saved">—</strong></div>
+      </div>
+      <div class="emptyNote" id="noteProSch" style="display:none;">No records yet. Click Add to create one.</div>
       <div class="tableWrap">
         <table id="tblProSch">
           <thead>
@@ -1319,6 +1407,11 @@
       </div>
     </header>
     <div class="content">
+      <div class="panelSummary" data-kind="results">
+        <div class="summaryItem">Records: <strong data-summary="count">—</strong></div>
+        <div class="summaryItem">Section score: <strong data-summary="score">—</strong></div>
+        <div class="summaryItem">Last saved: <strong data-summary="saved">—</strong></div>
+      </div>
       <div id="msgGlobal" class="notice warn" style="display:none;"></div>
 
       <!-- KPIs -->
@@ -1479,7 +1572,7 @@
     <div class="modal-body" id="modalBody"></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="modalCancel" type="button">Cancel</button>
-      <button class="btn btn-primary" id="modalSave" type="button">Save</button>
+      <button class="btn btn-secondary" id="modalSave" type="button">Save</button>
     </div>
   </div>
 </div>
@@ -1517,6 +1610,75 @@ function showMsg(kind, html){
 function hideMsg(){ $("msgGlobal").style.display="none"; }
 function confirmDelete(message="Delete this record? This action cannot be undone."){
   return window.confirm(message);
+}
+
+function formatTimestamp(value){
+  if(!value) return "—";
+  const dt = new Date(value);
+  return Number.isNaN(dt.getTime()) ? "—" : dt.toLocaleString();
+}
+
+function toggleEmptyNote(noteId, count){
+  const note = $(noteId);
+  if(!note) return;
+  note.style.display = count === 0 ? "block" : "none";
+}
+
+function updatePanelSummaries(scores=null){
+  const lastSaved = formatTimestamp(state.audit.last_saved_at);
+  const totalRecords = state.data.teaching.length +
+    state.data.supervision.length +
+    state.data.research.length +
+    state.data.publication.length +
+    state.data.admin.length +
+    state.data.service.length +
+    state.data.lab.length +
+    state.data.prosch.length;
+  const formatScore = (value)=>{
+    if(value === null || value === undefined) return "—";
+    return typeof value === "number" ? value.toFixed(1) : String(value);
+  };
+
+  const scoreText = {
+    teaching: state.audit.last_calc_at ? formatScore(scores?.Teaching ?? $("outTeaching").textContent) : "—",
+    supervision: state.audit.last_calc_at ? formatScore(scores?.Supervision ?? $("outSupervision").textContent) : "—",
+    research: state.audit.last_calc_at ? formatScore(scores?.Research ?? $("outResearch").textContent) : "—",
+    publication: state.audit.last_calc_at ? formatScore(scores?.Publication ?? $("outPublication").textContent) : "—",
+    administration: state.audit.last_calc_at ? formatScore(scores?.Administration ?? $("outAdministration").textContent) : "—",
+    service: state.audit.last_calc_at ? formatScore(scores?.Services ?? $("outServices").textContent) : "—",
+    labops: state.audit.last_calc_at ? formatScore(scores?.LabOps ?? $("outLabOps").textContent) : "—",
+    prosch: state.audit.last_calc_at ? formatScore(scores?.ProSch ?? $("outProSch").textContent) : "—",
+    results: state.audit.last_calc_at ? formatScore($("outIndex").textContent) : "—"
+  };
+
+  document.querySelectorAll(".panelSummary").forEach(summary=>{
+    const kind = summary.dataset.kind;
+    const countEl = summary.querySelector('[data-summary="count"]');
+    const scoreEl = summary.querySelector('[data-summary="score"]');
+    const savedEl = summary.querySelector('[data-summary="saved"]');
+
+    if(countEl){
+      if(kind === "profile") countEl.textContent = "1";
+      else if(kind === "toggles") countEl.textContent = String(Object.values(state.enabled).filter(Boolean).length);
+      else if(kind === "settings") countEl.textContent = "—";
+      else if(kind === "teaching") countEl.textContent = String(state.data.teaching.length);
+      else if(kind === "supervision") countEl.textContent = String(state.data.supervision.length);
+      else if(kind === "research") countEl.textContent = String(state.data.research.length);
+      else if(kind === "publication") countEl.textContent = String(state.data.publication.length);
+      else if(kind === "administration") countEl.textContent = String(state.data.admin.length);
+      else if(kind === "service") countEl.textContent = String(state.data.service.length);
+      else if(kind === "labops") countEl.textContent = String(state.data.lab.length);
+      else if(kind === "prosch") countEl.textContent = String(state.data.prosch.length);
+      else if(kind === "results") countEl.textContent = String(totalRecords);
+    }
+
+    if(scoreEl){
+      scoreEl.textContent = scoreText[kind] ?? "—";
+    }
+    if(savedEl){
+      savedEl.textContent = lastSaved;
+    }
+  });
 }
 
 /* =========================================================
@@ -2838,12 +3000,16 @@ function normalizeAndCap(sectionName, rawScore){
 ========================================================= */
 function getRawTeachingBurden(){
   if(!state.enabled.Teaching) return 0;
-  return normalizeAndCap("Teaching", scoreTeaching_raw());
+  const raw = scoreTeaching_raw();
+  const months = periodMonths(state.profile.period);
+  return months > 0 ? raw / months : raw;
 }
 
 function getRawSupervisionBurden(){
   if(!state.enabled.Supervision) return 0;
-  return normalizeAndCap("Supervision", scoreSupervision_raw());
+  const raw = scoreSupervision_raw();
+  const months = periodMonths(state.profile.period);
+  return months > 0 ? raw / months : raw;
 }
 
 function computeTutorDemoEligibility(){
@@ -2952,6 +3118,7 @@ function renderAll(){
   renderServices();
   renderLabOps();
   renderProSch();
+  updatePanelSummaries();
 }
 
 /* =========================================================
@@ -2960,6 +3127,7 @@ function renderAll(){
 function renderTeaching(){
   const tb = $("tblTeach").querySelector("tbody");
   tb.innerHTML="";
+  toggleEmptyNote("noteTeach", state.data.teaching.length);
   if(state.data.teaching.length===0) return;
   state.data.teaching.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
@@ -2997,6 +3165,7 @@ function renderTeaching(){
 function renderSupervision(){
   const tb=$("tblSv").querySelector("tbody");
   tb.innerHTML="";
+  toggleEmptyNote("noteSv", state.data.supervision.length);
   if(state.data.supervision.length===0) return;
   state.data.supervision.forEach(r=>{
     const normalized = normalizeSupervisionRecord(r);
@@ -3037,6 +3206,7 @@ function renderSupervision(){
 function renderResearch(){
   const tb=$("tblRes").querySelector("tbody");
   tb.innerHTML="";
+  toggleEmptyNote("noteRes", state.data.research.length);
   if(state.data.research.length===0) return;
   state.data.research.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
@@ -3073,6 +3243,7 @@ function renderResearch(){
 function renderPublication(){
   const tb=$("tblPub").querySelector("tbody");
   tb.innerHTML="";
+  toggleEmptyNote("notePub", state.data.publication.length);
   if(state.data.publication.length===0) return;
   state.data.publication.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
@@ -3108,6 +3279,7 @@ function renderPublication(){
 function renderAdministration(){
   const tb=$("tblAdmin").querySelector("tbody");
   tb.innerHTML="";
+  toggleEmptyNote("noteAdmin", state.data.admin.length);
   if(state.data.admin.length===0) return;
   state.data.admin.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
@@ -3144,6 +3316,7 @@ function renderAdministration(){
 function renderServices(){
   const tb=$("tblSvc").querySelector("tbody");
   tb.innerHTML="";
+  toggleEmptyNote("noteSvc", state.data.service.length);
   if(state.data.service.length===0) return;
   state.data.service.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
@@ -3179,6 +3352,7 @@ function renderServices(){
 function renderLabOps(){
   const tb=$("tblLab").querySelector("tbody");
   tb.innerHTML="";
+  toggleEmptyNote("noteLab", state.data.lab.length);
   if(state.data.lab.length===0) return;
   state.data.lab.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
@@ -3215,6 +3389,7 @@ function renderLabOps(){
 function renderProSch(){
   const tb=$("tblProSch").querySelector("tbody");
   tb.innerHTML="";
+  toggleEmptyNote("noteProSch", state.data.prosch.length);
   if(state.data.prosch.length===0) return;
   state.data.prosch.forEach(r=>{
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
@@ -3614,6 +3789,7 @@ function calculate(){
   renderEligibilityCard();
 
   state.audit.last_calc_at = new Date().toISOString();
+  updatePanelSummaries(scores);
   autosave();
 
   showMsg("ok", `<b>Calculated:</b> Busyness Index = <b>${index.toFixed(1)}</b> (${b.label}). Scores are normalized to points per month and apply diminishing returns (soft caps).`);
@@ -3986,6 +4162,7 @@ Professional & Scholarly Service cap=25, tail=0.50`);
 function autosave(){
   state.audit.last_saved_at = new Date().toISOString();
   localStorage.setItem("fst_busyness_v2", JSON.stringify(state));
+  updatePanelSummaries();
 }
 function saveNow(){
   syncProfileFromUI();
