@@ -914,9 +914,17 @@
           <h3>Student Supervision</h3>
           <div class="grid three">
             <div><label class="requiredMark">Weight: Student Supervision</label><input class="adminOnly" id="wSupervision" type="number" step="0.01" min="0" value="0.15"/></div>
-            <div><label>Student Supervision – Undergraduate (per student)</label><input class="adminOnly" id="svUG" type="number" step="0.1" min="0" value="1.5"/></div>
-            <div><label>Student Supervision – Master (per student)</label><input class="adminOnly" id="svM" type="number" step="0.1" min="0" value="3.0"/></div>
-            <div><label>Student Supervision – PhD (per student)</label><input class="adminOnly" id="svPHD" type="number" step="0.1" min="0" value="4.5"/></div>
+            <div><label>SEL weight – UG</label><input class="adminOnly" id="svWUG" type="number" step="0.01" min="0" value="0.25"/></div>
+            <div><label>SEL weight – Master</label><input class="adminOnly" id="svWMaster" type="number" step="0.01" min="0" value="1.00"/></div>
+            <div><label>SEL weight – PhD</label><input class="adminOnly" id="svWPhD" type="number" step="0.01" min="0" value="1.50"/></div>
+            <div><label>SEL mode weight – Full-time</label><input class="adminOnly" id="svWFT" type="number" step="0.01" min="0" value="1.00"/></div>
+            <div><label>SEL mode weight – Part-time</label><input class="adminOnly" id="svWPT" type="number" step="0.01" min="0" value="0.75"/></div>
+            <div><label>SEL status weight – Active</label><input class="adminOnly" id="svWStatusActive" type="number" step="0.01" min="0" value="1.00"/></div>
+            <div><label>SEL status weight – Writing-up</label><input class="adminOnly" id="svWStatusWritingUp" type="number" step="0.01" min="0" value="0.70"/></div>
+            <div><label>SEL status weight – On leave/Deferred</label><input class="adminOnly" id="svWStatusOnLeave" type="number" step="0.01" min="0" value="0.20"/></div>
+            <div><label>SEL status weight – Completed</label><input class="adminOnly" id="svWStatusCompleted" type="number" step="0.01" min="0" value="0.00"/></div>
+            <div><label>Role share – Main</label><input class="adminOnly" id="svShareMain" type="number" step="0.01" min="0" value="0.60"/></div>
+            <div><label>Role share – Co total</label><input class="adminOnly" id="svShareCoTotal" type="number" step="0.01" min="0" value="0.40"/></div>
           </div>
         </div>
 
@@ -1056,7 +1064,7 @@
     <header>
       <div>
         <h2>Student Supervision</h2>
-        <div class="sub">Include active supervision load for the reporting period (Undergraduate, Master, PhD).</div>
+        <div class="sub">Include supervision load for the reporting period (UG, Master, PhD) with mode, status, and role sharing.</div>
       </div>
       <div class="row right noPrint">
         <button class="btn" id="addSv"><span class="btn-label">Add supervision</span></button>
@@ -1068,12 +1076,15 @@
         <table id="tblSv">
           <thead>
             <tr>
-              <th style="width:18%">Level *</th>
+              <th style="width:10%">Level *</th>
+              <th style="width:8%">Mode *</th>
               <th>Student / Project *</th>
-              <th style="width:14%">Role *</th>
-              <th style="width:12%">Status *</th>
-              <th style="width:12%">Start *</th>
-              <th style="width:12%">End *</th>
+              <th style="width:10%">Role *</th>
+              <th style="width:14%">Student Status *</th>
+              <th style="width:10%">Supervisors *</th>
+              <th style="width:10%">Start *</th>
+              <th style="width:10%">End *</th>
+              <th style="width:10%">SEL (computed)</th>
               <th style="width:8%">Action</th>
             </tr>
           </thead>
@@ -1672,10 +1683,17 @@ const modalConfig = {
     editTitle:"Edit Student Supervision",
     saveLabel:"Add supervision",
     fields:[
-      {name:"level", label:"Level", type:"select", required:true, options:["Undergraduate","Master","PhD"], value:"Undergraduate"},
+      {name:"level", label:"Level", type:"select", required:true, options:["UG","Master","PhD"], value:"UG"},
+      {name:"mode", label:"Mode", type:"select", required:true, options:["FT","PT"], value:"FT"},
       {name:"title", label:"Student / Project", type:"text", required:true, placeholder:"Student name or project"},
-      {name:"role", label:"Role", type:"select", required:true, options:["Main","Co-supervisor"], value:"Main"},
-      {name:"status", label:"Status", type:"select", required:true, options:["Active","Completed"], value:"Active"},
+      {name:"role", label:"Role", type:"select", required:true, options:["Main","Co"], value:"Main"},
+      {name:"status", label:"Student Status", type:"select", required:true, options:[
+        {value:"Active", label:"Active"},
+        {value:"WritingUp", label:"Writing-up"},
+        {value:"OnLeave", label:"On leave/Deferred"},
+        {value:"Completed", label:"Completed"}
+      ], value:"Active"},
+      {name:"nSupervisors", label:"Number of Supervisors", type:"number", required:true, min:1, step:1, value:1},
       {name:"start", label:"Start Date", type:"date", required:true},
       {name:"end", label:"End Date", type:"date", required:true}
     ]
@@ -1784,8 +1802,10 @@ function buildModalBody(fields, initialValues = {}){
     const valueAttr = value === "" ? "" : ` value="${escapeHTML(value)}"`;
     if(field.type === "select"){
       const opts = field.options.map(opt=>{
-        const selected = value === opt ? " selected" : "";
-        return `<option value="${escapeHTML(opt)}"${selected}>${opt}</option>`;
+        const optValue = (typeof opt === "object") ? opt.value : opt;
+        const optLabel = (typeof opt === "object") ? opt.label : opt;
+        const selected = value === optValue ? " selected" : "";
+        return `<option value="${escapeHTML(optValue)}"${selected}>${escapeHTML(optLabel)}</option>`;
       }).join("");
       return `
         <div>
@@ -1842,6 +1862,24 @@ function readModalValues(fields){
   return {ok, values};
 }
 
+function validateSupervisionModal(values){
+  const body = $("modalBody");
+  const field = body.querySelector('[data-field="nSupervisors"]');
+  if(field) field.classList.remove("err");
+  const role = values.role || "Main";
+  const nSupRaw = Math.floor(n(values.nSupervisors));
+  const minSup = role === "Co" ? 2 : 1;
+  if(nSupRaw < minSup){
+    if(field) field.classList.add("err");
+    const msg = role === "Co"
+      ? "For Co-supervisor, the number of supervisors must be at least 2."
+      : "Number of supervisors must be at least 1.";
+    showMsg("warn", `<b>Validation:</b> ${msg}`);
+    return {ok:false, nSupervisors: Math.max(1, nSupRaw)};
+  }
+  return {ok:true, nSupervisors: Math.max(1, nSupRaw)};
+}
+
 function openAddModal(kind){
   const cfg = modalConfig[kind];
   if(!cfg) return;
@@ -1868,14 +1906,28 @@ function openAddModal(kind){
         });
       }
       if(kind==="sv"){
-        state.data.supervision.push({
-          id:uid(),
-          level:values.level || "Undergraduate",
+        const check = validateSupervisionModal(values);
+        if(!check.ok) return;
+        const normalized = normalizeSupervisionRecord({
+          level:values.level || "UG",
+          mode:values.mode || "FT",
           title:values.title || "",
           role:values.role || "Main",
           status:values.status || "Active",
+          nSupervisors: check.nSupervisors,
           start:values.start || "",
           end:values.end || ""
+        });
+        state.data.supervision.push({
+          id:uid(),
+          level:normalized.level,
+          mode:normalized.mode,
+          title:normalized.title,
+          role:normalized.role,
+          status:normalized.status,
+          nSupervisors: normalized.nSupervisors,
+          start:normalized.start || "",
+          end:normalized.end || ""
         });
       }
       if(kind==="res"){
@@ -2000,12 +2052,27 @@ function openEditModal(kind, recordId){
         record.field = Math.max(0, n(values.field));
       }
       if(kind==="sv"){
-        record.level = values.level || "Undergraduate";
-        record.title = values.title || "";
-        record.role = values.role || "Main";
-        record.status = values.status || "Active";
-        record.start = values.start || "";
-        record.end = values.end || "";
+        const check = validateSupervisionModal(values);
+        if(!check.ok) return;
+        const normalized = normalizeSupervisionRecord({
+          ...record,
+          level:values.level || "UG",
+          mode:values.mode || "FT",
+          title:values.title || "",
+          role:values.role || "Main",
+          status:values.status || "Active",
+          nSupervisors: check.nSupervisors,
+          start:values.start || "",
+          end:values.end || ""
+        });
+        record.level = normalized.level;
+        record.mode = normalized.mode;
+        record.title = normalized.title;
+        record.role = normalized.role;
+        record.status = normalized.status;
+        record.nSupervisors = normalized.nSupervisors;
+        record.start = normalized.start || "";
+        record.end = normalized.end || "";
       }
       if(kind==="res"){
         record.code = values.code || "";
@@ -2138,7 +2205,12 @@ const state = {
   // Admin scoring scheme + caps (defaults are sensible placeholders)
   scheme:{
     teaching:{ hourW:1.0, studW:0.6, creditW:0.4 },
-    supervision:{ ug:1.5, m:3.0, phd:4.5 },
+    supervision:{
+      level:{ UG:0.25, Master:1.00, PhD:1.50 },
+      mode:{ FT:1.00, PT:0.75 },
+      status:{ Active:1.00, WritingUp:0.70, OnLeave:0.20, Completed:0.00 },
+      share:{ main:0.60, coTotal:0.40 }
+    },
     research:{ base:6, lvl:[1.0,1.4,1.8], role:[1.6,1.2,1.0] },
     publication:{ base:4, type:[1.5,1.8,1.0,0.8], idx:[1.4,1.0] },
     admin:{ lvl:[3,5,7,8,10,12,9], meetW:1.5, monthW:0.3 },
@@ -2319,9 +2391,17 @@ function syncSettingsFromUI_ifAdmin(){
   state.scheme.teaching.studW = n($("tStudW").value);
   state.scheme.teaching.creditW = n($("tCreditW").value);
 
-  state.scheme.supervision.ug = n($("svUG").value);
-  state.scheme.supervision.m = n($("svM").value);
-  state.scheme.supervision.phd = n($("svPHD").value);
+  state.scheme.supervision.level.UG = n($("svWUG").value);
+  state.scheme.supervision.level.Master = n($("svWMaster").value);
+  state.scheme.supervision.level.PhD = n($("svWPhD").value);
+  state.scheme.supervision.mode.FT = n($("svWFT").value);
+  state.scheme.supervision.mode.PT = n($("svWPT").value);
+  state.scheme.supervision.status.Active = n($("svWStatusActive").value);
+  state.scheme.supervision.status.WritingUp = n($("svWStatusWritingUp").value);
+  state.scheme.supervision.status.OnLeave = n($("svWStatusOnLeave").value);
+  state.scheme.supervision.status.Completed = n($("svWStatusCompleted").value);
+  state.scheme.supervision.share.main = n($("svShareMain").value);
+  state.scheme.supervision.share.coTotal = n($("svShareCoTotal").value);
 
   state.scheme.research.base = n($("rBase").value);
   const rLvl = parseCSVNums($("rUniNatIntl").value, 3); if(rLvl) state.scheme.research.lvl = rLvl;
@@ -2404,9 +2484,17 @@ function syncUIFromState(){
   $("tStudW").value = state.scheme.teaching.studW;
   $("tCreditW").value = state.scheme.teaching.creditW;
 
-  $("svUG").value = state.scheme.supervision.ug;
-  $("svM").value = state.scheme.supervision.m;
-  $("svPHD").value = state.scheme.supervision.phd;
+  $("svWUG").value = state.scheme.supervision.level.UG;
+  $("svWMaster").value = state.scheme.supervision.level.Master;
+  $("svWPhD").value = state.scheme.supervision.level.PhD;
+  $("svWFT").value = state.scheme.supervision.mode.FT;
+  $("svWPT").value = state.scheme.supervision.mode.PT;
+  $("svWStatusActive").value = state.scheme.supervision.status.Active;
+  $("svWStatusWritingUp").value = state.scheme.supervision.status.WritingUp;
+  $("svWStatusOnLeave").value = state.scheme.supervision.status.OnLeave;
+  $("svWStatusCompleted").value = state.scheme.supervision.status.Completed;
+  $("svShareMain").value = state.scheme.supervision.share.main;
+  $("svShareCoTotal").value = state.scheme.supervision.share.coTotal;
 
   $("rBase").value = state.scheme.research.base;
   $("rUniNatIntl").value = state.scheme.research.lvl.join(",");
@@ -2567,6 +2655,59 @@ function contactHoursRow(r){
 }
 
 /* =========================================================
+   Supervision helpers
+========================================================= */
+const supervisionStatusLabels = {
+  Active:"Active",
+  WritingUp:"Writing-up",
+  OnLeave:"On leave/Deferred",
+  Completed:"Completed"
+};
+
+function normalizeSupervisionRecord(record){
+  const levelMap = {Undergraduate:"UG", UG:"UG", Master:"Master", PhD:"PhD"};
+  const modeMap = {FT:"FT", PT:"PT", "Full-time":"FT", "Part-time":"PT"};
+  const roleMap = {"Co-supervisor":"Co", "Co Supervisor":"Co", Co:"Co", Main:"Main"};
+  const statusMap = {
+    Active:"Active",
+    "Writing-up":"WritingUp",
+    WritingUp:"WritingUp",
+    "On leave/Deferred":"OnLeave",
+    OnLeave:"OnLeave",
+    Completed:"Completed",
+    Applied:"WritingUp"
+  };
+  const nSupervisors = Math.max(1, Math.floor(n(record.nSupervisors ?? 1)));
+  return {
+    ...record,
+    level: levelMap[record.level] || "UG",
+    mode: modeMap[record.mode] || "FT",
+    role: roleMap[record.role] || "Main",
+    status: statusMap[record.status] || "Active",
+    nSupervisors
+  };
+}
+
+function supervisionSEL(record){
+  const sc = state.scheme.supervision;
+  const levelW = n(sc.level?.[record.level] ?? sc.level?.UG ?? 0);
+  const modeW = n(sc.mode?.[record.mode] ?? sc.mode?.FT ?? 1);
+  const statusW = n(sc.status?.[record.status] ?? sc.status?.Active ?? 1);
+  const shareMain = n(sc.share?.main ?? 1);
+  const shareCo = n(sc.share?.coTotal ?? 0);
+  let share = shareMain;
+  if(record.role === "Co"){
+    const nSup = Math.max(1, Math.floor(n(record.nSupervisors)));
+    share = nSup > 1 ? shareCo / (nSup - 1) : shareCo;
+  }
+  return levelW * modeW * statusW * share;
+}
+
+function supervisionStatusLabel(status){
+  return supervisionStatusLabels[status] || status || "";
+}
+
+/* =========================================================
    Scoring (raw -> monthly -> soft caps)
 ========================================================= */
 function scoreTeaching_raw(){
@@ -2583,16 +2724,11 @@ function scoreTeaching_raw(){
 }
 
 function scoreSupervision_raw(){
-  const sc=state.scheme.supervision;
   let total=0;
   state.data.supervision.forEach(x=>{
-    const roleMultiplier = (x.role==="Main") ? 1.0 : 0.6;
-    const statusMultiplier = (x.status==="Active") ? 1.0 : 0.5;
-    let base = 0;
-    if(x.level==="Undergraduate") base=sc.ug;
-    if(x.level==="Master") base=sc.m;
-    if(x.level==="PhD") base=sc.phd;
-    total += base * roleMultiplier * statusMultiplier;
+    const normalized = normalizeSupervisionRecord(x);
+    Object.assign(x, normalized);
+    total += supervisionSEL(normalized);
   });
   return total;
 }
@@ -2863,14 +2999,20 @@ function renderSupervision(){
   tb.innerHTML="";
   if(state.data.supervision.length===0) return;
   state.data.supervision.forEach(r=>{
+    const normalized = normalizeSupervisionRecord(r);
+    Object.assign(r, normalized);
+    const sel = supervisionSEL(normalized);
     const tr=document.createElement("tr"); tr.dataset.id=r.id;
     tr.innerHTML=`
-      <td data-label="Level *">${cellTextHTML(r.level || "Undergraduate")}</td>
+      <td data-label="Level *">${cellTextHTML(r.level || "UG")}</td>
+      <td data-label="Mode *">${cellTextHTML(r.mode || "FT")}</td>
       <td data-label="Student / Project *">${cellTextHTML(r.title || "")}</td>
       <td data-label="Role *">${cellTextHTML(r.role || "Main")}</td>
-      <td data-label="Status *">${cellTextHTML(r.status || "Active")}</td>
+      <td data-label="Student Status *">${cellTextHTML(supervisionStatusLabel(r.status || "Active"))}</td>
+      <td data-label="Supervisors *">${cellTextHTML(formatInt(r.nSupervisors || 1))}</td>
       <td data-label="Start Date *">${cellTextHTML(r.start || "")}</td>
       <td data-label="End Date *">${cellTextHTML(r.end || "")}</td>
+      <td data-label="SEL (computed)">${cellTextHTML(sel.toFixed(2))}</td>
       <td class="cell-actions" data-label="Action">${editButtonHTML("Edit supervision record")}${deleteButtonHTML("Delete supervision record")}</td>
     `;
     tb.appendChild(tr);
@@ -3110,7 +3252,7 @@ function renderProSch(){
 ========================================================= */
 function addRow(kind){
   if(kind==="teach") state.data.teaching.push({id:uid(), code:"", name:"", credit:0, students:0, lecture:0, tutorial:0, laboratory:0, field:0});
-  if(kind==="sv") state.data.supervision.push({id:uid(), level:"Undergraduate", title:"", role:"Main", status:"Active", start:"", end:""});
+  if(kind==="sv") state.data.supervision.push({id:uid(), level:"UG", mode:"FT", title:"", role:"Main", status:"Active", nSupervisors:1, start:"", end:""});
 
   if(kind==="res") state.data.research.push({
     id:uid(),
@@ -3177,7 +3319,15 @@ function validateActivityTables(){
 
   if(state.enabled.Supervision){
     state.data.supervision.forEach(item=>{
+      const normalized = normalizeSupervisionRecord(item);
+      Object.assign(item, normalized);
+      requireText(item.level);
+      requireText(item.mode);
       requireText(item.title);
+      requireText(item.role);
+      requireText(item.status);
+      requireNonNeg(item.nSupervisors, true);
+      if(item.role === "Co" && n(item.nSupervisors) < 2){ ok=false; }
       requireDate(item.start);
       requireDate(item.end);
     });
@@ -3728,7 +3878,7 @@ function manualPDF(){
     "Profile: Name, Staff ID, Category (Academic / Administrative / Laboratory), Unit/School/Department, Grade (or Other + text), Status (or Other + text), Reporting Period.",
     "Section toggles: Turn ON only relevant sections. Category presets update ON/OFF and baseline weights automatically.",
     "Teaching: Course code and name, enrolled students, lecture/tutorial/lab/field contact hours, start/end. Credit is auto-read from the last digit of the course code; contact hours auto-sum.",
-    "Student Supervision: Level (Undergraduate, Master, PhD), student/project title, role (Main/Co), status (Active/Completed/Applied), start/end.",
+    "Student Supervision: Level (UG/Master/PhD), mode (FT/PT), student/project title, role (Main/Co), student status (Active/Writing-up/On leave/Deferred/Completed), number of supervisors, start/end.",
     "Research (Grants/Projects): Grant code, title, level (University/National/International), status, role (PI/Co-I/Member), amount (RM), start/end.",
     "Publication: Year, title, type (Journal/Book-Chapter/Proceeding/Other), indexed? (Yes/No), role (First/Corresponding/Co-Author), start/end.",
     "Administration: Position, type (Official/Other), level (Programme to Industry), months in role, meetings, workload notes, start/end.",
@@ -3757,7 +3907,8 @@ final_index = clamp(index, 0, 100)`);
   headerBox("4. Section Formulas (Busyness-based)");
   formula(
 `Teaching = sum[(contact_hours * hourW) + ((students/100) * studW) + (credit * creditW)]
-Student Supervision = sum[base(level) * role_multiplier * status_multiplier]
+Student Supervision = sum[SEL]
+SEL = W_level * W_mode * W_status * share
 Research = sum[base * level_multiplier * role_multiplier * status_multiplier]
 Publication = sum[base * type_multiplier * indexed_multiplier * role_multiplier]
 Administration = sum[(base(level) + meetings * meetW + months * monthW) * type_multiplier]
@@ -3787,14 +3938,14 @@ Professional & Scholarly Service cap=25, tail=0.50`);
   formula(
 `Data entered:
 - Teaching: 2 courses -> 10.12 pts (contact hours + students + credits)
-- Student Supervision: 2 Master (Main, Active) + 1 PhD (Main, Active) -> 10.50 pts
+- Student Supervision: 2 Master (Main, Active, FT, n=1) + 1 PhD (Main, Active, FT, n=1) -> 2.10 pts
 - Research: 1 National grant (PI, Active) -> 13.44 pts
 - Publication: 2 indexed journal papers (First/Corresponding) -> 20.16 raw -> 20.08 after cap (cap 20, tail 0.50)
 - Administration: Faculty appointment (12 months, 4 meetings) -> 14.60 pts
 - Service & Engagement: Lead outreach (10 hours, 60 pax) -> 18.80 pts
 - Professional & Scholarly Service: Reviewer (3 manuscripts, 2 rounds, High complexity, Tight urgency, +5 hours) -> 46.00 raw -> 35.50 after cap (cap 25, tail 0.50)
- Index = (10.12*0.28)+(10.50*0.14)+(13.44*0.20)+(20.08*0.10)+(14.60*0.12)+(18.80*0.08)+(35.50*0.08)
- Index ≈ 15.10 points per month`);
+ Index = (10.12*0.28)+(2.10*0.14)+(13.44*0.20)+(20.08*0.10)+(14.60*0.12)+(18.80*0.08)+(35.50*0.08)
+ Index ≈ 13.92 points per month`);
 
   subhead("Administrative (period: Quarterly = 3 months; sections ON: Administration, Service & Engagement, ProSch)");
   paragraph("Baseline weights: Administration 0.55, Service & Engagement 0.30, Professional & Scholarly Service 0.15.");
@@ -3853,11 +4004,37 @@ function loadLocal(){
     if(obj.profile) state.profile = {...state.profile, ...obj.profile};
     if(obj.enabled) state.enabled = {...state.enabled, ...obj.enabled};
     if(obj.weights) state.weights = {...state.weights, ...obj.weights};
-    if(obj.scheme) state.scheme = {...state.scheme, ...obj.scheme};
+    if(obj.scheme){
+      const merged = {...state.scheme, ...obj.scheme};
+      merged.teaching = {...state.scheme.teaching, ...(obj.scheme.teaching || {})};
+      merged.research = {...state.scheme.research, ...(obj.scheme.research || {})};
+      merged.publication = {...state.scheme.publication, ...(obj.scheme.publication || {})};
+      merged.admin = {...state.scheme.admin, ...(obj.scheme.admin || {})};
+      merged.service = {...state.scheme.service, ...(obj.scheme.service || {})};
+      merged.lab = {...state.scheme.lab, ...(obj.scheme.lab || {})};
+      merged.prosch = {...state.scheme.prosch, ...(obj.scheme.prosch || {})};
+
+      const svScheme = obj.scheme.supervision || {};
+      const hasLegacySv = ("ug" in svScheme) || ("m" in svScheme) || ("phd" in svScheme);
+      if(hasLegacySv && !svScheme.level && !svScheme.mode && !svScheme.status && !svScheme.share){
+        merged.supervision = {...state.scheme.supervision};
+      }else{
+        merged.supervision = {...state.scheme.supervision, ...svScheme};
+        merged.supervision.level = {...state.scheme.supervision.level, ...(svScheme.level || {})};
+        merged.supervision.mode = {...state.scheme.supervision.mode, ...(svScheme.mode || {})};
+        merged.supervision.status = {...state.scheme.supervision.status, ...(svScheme.status || {})};
+        merged.supervision.share = {...state.scheme.supervision.share, ...(svScheme.share || {})};
+      }
+      state.scheme = merged;
+    }
     if(obj.benchmarks) state.benchmarks = {...state.benchmarks, ...obj.benchmarks};
     if(obj.eligibility) state.eligibility = {...state.eligibility, ...obj.eligibility};
     if(obj.data) state.data = {...state.data, ...obj.data};
     if(obj.audit) state.audit = {...state.audit, ...obj.audit};
+
+    if(Array.isArray(state.data.supervision)){
+      state.data.supervision = state.data.supervision.map(item=>normalizeSupervisionRecord(item));
+    }
   }catch(e){}
 }
 
