@@ -246,7 +246,7 @@
     /* =========================
        Layout grids
     ========================= */
-    .grid{display:grid;gap:12px}
+    .grid{display:grid;gap:12px;align-items:start}
     .grid.two{grid-template-columns:repeat(2, minmax(0,1fr))}
     .grid.three{grid-template-columns:repeat(3, minmax(0,1fr))}
 
@@ -447,6 +447,7 @@
     .kpi{
       display:grid;gap:10px;
       grid-template-columns:repeat(4, minmax(0,1fr));
+      align-items:start;
     }
     .box{
       border:1px solid var(--border);
@@ -455,6 +456,10 @@
       padding:12px;
       font-family:var(--font);
       min-width: 0;
+      align-self:start;
+      white-space: normal;
+      overflow-wrap:anywhere;
+      word-break:break-word;
     }
     .box .k{font-size:12px;color:var(--muted)}
     .box .v{font-size:20px;font-weight:900;margin-top:4px}
